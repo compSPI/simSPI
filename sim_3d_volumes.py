@@ -122,4 +122,4 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, long=2):
     return volumes, labels
 
 
-A = save_volume(Particules, N_particules, Vol_size, Main_dir, Name, Long=2)
+A = save_volume(Particules, N_particules, Vol_size, Main_dir, Name, long=Long)
