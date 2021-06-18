@@ -6,7 +6,6 @@ Created on Tue Jun  8 02:07:02 2021
 """
 import coords
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import os
@@ -25,7 +24,7 @@ name = '4_points_3D'
 long = 2
 
 
-def long(point1, point2):
+def dist(point1, point2):
     """
 
     Parameters
@@ -58,18 +57,18 @@ def modif_weight(points, volume, SIZE, LONG):
     volume : ndarray volume of the molecule.
 
     """
-    n = len(points)
-    for i in range(n):
-        point = points.T[i]
+    for m, point in enumerate(points.T):
         for i in range(SIZE):
             for j in range(SIZE):
                 for k in range(SIZE):
-                    volume[i][j][k] += np.exp(-long([i/LONG-SIZE/LONG/2,
-                                              j/LONG-SIZE/LONG/2, k/LONG-SIZE/LONG/2], point)/2)
+                    volume[i][j][k] += np.exp(-dist([i/LONG-SIZE/LONG/2,
+                                                     j/LONG-SIZE/LONG/2,
+                                                     k/LONG-SIZE/LONG/2],
+                                                    point)/2)
     return volume
 
 
-def simulate_3D_volumes(particules, n_particles, img_size, long=2):
+def simulate_3D_volumes(particules, n_volumes, img_size, long=2):
     """
 
     Parameters
@@ -81,15 +80,15 @@ def simulate_3D_volumes(particules, n_particles, img_size, long=2):
 
     Returns
     -------
-    volumes : ndarray 3D map of the molecule
-    qs : dataframe describes rotations in quaternions
+    volumes : ndarray 3D map of the molecule.
+    qs : dataframe describes rotations in quaternions.
 
     """
-    rots, qs = coords.uniform_rotations(n_particles)
-    volumes = np.zeros((n_particles, img_size, img_size,
+    rots, qs = coords.uniform_rotations(n_volumes)
+    volumes = np.zeros((n_volumes, img_size, img_size,
                        img_size))
-    for idx in range(n_particles):
-        if idx % (n_particles/10) == 0:
+    for idx in range(n_volumes):
+        if idx % (n_volumes/10) == 0:
             print(idx)
         points = rots[idx].dot(particules)
         volumes[idx] = modif_weight(points, volumes[idx], img_size, long)
@@ -99,7 +98,7 @@ def simulate_3D_volumes(particules, n_particles, img_size, long=2):
     return volumes, qs
 
 
-def save_volume(particules, n_particules, vol_size, main_dir, name, long=2):
+def save_volume(particules, n_volumes, vol_size, main_dir, name, long=2):
     """
 
     Parameters
@@ -107,9 +106,9 @@ def save_volume(particules, n_particules, vol_size, main_dir, name, long=2):
     particules : array position of particules.
     n_particules : int number of data.
     vol_size : int size of data.
-    main_dir : string main directory
-    name : string name 
-    long : int center the molecule around 0
+    main_dir : string main directory.
+    name : string name.
+    long : int center the molecule around 0.
 
     Returns
     -------
@@ -117,7 +116,7 @@ def save_volume(particules, n_particules, vol_size, main_dir, name, long=2):
     labels : dataframe describes rotations in quaternions
     """
     volumes, labels = simulate_3D_volumes(
-        particules, n_particules, vol_size, long)
+        particules, n_volumes, vol_size, long)
     np.save(main_dir+name+'.npy', volumes)
     labels.to_csv(main_dir+name+'.csv')
     return volumes, labels
