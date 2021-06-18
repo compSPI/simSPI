@@ -13,15 +13,15 @@ import os
 CUDA = torch.cuda.is_available()
 
 if CUDA:
-    main_dir = "/scratch/ex-kdd-1/NicolasLegendre/Cryo/Data"
+    Main_dir = "/scratch/ex-kdd-1/NicolasLegendre/Cryo/Data"
 else:
-    main_dir = os.getcwd()+"\\Data\\"
+    Main_dir = os.getcwd()+"\\Data\\"
 
-particules = np.asarray([[1, 0, 0, 3], [0, 8, 0, 5], [0, 0, 7, 9]])
-n_particules = 2000
-vol_size = 64
-name = '4_points_3D'
-long = 2
+Particules = np.asarray([[1, 0, 0, 3], [0, 8, 0, 5], [0, 0, 7, 9]])
+N_particules = 2000
+Vol_size = 64
+Name = '4_points_3D'
+Long = 2
 
 
 def dist(point1, point2):
@@ -57,7 +57,7 @@ def modif_weight(points, volume, SIZE, LONG):
     volume : ndarray volume of the molecule.
 
     """
-    for m, point in enumerate(points.T):
+    for _, point in enumerate(points.T):
         for i in range(SIZE):
             for j in range(SIZE):
                 for k in range(SIZE):
@@ -122,4 +122,4 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, long=2):
     return volumes, labels
 
 
-A = save_volume(particules, n_particules, vol_size, main_dir, name, long=2)
+A = save_volume(Particules, N_particules, Vol_size, Main_dir, Name, Long=2)
