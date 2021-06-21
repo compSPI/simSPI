@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
+""" Generate 3D map of molecules
 """
-Created on Tue Jun  8 02:07:02 2021
-
-@author: NLEGENDN
-"""
-import coords
-import pandas as pd
+import os
 import numpy as np
 import torch
-import os
+import coords
+
 
 CUDA = torch.cuda.is_available()
 
