@@ -75,8 +75,6 @@ def simulate_volumes(particules, n_volumes, img_size, long=2):
         points = rots[idx].dot(particules)
         volumes[idx] = modify_weight(points, volumes[idx], img_size, long)
     qs = [np.array2string(q) for q in qs]
-    qs = pd.DataFrame(qs)
-    qs.columns = ['rotation_quaternion']
     return volumes, qs
 
 
@@ -100,8 +98,9 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, long=2):
     """
     volumes, labels = simulate_volumes(
         particules, n_volumes, vol_size, long)
-    np.save(main_dir+name+'.npy', volumes)
-    labels.to_csv(main_dir+name+'.csv')
+    np.save(main_dir + name + '_molecules.npy', volumes)
+    np.save(main_dir + name + '_labels.npy', volumes)
+
     return volumes, labels
 
 
