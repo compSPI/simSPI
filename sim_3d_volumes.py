@@ -1,4 +1,4 @@
-""" Generate 3D map of molecules."""
+"""Generate 3D map of molecules."""
 import os
 import numpy as np
 import torch
@@ -123,5 +123,5 @@ def main(particules=Particules, n_particules=N_particules, vol_size=Vol_size,
 
 
 if __name__ == "__main__":
-    """execute only if run as a script"""
+    '''execute only if run as a script'''
     main()
