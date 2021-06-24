@@ -122,6 +122,6 @@ def main(particules=Particules, n_particules=N_particules, vol_size=Vol_size,
                     main_dir, name, long)
 
 
+# execute only if run as a script.
 if __name__ == "__main__":
-    '''execute only if run as a script'''
     main()
