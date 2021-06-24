@@ -83,6 +83,12 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, center=2):
     -------
     volumes : ndarray 3D map of the molecule
     labels : dataframe describes rotations in quaternions
+
+    Example
+    -------
+    >>>import numpy as np
+    >>>import coords
+    _ = save_volume(PARTICULES,N_VOLUMES,VOL_SIZE, dir, NAME, CENTER)
     """
     volumes, labels = simulate_volumes(
         particules, n_volumes, vol_size, center)
