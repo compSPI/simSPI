@@ -1,5 +1,4 @@
-""" Generate 3D map of molecules
-"""
+""" Generate 3D map of molecules."""
 import os
 import numpy as np
 import torch
@@ -28,8 +27,8 @@ def modify_weight(points, volume, size, long):
     ----------
     points : array, list particules position.
     volume : ndarray, volume of the molecule.
-    SIZE : int, size of the volume.
-    LONG : int, center the molecule around zero.
+    size : int, size of the volume.
+    long : int, center the molecule around zero.
 
     Returns
     -------
@@ -48,7 +47,7 @@ def modify_weight(points, volume, size, long):
 
 def simulate_volumes(particules, n_volumes, img_size, long=2):
     """
-    Fill empty volumes with uniform rotations of particules.
+    Update a volume with new particles.
 
     Parameters
     ----------
@@ -82,7 +81,7 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, long=2):
     ----------
     particules : array, position of particules.
     n_particules : int, number of data.
-    vol_size : int, size of data.
+    vol_size : int, size of the volume.
     main_dir : string, main directory.
     name : string, name.
     long : int, center the molecule around 0.
@@ -100,4 +99,29 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, long=2):
     return volumes, labels
 
 
-A = save_volume(Particules, N_particules, Vol_size, Main_dir, Name, long=Long)
+def main(particules=Particules, n_particules=N_particules, vol_size=Vol_size,
+         main_dir=Main_dir, name=Name, long=Long):
+    """
+    Create and save a volume.
+
+    Parameters
+    ----------
+    particules : array, position of particules.
+    n_particules : int, optional number of rotations.
+    vol_size : int, size of the volume.
+    main_dir : string, dir where to save the volumes
+    name : string, name of the volumes
+    long : int, center the molecule around 0.
+
+    Returns
+    -------
+    None.
+
+    """
+    _ = save_volume(particules, n_particules, vol_size,
+                    main_dir, name, long)
+
+
+if __name__ == "__main__":
+    """execute only if run as a script"""
+    main()
