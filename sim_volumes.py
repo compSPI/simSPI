@@ -1,14 +1,62 @@
 """Generate 3D map of molecules."""
 
 import numpy as np
-import coords
+from geomstats.geometry.special_orthogonal import SpecialOrthogonal
 
+SO3 = SpecialOrthogonal(n=3, point_type="vector")
 
 PARTICULES = np.asarray([[1, 0, 0, 3], [0, 8, 0, 5], [0, 0, 7, 9]])
 N_VOLUMES = 2000
 VOL_SIZE = 64
 NAME = '4_points_3d'
 CENTER = 2
+
+
+def get_random_quat(num_pts):
+    """Generate a list of quaternions by using uniform distribution.
+
+    Parameters
+    ----------
+    num_pts : int
+        number of quaternions to return.
+
+    Returns
+    -------
+    array
+        list of simulated quaternions of shape [num_pts,4].
+
+    """
+    u = np.random.rand(3, num_pts)
+    u1, u2, u3 = [u[x] for x in range(3)]
+
+    quat = np.zeros((4, num_pts))
+    quat[0] = np.sqrt(1 - u1) * np.sin(np.pi * u2 * 2)
+    quat[1] = np.sqrt(1 - u1) * np.cos(np.pi * u2 * 2)
+    quat[2] = np.sqrt(u1) * np.sin(np.pi * u3 * 2)
+    quat[3] = np.sqrt(u1) * np.cos(np.pi * u3 * 2)
+
+    return np.transpose(quat)
+
+
+def uniform_rotations(num_pts):
+    """Generate ratation as quaternion and convert them as rotation matrix.
+
+    Parameters
+    ----------
+    num : int
+        number of quaternion to return.
+
+    Returns
+    -------
+    rots : ndarray
+        matrix of rotation of the simulated quaternions of shape (num_pts,3,3)
+    qs : array
+        list of simulated quaternions of shape [num_pts,4].
+
+    """
+    qs = get_random_quat(num_pts)
+    rots = SO3.matrix_from_quaternion(qs)  # num,3,3
+    return (rots, qs)
 
 
 def modify_weight(points, volume, vol_size, center):
@@ -66,7 +114,7 @@ def simulate_volumes(particules, n_volumes, vol_size, center=2):
         describes rotations in quaternions.
 
     """
-    rots, qs = coords.uniform_rotations(n_volumes)
+    rots, qs = uniform_rotations(n_volumes)
     volumes = np.zeros((n_volumes,) + (vol_size,) * 3)
     for idx in range(n_volumes):
         if idx % (n_volumes/10) == 0:
