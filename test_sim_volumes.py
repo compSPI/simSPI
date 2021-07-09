@@ -48,5 +48,7 @@ class TestSimVolumes:
         main_dir = ""
         name = "2particules"
         volumes, qs = sim_volumes.save_volume(
-            particules, n_volumes, vol_size, main_dir, name, center=2)
+            particules, n_volumes, vol_size, main_dir, name)
         assert volumes.shape == (1, 64, 64, 64)
+        assert len(qs) == 1
+        assert qs[0][0] == '['
