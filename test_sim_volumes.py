@@ -8,6 +8,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 class TestSimVolumes:
+    @staticmethod
     def test_modify_weight(self):
         points = np.asarray([[1, 0, 0, 3], [0, 8, 0, 5], [0, 0, 7, 9]])
         vol_size = 64
@@ -17,6 +18,7 @@ class TestSimVolumes:
         assert volume.shape == (vol_size,) * 3
         assert volume[1][1][1] == 3.4866983294215885e-164
 
+    @staticmethod
     def test_simulate_volumes(self):
         particules = np.asarray([[1, 0], [0, 8], [0, 0]])
         n_volumes = 1
@@ -26,6 +28,7 @@ class TestSimVolumes:
         assert len(qs) == 1
         assert qs[0][0] == '['
 
+    @staticmethod
     def test_save_volume(self):
         particules = np.asarray([[1, 0], [0, 8], [0, 0]])
         n_volumes = 1

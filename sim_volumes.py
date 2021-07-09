@@ -17,14 +17,19 @@ def modify_weight(points, volume, vol_size, center):
 
     Parameters
     ----------
-    points : array, list particules position.
-    volume : ndarray, volume of the molecule.
-    size : int, size of the volume.
-    center : int, center the molecule around zero.
+    points : array
+        list particules position.
+    volume : ndarray
+        volume of the molecule.
+    size : int
+        size of the volume.
+    center : int
+        center the molecule around zero.
 
     Returns
     -------
-    volume : ndarray, volume of the molecule.
+    volume : ndarray
+        volume of the molecule.
 
     """
     for point in points.T:
@@ -44,15 +49,21 @@ def simulate_volumes(particules, n_volumes, vol_size, center=2):
 
     Parameters
     ----------
-    particules : array, list particules position.
-    n_volumes : int, number of data.
-    img_size : int, size of the molecule.
-    center : int, optional center the molecule around zero.
+    particules : array
+        list particules position.
+    n_volumes : int
+        number of data.
+    img_size : int
+        size of the molecule.
+    center : int
+        optional center the molecule around zero.
 
     Returns
     -------
-    volumes : ndarray, 3D map of the molecule.
-    qs : list, describes rotations in quaternions.
+    volumes : ndarray
+        3D map of the molecule.
+    qs : list
+        describes rotations in quaternions.
 
     """
     rots, qs = coords.uniform_rotations(n_volumes)
@@ -72,17 +83,25 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, center=2):
 
     Parameters
     ----------
-    particules : array, position of particules.
-    n_volumes : int, number of data.
-    vol_size : int, size of the volume.
-    main_dir : string, main directory.
-    name : string, name.
-    center : int, center the molecule around 0.
+    particules : array
+        position of particules.
+    n_volumes : int
+        number of data.
+    vol_size : int
+        size of the volume.
+    main_dir : string
+        main directory.
+    name : string
+        name.
+    center : int
+        center the molecule around 0.
 
     Returns
     -------
-    volumes : ndarray 3D map of the molecule
-    labels : dataframe describes rotations in quaternions
+    volumes : ndarray
+        3D map of the molecule
+    labels : ndarray
+        describes rotations in quaternions
 
     Example
     -------
