@@ -8,7 +8,7 @@ SO3 = SpecialOrthogonal(n=3, point_type="vector")
 PARTICULES = np.asarray([[1, 0, 0, 3], [0, 8, 0, 5], [0, 0, 7, 9]])
 N_VOLUMES = 2000
 VOL_SIZE = 64
-NAME = '4_points_3d'
+NAME = "4_points_3d"
 CENTER = 2
 
 

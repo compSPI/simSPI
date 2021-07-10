@@ -11,7 +11,7 @@ class TestSimVolumes:
     def test_get_random_quat():
         quaternions = sim_volumes.get_random_quat(5)
         assert quaternions.shape == (5, 4)
-        assert type(quaternions) == np.ndarray
+        assert type(quaternions) is np.ndarray
 
     @staticmethod
     def test_uniform_rotations():
