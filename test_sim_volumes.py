@@ -1,6 +1,8 @@
 """Test sim_volumes."""
-import numpy as np
 import os
+
+import numpy as np
+
 import sim_volumes
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -34,11 +36,10 @@ class TestSimVolumes:
         particules = np.asarray([[1, 0], [0, 8], [0, 0]])
         n_volumes = 1
         vol_size = 64
-        volumes, qs = sim_volumes.simulate_volumes(
-            particules, n_volumes, vol_size)
+        volumes, qs = sim_volumes.simulate_volumes(particules, n_volumes, vol_size)
         assert volumes.shape == (1, 64, 64, 64)
         assert len(qs) == 1
-        assert qs[0][0] == '['
+        assert qs[0][0] == "["
 
     @staticmethod
     def test_save_volume():
@@ -48,7 +49,8 @@ class TestSimVolumes:
         main_dir = ""
         name = "2particules"
         volumes, qs = sim_volumes.save_volume(
-            particules, n_volumes, vol_size, main_dir, name)
+            particules, n_volumes, vol_size, main_dir, name
+        )
         assert volumes.shape == (1, 64, 64, 64)
         assert len(qs) == 1
-        assert qs[0][0] == '['
+        assert qs[0][0] == "["

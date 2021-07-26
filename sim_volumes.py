@@ -1,7 +1,8 @@
 """Generate 3D map of molecules."""
 
-import numpy as np
 import os
+
+import numpy as np
 from geomstats.geometry.special_orthogonal import SpecialOrthogonal
 
 SO3 = SpecialOrthogonal(n=3, point_type="vector")
@@ -95,10 +96,18 @@ def modify_weight(points, volume, vol_size, center):
         for i in range(vol_size):
             for j in range(vol_size):
                 for k in range(vol_size):
-                    volume[i][j][k] += np.exp(-np.linalg.norm(
-                        [i/center-vol_size/center/2, j/center -
-                         vol_size/center/2, k/center-vol_size/center/2] -
-                        point)**2/2)
+                    volume[i][j][k] += np.exp(
+                        -np.linalg.norm(
+                            [
+                                i / center - vol_size / center / 2,
+                                j / center - vol_size / center / 2,
+                                k / center - vol_size / center / 2,
+                            ]
+                            - point
+                        )
+                        ** 2
+                        / 2
+                    )
     return volume
 
 
@@ -128,7 +137,7 @@ def simulate_volumes(particules, n_volumes, vol_size, center=2):
     rots, qs = uniform_rotations(n_volumes)
     volumes = np.zeros((n_volumes,) + (vol_size,) * 3)
     for idx in range(n_volumes):
-        if idx % (n_volumes/10) == 0:
+        if idx % (n_volumes / 10) == 0:
             print(idx)
         points = rots[idx].dot(particules)
         volumes[idx] = modify_weight(points, volumes[idx], vol_size, center)
@@ -169,8 +178,7 @@ def save_volume(particules, n_volumes, vol_size, main_dir, name, center=2):
     """
     path_molecules = os.path.join(main_dir, name + "_molecules.npy")
     path_labels = os.path.join(main_dir, name + "_labels.npy")
-    volumes, labels = simulate_volumes(
-        particules, n_volumes, vol_size, center)
+    volumes, labels = simulate_volumes(particules, n_volumes, vol_size, center)
     np.save(path_molecules, volumes)
     np.save(path_labels, volumes)
 
