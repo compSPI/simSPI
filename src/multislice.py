@@ -9,14 +9,14 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f,complex_ctf):
     Parameters
     ----------
     exit_wave_f : numpy.ndarray, shape (N,N)
-        exit wave array.
+        Exit wave array.
     complex_ctf : numpy.ndarray, shape (N,N)
-        complex ctf array.
+        Complex ctf array.
 
     Returns
     -------
     i0 : numpy.ndarray, shape (N,N)
-        exit wave ctf convolution (in real space).
+        Exit wave ctf convolution (in real space).
     """
     i0 = np.abs(fourier.do_ifft(exit_wave_f*complex_ctf,d=2,only_real=False))
     return i0
@@ -29,14 +29,14 @@ def apply_dqe(i0_f,dqe):
     Parameters
     ----------
     i0_f : numpy.ndarray, shape (N,N)
-        image with ctf applied.
+        Image with ctf applied.
     dqe : numpy.ndarray, shape (N,N)
-        detective quantum efficiency (in 2D).
+        Detective quantum efficiency (in 2D).
 
     Returns
     -------
     i0_dqe : numpy.ndarray, shape (N,N)
-        exit wave with dqe applied (in real space).
+        Exit wave with dqe applied (in real space).
     """
     i0_dqe = fourier.do_ifft(i0_f*np.sqrt(dqe),d=2)
     return i0_dqe
@@ -49,11 +49,11 @@ def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
     Parameters
     ----------
     signal : numpy.ndarray, shape (N,N)
-        input signal, (e.g. exit wave with ctf and dqe applied).
+        Input signal, (e.g. exit wave with ctf and dqe applied).
     dose : float
-        multiplicative scaling factor to simulate electron dose.
+        Multiplicative scaling factor to simulate electron dose.
     noise_bg : float
-        additive factor to simulate dark current noise.
+        Additive factor to simulate dark current noise.
 
     Returns
     -------
@@ -71,14 +71,14 @@ def apply_ntf(shot_noise_sample,ntf):
     Parameters
     ----------
     shot_noise_sample : numpy.ndarray, shape (N,N)
-        image with ctf applied.
+        Image with ctf applied.
     ntf : numpy.ndarray, shape (N,N)
-        noise transfer function (in 2D).
+        Noise transfer function (in 2D).
 
     Returns
     -------
     i : numpy.ndarray, shape (N,N)
-        exit wave with ntf applied (in real space).
+        Exit wave with ntf applied (in real space).
     """
     i = fourier.do_ifft(fourier.do_fft(shot_noise_sample,d=2)*ntf,d=2)
     return i
@@ -100,20 +100,20 @@ def exit_wave_to_image(exit_wave_f,complex_ctf,dose,noise_bg,dqe,ntf):
     exit_wave_f : numpy.ndarray, shape (N,N)
         Fourier transform of exit wave.
     complex_ctf : numpy.ndarray, shape (N,N)
-        complex ctf array.
+        Complex ctf array.
     dose : float
-        multiplicative scaling factor to simulate electron dose.
+        Multiplicative scaling factor to simulate electron dose.
     noise_bg : float
-        additive factor to simulate dark current noise.
+        Additive factor to simulate dark current noise.
     dqe : numpy.ndarray, shape (N,N)
-        detective quantum efficiency (in 2D).
+        Detective quantum efficiency (in 2D).
     ntf : numpy.ndarray, shape (N,N)
-        noise transfer function (in 2D).
+        Noise transfer function (in 2D).
 
     Returns
     -------
     i : numpy.ndarray, shape (N,N)
-        exit wave with ntf applied (in real space).
+        Exit wave with ntf applied (in real space).
     """
 
     i0 = apply_complex_ctf_to_exit_wave(exit_wave_f,complex_ctf)
