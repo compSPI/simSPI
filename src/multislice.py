@@ -1,5 +1,5 @@
 import numpy as np
-from simSPI import fourier
+from ioSPI import fourier
 
 
 def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
