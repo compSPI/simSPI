@@ -1,4 +1,4 @@
-from compSPI import fourier
+from simSPI import fourier
 import numpy as np
 
 def apply_complex_ctf_to_exit_wave(exit_wave_f,complex_ctf):
@@ -21,9 +21,6 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f,complex_ctf):
   i0 = np.abs(fourier.do_ifft(exit_wave_f*complex_ctf,d=2,only_real=False))
   return i0
 
-
-  
-
 def apply_dqe(i0_f,dqe):
   """Convolution with detector's DQE.
 
@@ -43,9 +40,6 @@ def apply_dqe(i0_f,dqe):
   """
   i0_dqe = fourier.do_ifft(i0_f*np.sqrt(dqe),d=2)
   return i0_dqe
-
-
-
 
 def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
   """Poisson shot noise.

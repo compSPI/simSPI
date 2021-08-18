@@ -2,7 +2,7 @@ def test_exit_wave_to_image():
   """ high dose, no ctf/dqe/ntf
   """
   N = 64
-  sphere = raster_geometry.sphere([N,N,N],radius=N//8,position=.25).astype(np.float32)
+  sphere = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32)
   ones = np.ones((N,N))
   zeros = np.zeros((N,N))
   exit_wave = sphere.sum(-1)
@@ -62,7 +62,7 @@ def test_apply_dqe():
   N_random = np.random.uniform(low=50,high=100)
   N = int(2*(N_random//2))
 
-  i0 = raster_geometry.sphere([N,N,N],radius=N//8,position=.25).astype(np.float32).sum(-1)
+  i0 = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32).sum(-1)
   ones = np.ones((N,N))
   zeros = np.zeros((N,N))
   i0_f = fourier.do_fft(i0,d=2)
@@ -81,7 +81,7 @@ def test_apply_ntf():
   N_random = np.random.uniform(low=50,high=100)
   N = int(2*(N_random//2))
 
-  i0 = raster_geometry.sphere([N,N,N],radius=N//8,position=.25).astype(np.float32).sum(-1)
+  i0 = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32).sum(-1)
   ones = np.ones((N,N))
   zeros = np.zeros((N,N))
   i0_f = fourier.do_fft(i0,d=2)
