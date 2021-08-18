@@ -2,6 +2,11 @@ import numpy as np
 import raster_geometry
 from ioSPI import transfer
 from ioSPI import fourier
+from simSPI import exit_wave_to_image
+from simSPI import apply_poisson_shot_noise_sample
+from simSPI import apply_complex_ctf_to_exit_wave
+from simSPI import apply_dqe
+from simSPI import apply_ntf
 
 def test_exit_wave_to_image():
   """ high dose, no ctf/dqe/ntf
