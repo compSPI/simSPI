@@ -14,15 +14,14 @@ def test_exit_wave_to_image():
     N = 64
     sphere = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32)
     ones = np.ones((N,N))
-    zeros = np.zeros((N,N))
     exit_wave = sphere.sum(-1)
     exit_wave_f = fourier.do_fft(exit_wave,d=2)
-    dose = 1e9*exit_wave.max()
+    high_dose = 1e9*exit_wave.max()
 
     i, shot_noise_sample, i0_dqe, i0 = exit_wave_to_image(
         exit_wave_f=exit_wave_f,
         complex_ctf=ones,
-        dose=dose,
+        dose=high_dose,
         noise_bg=0,
         dqe=ones,
         ntf=ones
@@ -71,35 +70,22 @@ test_apply_complex_ctf_to_exit_wave()
 def test_apply_dqe():
     N_random = np.random.uniform(low=50,high=100)
     N = int(2*(N_random//2))
-
-    i0 = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32).sum(-1)
     ones = np.ones((N,N))
-    zeros = np.zeros((N,N))
-    i0_f = fourier.do_fft(i0,d=2)
-
     freq_A_2d,angles_rad = transfer.ctf_freqs(N,d=2)
-
     mtf_const = 1.5
     mtf2 = (np.sinc(freq_A_2d*mtf_const))**2
     ntf2 = np.sinc(freq_A_2d)**2
     dqe = mtf2/ntf2
-    i0_dqe = apply_dqe(i0_f,dqe)
+    i0_dqe = apply_dqe(ones,dqe)
     assert i0_dqe.shape == (N,N)
 test_apply_dqe()
 
 def test_apply_ntf():
     N_random = np.random.uniform(low=50,high=100)
     N = int(2*(N_random//2))
-
-    i0 = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32).sum(-1)
     ones = np.ones((N,N))
-    zeros = np.zeros((N,N))
-    i0_f = fourier.do_fft(i0,d=2)
-
     freq_A_2d,angles_rad = transfer.ctf_freqs(N,d=2)
-
     ntf = np.sinc(freq_A_2d)
-
     i = apply_ntf(shot_noise_sample=ones,ntf=ntf)
     assert i.shape == (N,N)
 test_apply_ntf()
