@@ -1,0 +1,11 @@
+name: simSPI
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - flake8-black
+  - numpy
+  - pip
+  - pytest 
+  - pytest-cov 
+  - pytorch
