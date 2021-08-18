@@ -121,3 +121,4 @@ def exit_wave_to_image(exit_wave_f,complex_ctf,dose,noise_bg,dqe,ntf):
     i = apply_ntf(shot_noise_sample,ntf)
 
     return i, shot_noise_sample, i0_dqe, i0
+    
