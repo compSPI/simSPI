@@ -9,8 +9,7 @@ from simSPI import apply_dqe
 from simSPI import apply_ntf
 
 def test_exit_wave_to_image():
-    """ high dose, no ctf/dqe/ntf
-    """
+    """High dose, no ctf/dqe/ntf."""
     N = 64
     sphere = raster_geometry.sphere([N,N,N],radius=N//8,position=0.25).astype(np.float32)
     ones = np.ones((N,N))
@@ -33,11 +32,11 @@ def test_exit_wave_to_image():
     assert i0.shape == [N,N]
     assert np.allclose(i/dose,exit_wave,atol=1e-4)
 
+
 test_exit_wave_to_image()
 
 def test_apply_poisson_shot_noise_sample():
-    """ poisson noise high vs low
-    """
+    """Poisson noise high vs low."""
 
     N=64
     signal = np.ones((N,N))
@@ -60,6 +59,7 @@ def test_apply_poisson_shot_noise_sample():
     diff_highdose = np.linalg.norm(signal - (shot_noise_sample_highdose/dose_highdose - noise_bg_highdose))
     assert  diff_highdose < diff_highnoise
 
+
 test_apply_poisson_shot_noise_sample()
 
 def test_apply_complex_ctf_to_exit_wave():
@@ -69,6 +69,8 @@ def test_apply_complex_ctf_to_exit_wave():
                                    complex_ctf = np.ones((N,N))
                                    )
     assert i0.shape == (N,N)
+
+
 test_apply_complex_ctf_to_exit_wave()
 
 def test_apply_dqe():
@@ -82,6 +84,8 @@ def test_apply_dqe():
     dqe = mtf2/ntf2
     i0_dqe = apply_dqe(ones,dqe)
     assert i0_dqe.shape == (N,N)
+
+
 test_apply_dqe()
 
 def test_apply_ntf():
@@ -92,4 +96,6 @@ def test_apply_ntf():
     ntf = np.sinc(freq_A_2d)
     i = apply_ntf(shot_noise_sample=ones,ntf=ntf)
     assert i.shape == (N,N)
+
+
 test_apply_ntf()
