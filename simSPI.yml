@@ -8,4 +8,4 @@ dependencies:
   - pip
   - pytest 
   - pytest-cov 
-  - pytorch
+  - raster_geometry

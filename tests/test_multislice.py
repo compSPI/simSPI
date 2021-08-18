@@ -1,3 +1,8 @@
+import numpy as np
+import raster_geometry
+from ioSPI import transfer
+from ioSPI import fourier
+
 def test_exit_wave_to_image():
   """ high dose, no ctf/dqe/ntf
   """
