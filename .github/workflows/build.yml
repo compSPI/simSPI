@@ -22,7 +22,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04]
         python-version: [3.7,3.8,3.9]
-        test-folder : ['tests.test_multislice']
+        test-folder : ['tests']
       fail-fast: false
 
     steps:
