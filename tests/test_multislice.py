@@ -27,6 +27,10 @@ def test_exit_wave_to_image():
         ntf=ones
         )
 
+    assert i.shape == [N,N]
+    assert shot_noise_sample.shape == [N,N]
+    assert i0_dqe.shape == [N,N]
+    assert i0.shape == [N,N]
     assert np.allclose(i/dose,exit_wave,atol=1e-4)
 
 test_exit_wave_to_image()
