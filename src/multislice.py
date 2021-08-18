@@ -88,10 +88,12 @@ def exit_wave_to_image(exit_wave_f,complex_ctf,dose,noise_bg,dqe,ntf):
 
     Convolution of (ctf, detector dqe/ntf,) with exit wave. 
     Incorporates Poisson shot noise and the collapse of the wave function.
-        Forward model eqs 5-7 in 
-        Vulović, M., Ravelli, R. B. G., van Vliet, L. J., Koster, A. J., Lazić, I., Lücken, U., … Rieger, B. (2013). 
-        Image formation modeling in cryo-electron microscopy. 
-        Journal of Structural Biology, 183(1), 19–32. http://doi.org/10.1016/j.jsb.2013.05.008 .
+    Forward model eqs 5-7 in
+    ..[Vulović]   Vulović, M., Ravelli, R. B. G., van Vliet, L. J., 
+                   Koster, A. J., Lazić, I., Lücken, U., … Rieger, B. 
+                  "Image formation modeling in cryo-electron microscopy."
+                  Journal of Structural Biology 183, no. 1 (2013): 19–32. 
+                   http://doi.org/10.1016/j.jsb.2013.05.008.
 
     Parameters
     ----------
@@ -121,4 +123,3 @@ def exit_wave_to_image(exit_wave_f,complex_ctf,dose,noise_bg,dqe,ntf):
     i = apply_ntf(shot_noise_sample,ntf)
 
     return i, shot_noise_sample, i0_dqe, i0
-    
