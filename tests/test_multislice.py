@@ -32,7 +32,6 @@ def test_exit_wave_to_image():
     assert np.allclose(i / high_dose, exit_wave, atol=1e-4)
 
 
-
 def test_apply_poisson_shot_noise_sample():
     """Poisson noise high vs low."""
     N = 64
@@ -89,4 +88,3 @@ def test_apply_ntf():
     ntf = np.sinc(freq_A_2d)
     i = apply_ntf(shot_noise_sample=ones, ntf=ntf)
     assert i.shape == (N, N)
-
