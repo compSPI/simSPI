@@ -1,8 +1,13 @@
 import numpy as np
 import raster_geometry
 from ioSPI import fourier, transfer
-from simSPI import (apply_complex_ctf_to_exit_wave, apply_dqe, apply_ntf,
-                    apply_poisson_shot_noise_sample, exit_wave_to_image)
+from simSPI import (
+    apply_complex_ctf_to_exit_wave,
+    apply_dqe,
+    apply_ntf,
+    apply_poisson_shot_noise_sample,
+    exit_wave_to_image,
+)
 
 
 def test_exit_wave_to_image():
