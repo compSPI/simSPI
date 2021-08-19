@@ -32,8 +32,6 @@ def test_exit_wave_to_image():
     assert np.allclose(i / high_dose, exit_wave, atol=1e-4)
 
 
-test_exit_wave_to_image()
-
 
 def test_apply_poisson_shot_noise_sample():
     """Poisson noise high vs low."""
@@ -61,9 +59,6 @@ def test_apply_poisson_shot_noise_sample():
     assert diff_highdose < diff_highnoise
 
 
-test_apply_poisson_shot_noise_sample()
-
-
 def test_apply_complex_ctf_to_exit_wave():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))  # even N
@@ -71,9 +66,6 @@ def test_apply_complex_ctf_to_exit_wave():
         exit_wave_f=np.ones((N, N)), complex_ctf=np.ones((N, N))
     )
     assert i0.shape == (N, N)
-
-
-test_apply_complex_ctf_to_exit_wave()
 
 
 def test_apply_dqe():
@@ -89,9 +81,6 @@ def test_apply_dqe():
     assert i0_dqe.shape == (N, N)
 
 
-test_apply_dqe()
-
-
 def test_apply_ntf():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
@@ -101,5 +90,3 @@ def test_apply_ntf():
     i = apply_ntf(shot_noise_sample=ones, ntf=ntf)
     assert i.shape == (N, N)
 
-
-test_apply_ntf()
