@@ -26,7 +26,7 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
 def apply_dqe(i0_f, dqe):
     """Convolution with detector's DQE.
 
-    Convolution of (ctf applied) exit wave 
+    Convolution of (ctf applied) exit wave
     with sqrt of the detective quantum efficiency.
 
     Parameters
