@@ -9,3 +9,4 @@ dependencies:
   - pytest 
   - pytest-cov 
   - raster_geometry
+  - git+https://github.com/compSPI/ioSPI.git
