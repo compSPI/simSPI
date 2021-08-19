@@ -37,7 +37,6 @@ test_exit_wave_to_image()
 
 def test_apply_poisson_shot_noise_sample():
     """Poisson noise high vs low."""
-
     N = 64
     signal = np.ones((N, N))
     dose_highnoise = 0.1
@@ -81,7 +80,7 @@ def test_apply_dqe():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
     ones = np.ones((N, N))
-    freq_A_2d, angles_rad = transfer.ctf_freqs(N, d=2)
+    freq_A_2d = transfer.ctf_freqs(N, d=2)[0]
     mtf_const = 1.5
     mtf2 = (np.sinc(freq_A_2d * mtf_const)) ** 2
     ntf2 = np.sinc(freq_A_2d) ** 2
@@ -97,7 +96,7 @@ def test_apply_ntf():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
     ones = np.ones((N, N))
-    freq_A_2d, angles_rad = transfer.ctf_freqs(N, d=2)
+    freq_A_2d = transfer.ctf_freqs(N, d=2)[0]
     ntf = np.sinc(freq_A_2d)
     i = apply_ntf(shot_noise_sample=ones, ntf=ntf)
     assert i.shape == (N, N)

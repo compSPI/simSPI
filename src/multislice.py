@@ -26,7 +26,8 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
 def apply_dqe(i0_f, dqe):
     """Convolution with detector's DQE.
 
-    Convolution of (ctf applied) exit wave with sqrt of the detective quantum efficiency.
+    Convolution of (ctf applied) exit wave 
+    with sqrt of the detective quantum efficiency.
 
     Parameters
     ----------
@@ -120,7 +121,6 @@ def exit_wave_to_image(exit_wave_f, complex_ctf, dose, noise_bg, dqe, ntf):
     i : numpy.ndarray, shape (N,N)
         Exit wave with ntf applied (in real space).
     """
-
     i0 = apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf)
     i0_f = fourier.do_fft(i0, d=2)
     i0_dqe = apply_dqe(i0_f, dqe)
