@@ -5,7 +5,8 @@ from ioSPI import fourier
 def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
     """Apply complex contrast transfer function to multisclice exit wave.
 
-    Fourier based convolution of exit wave and ctf, and collapse of wave function.
+    Fourier based convolution of exit wave and ctf,
+    and collapse of wave function.
 
     Parameters
     ----------
@@ -19,7 +20,9 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
     i0 : numpy.ndarray, shape (N,N)
         Exit wave ctf convolution (in real space).
     """
-    i0 = np.abs(fourier.do_ifft(exit_wave_f * complex_ctf, d=2, only_real=False))
+    i0 = np.abs(
+        fourier.do_ifft(exit_wave_f * complex_ctf, d=2, only_real=False)
+    )
     return i0
 
 
@@ -48,7 +51,8 @@ def apply_dqe(i0_f, dqe):
 def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
     """Poisson shot noise.
 
-    Poisson sampling of exit wave with ctf and dqe applied, to simulate shot noise.
+    Poisson sampling of exit wave with ctf and dqe applied,
+    to simulate shot noise.
 
     Parameters
     ----------
@@ -71,7 +75,8 @@ def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
 def apply_ntf(shot_noise_sample, ntf):
     """Convolution with detector's NTF.
 
-    Convolution of (ctf and dqe applied) exit wave with the noise transfer function.
+    Convolution of (ctf and dqe applied) exit wave
+    with the noise transfer function.
 
     Parameters
     ----------
