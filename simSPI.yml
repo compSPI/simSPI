@@ -5,8 +5,9 @@ channels:
 dependencies:
   - flake8-black
   - numpy
-  - pytest 
-  - pytest-cov 
-  - raster_geometry
+  - pytest
+  - pip
+  - pytest-cov
   - pip:
     - git+https://github.com/compSPI/ioSPI.git
+    - raster_geometry
