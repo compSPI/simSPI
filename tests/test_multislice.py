@@ -1,16 +1,21 @@
 import numpy as np
 import raster_geometry
 from ioSPI import fourier, transfer
-from simSPI import (apply_complex_ctf_to_exit_wave, apply_dqe, apply_ntf,
-                    apply_poisson_shot_noise_sample, exit_wave_to_image)
+from simSPI import (
+    apply_complex_ctf_to_exit_wave,
+    apply_dqe,
+    apply_ntf,
+    apply_poisson_shot_noise_sample,
+    exit_wave_to_image,
+)
 
 
 def test_exit_wave_to_image():
     """High dose, no ctf/dqe/ntf."""
     N = 64
-    sphere = raster_geometry.sphere([N, N, N], radius=N // 8, position=0.25).astype(
-        np.float32
-    )
+    sphere = raster_geometry.sphere(
+        [N, N, N], radius=N // 8, position=0.25
+    ).astype(np.float32)
     ones = np.ones((N, N))
     exit_wave = sphere.sum(-1)
     exit_wave_f = fourier.do_fft(exit_wave, d=2)
@@ -50,10 +55,12 @@ def test_apply_poisson_shot_noise_sample():
     )
 
     diff_highnoise = np.linalg.norm(
-        signal - (shot_noise_sample_highnoise / dose_highnoise - noise_bg_highnoise)
+        signal
+        - (shot_noise_sample_highnoise / dose_highnoise - noise_bg_highnoise)
     )
     diff_highdose = np.linalg.norm(
-        signal - (shot_noise_sample_highdose / dose_highdose - noise_bg_highdose)
+        signal
+        - (shot_noise_sample_highdose / dose_highdose - noise_bg_highdose)
     )
     assert diff_highdose < diff_highnoise
 
