@@ -46,7 +46,7 @@ jobs:
           $CONDA/bin/pip install -e .
       - name: linting [flake8]
         run: |
-          $CONDA/bin/flake8 simSPI tests
+          $CONDA/bin/flake8 src tests
       - name: unit testing [pytest]
         run: |
           $CONDA/bin/pytest
