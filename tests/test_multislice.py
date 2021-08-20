@@ -41,28 +41,28 @@ def test_apply_poisson_shot_noise_sample():
     """Poisson noise high vs low."""
     N = 64
     signal = np.ones((N, N))
-    dose_highnoise = 0.1
-    noise_bg_highnoise = 1
-    shot_noise_sample_highnoise = apply_poisson_shot_noise_sample(
-        signal=signal, dose=dose_highnoise, noise_bg=noise_bg_highnoise
+    # hi noise
+    dose_hin = 0.1
+    noise_bg_hin = 1
+    shot_noise_sample_hin = apply_poisson_shot_noise_sample(
+        signal=signal, dose=dose_hin, noise_bg=noise_bg_hin
     )
-    assert shot_noise_sample_highnoise.shape == (N, N)
+    assert shot_noise_sample_hin.shape == (N, N)
 
-    dose_highdose = 1
-    noise_bg_highdose = 0.1
-    shot_noise_sample_highdose = apply_poisson_shot_noise_sample(
-        signal=signal, dose=dose_highdose, noise_bg=noise_bg_highdose
+    # hi dose
+    dose_hid = 1
+    noise_bg_hid = 0.1
+    shot_noise_sample_hid = apply_poisson_shot_noise_sample(
+        signal=signal, dose=dose_hid, noise_bg=noise_bg_hid
     )
 
-    diff_highnoise = np.linalg.norm(
-        signal
-        - (shot_noise_sample_highnoise / dose_highnoise - noise_bg_highnoise)
+    diff_hin = np.linalg.norm(
+        signal - (shot_noise_sample_hin / dose_hin - noise_bg_hin)
     )
-    diff_highdose = np.linalg.norm(
-        signal
-        - (shot_noise_sample_highdose / dose_highdose - noise_bg_highdose)
+    diff_hid = np.linalg.norm(
+        signal - (shot_noise_sample_hid / dose_hid - noise_bg_hid)
     )
-    assert diff_highdose < diff_highnoise
+    assert diff_hid < diff_hin
 
 
 def test_apply_complex_ctf_to_exit_wave():
