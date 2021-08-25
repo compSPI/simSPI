@@ -7,9 +7,9 @@ dependencies:
   - numba
   - numpy
   - pip
-  - pyfftw
-  - pytest
-  - pytest-cov
   - pip:
     - git+https://github.com/geoffwoollard/ioSPI.git@move_functions_from_compspi
     - raster_geometry
+  - pyfftw
+  - pytest
+  - pytest-cov
