@@ -9,5 +9,5 @@ dependencies:
   - pip
   - pytest-cov
   - pip:
-    - git+https://github.com/compSPI/ioSPI.git
+    - git+https://github.com/geoffwoollard/compSPI/ioSPI.git@move_functions_from_compspi
     - raster_geometry
