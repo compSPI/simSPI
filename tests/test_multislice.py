@@ -1,13 +1,7 @@
 import numpy as np
 import raster_geometry
 from ioSPI import fourier, transfer
-from simSPI import (
-    apply_complex_ctf_to_exit_wave,
-    apply_dqe,
-    apply_ntf,
-    apply_poisson_shot_noise_sample,
-    exit_wave_to_image,
-)
+from simSPI import multislice
 
 
 def test_exit_wave_to_image():
@@ -21,7 +15,7 @@ def test_exit_wave_to_image():
     exit_wave_f = fourier.do_fft(exit_wave, d=2)
     high_dose = 1e9 * exit_wave.max()
 
-    i, shot_noise_sample, i0_dqe, i0 = exit_wave_to_image(
+    i, shot_noise_sample, i0_dqe, i0 = multislice.exit_wave_to_image(
         exit_wave_f=exit_wave_f,
         complex_ctf=ones,
         dose=high_dose,
@@ -44,7 +38,7 @@ def test_apply_poisson_shot_noise_sample():
     # hi noise
     dose_hin = 0.1
     noise_bg_hin = 1
-    shot_noise_sample_hin = apply_poisson_shot_noise_sample(
+    shot_noise_sample_hin = multislice.apply_poisson_shot_noise_sample(
         signal=signal, dose=dose_hin, noise_bg=noise_bg_hin
     )
     assert shot_noise_sample_hin.shape == (N, N)
@@ -52,7 +46,7 @@ def test_apply_poisson_shot_noise_sample():
     # hi dose
     dose_hid = 1
     noise_bg_hid = 0.1
-    shot_noise_sample_hid = apply_poisson_shot_noise_sample(
+    shot_noise_sample_hid = multislice.apply_poisson_shot_noise_sample(
         signal=signal, dose=dose_hid, noise_bg=noise_bg_hid
     )
 
@@ -68,7 +62,7 @@ def test_apply_poisson_shot_noise_sample():
 def test_apply_complex_ctf_to_exit_wave():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))  # even N
-    i0 = apply_complex_ctf_to_exit_wave(
+    i0 = multislice.apply_complex_ctf_to_exit_wave(
         exit_wave_f=np.ones((N, N)), complex_ctf=np.ones((N, N))
     )
     assert i0.shape == (N, N)
@@ -83,7 +77,7 @@ def test_apply_dqe():
     mtf2 = (np.sinc(freq_A_2d * mtf_const)) ** 2
     ntf2 = np.sinc(freq_A_2d) ** 2
     dqe = mtf2 / ntf2
-    i0_dqe = apply_dqe(ones, dqe)
+    i0_dqe = multislice.apply_dqe(ones, dqe)
     assert i0_dqe.shape == (N, N)
 
 
@@ -93,5 +87,5 @@ def test_apply_ntf():
     ones = np.ones((N, N))
     freq_A_2d = transfer.ctf_freqs(N, d=2)[0]
     ntf = np.sinc(freq_A_2d)
-    i = apply_ntf(shot_noise_sample=ones, ntf=ntf)
+    i = multislice.apply_ntf(shot_noise_sample=ones, ntf=ntf)
     assert i.shape == (N, N)
