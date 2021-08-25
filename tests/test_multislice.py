@@ -1,7 +1,7 @@
 import numpy as np
 import raster_geometry
-from ioSPI import fourier, transfer
-from simSPI import multislice
+from ioSPI import fourier
+from simSPI import multislice, transfer
 
 
 def test_exit_wave_to_image():
