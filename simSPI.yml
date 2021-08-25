@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - flake8-black
+  - geomstats
   - numba
   - numpy
   - pip
