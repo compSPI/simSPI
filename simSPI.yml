@@ -4,11 +4,11 @@ channels:
   - defaults
 dependencies:
   - flake8-black
-  - geomstats
   - numba
   - numpy
   - pip
   - pip:
+    - geomstats
     - git+https://github.com/geoffwoollard/ioSPI.git@move_functions_from_compspi
     - raster_geometry
   - pyfftw
