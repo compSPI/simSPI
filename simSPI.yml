@@ -6,7 +6,6 @@ dependencies:
   - flake8-black
   - numba
   - numpy
-  - pip
   - pip:
     - geomstats
     - git+https://github.com/geoffwoollard/ioSPI.git@move_functions_from_compspi
