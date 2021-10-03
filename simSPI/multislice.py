@@ -21,7 +21,7 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
         Exit wave ctf convolution (in real space).
     """
     i0 = np.abs(
-        fourier.do_ifft(exit_wave_f * complex_ctf, d=2, only_real=False)
+        fourier.do_ifft(exit_wave_f * complex_ctf, dim=2, only_real=False)
     )
     return i0
 
@@ -44,7 +44,7 @@ def apply_dqe(i0_f, dqe):
     i0_dqe : numpy.ndarray, shape (N,N)
         Exit wave with dqe applied (in real space).
     """
-    i0_dqe = fourier.do_ifft(i0_f * np.sqrt(dqe), d=2)
+    i0_dqe = fourier.do_ifft(i0_f * np.sqrt(dqe), dim=2)
     return i0_dqe
 
 
@@ -90,7 +90,7 @@ def apply_ntf(shot_noise_sample, ntf):
     i : numpy.ndarray, shape (N,N)
         Exit wave with ntf applied (in real space).
     """
-    i = fourier.do_ifft(fourier.do_fft(shot_noise_sample, d=2) * ntf, d=2)
+    i = fourier.do_ifft(fourier.do_fft(shot_noise_sample, dim=2) * ntf, dim=2)
     return i
 
 
@@ -127,7 +127,7 @@ def exit_wave_to_image(exit_wave_f, complex_ctf, dose, noise_bg, dqe, ntf):
         Exit wave with ntf applied (in real space).
     """
     i0 = apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf)
-    i0_f = fourier.do_fft(i0, d=2)
+    i0_f = fourier.do_fft(i0, dim=2)
     i0_dqe = apply_dqe(i0_f, dqe)
     shot_noise_sample = apply_poisson_shot_noise_sample(i0_dqe, dose, noise_bg)
     i = apply_ntf(shot_noise_sample, ntf)

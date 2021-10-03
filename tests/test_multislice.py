@@ -12,7 +12,7 @@ def test_exit_wave_to_image():
     ).astype(np.float32)
     ones = np.ones((N, N))
     exit_wave = sphere.sum(-1)
-    exit_wave_f = fourier.do_fft(exit_wave, d=2)
+    exit_wave_f = fourier.do_fft(exit_wave, dim=2)
     high_dose = 1e9 * exit_wave.max()
 
     i, shot_noise_sample, i0_dqe, i0 = multislice.exit_wave_to_image(
@@ -72,7 +72,7 @@ def test_apply_dqe():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
     ones = np.ones((N, N))
-    freq_A_2d = transfer.ctf_freqs(N, d=2)[0]
+    freq_A_2d = transfer.ctf_freqs(N, dim=2)[0]
     mtf_const = 1.5
     mtf2 = (np.sinc(freq_A_2d * mtf_const)) ** 2
     ntf2 = np.sinc(freq_A_2d) ** 2
@@ -85,7 +85,7 @@ def test_apply_ntf():
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
     ones = np.ones((N, N))
-    freq_A_2d = transfer.ctf_freqs(N, d=2)[0]
+    freq_A_2d = transfer.ctf_freqs(N, dim=2)[0]
     ntf = np.sinc(freq_A_2d)
     i = multislice.apply_ntf(shot_noise_sample=ones, ntf=ntf)
     assert i.shape == (N, N)

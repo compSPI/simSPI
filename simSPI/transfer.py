@@ -3,7 +3,7 @@ import numpy as np
 import logging
 
 
-def ctf_freqs(n_pixels, psize=1.0, d=2):
+def ctf_freqs(n_pixels, psize=1.0, dim=2):
     """Make CTF Frequencies.
 
     Makes 1 or 2 D array of fourier space frequenceis
@@ -12,7 +12,7 @@ def ctf_freqs(n_pixels, psize=1.0, d=2):
     ----------
     n_pixels : int
         Number of pixels.
-    d : int, 1 or 2
+    dim : int, 1 or 2
         Dimension.
     psize : float
         Pixel size in Å
@@ -27,7 +27,7 @@ def ctf_freqs(n_pixels, psize=1.0, d=2):
     angles_rad : numpy.ndarray, shape (N,N)
         Angle of 2D frequency vector.
     """
-    if d == 1:
+    if dim == 1:
         freq_pix_1d = np.arange(0, 0.5, 1 / n_pixels)
         freq_1d = freq_pix_1d * psize
         return freq_1d
@@ -161,7 +161,7 @@ def random_ctfs(
         low=df_ang_min, high=df_ang_max, size=n_particles
     )
     ctfs = np.empty((n_particles, n_pixels, n_pixels))
-    freq_mag_2d, angles_rad = ctf_freqs(n_pixels, psize, d=2)
+    freq_mag_2d, angles_rad = ctf_freqs(n_pixels, psize, dim=2)
     for idx in range(n_particles):
         if do_log and idx % max(1, (n_particles // 10)) == 0:
             logging.debug(idx)  # needs work: logger

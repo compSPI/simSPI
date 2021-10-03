@@ -5,13 +5,13 @@ from simSPI import transfer
 def test_ctf_freqs():
     """Test for ctf_freq."""
     n_pixels = (np.random.randint(low=8, high=128) // 2) * 2
-    freq_1d = transfer.ctf_freqs(n_pixels, d=1)
+    freq_1d = transfer.ctf_freqs(n_pixels, dim=1)
     assert freq_1d.shape == (n_pixels // 2,)
     assert np.isclose(freq_1d.min(), 0)
     assert np.isclose(freq_1d[0], 0)
     assert freq_1d[-1] < n_pixels // 2
     psize = np.random.uniform(low=1, high=10)
-    freq_mag_2d, angles_rad = transfer.ctf_freqs(n_pixels, d=2, psize=psize)
+    freq_mag_2d, angles_rad = transfer.ctf_freqs(n_pixels, dim=2, psize=psize)
     assert np.isclose(freq_mag_2d[n_pixels // 2, 0], 0.5 * psize)
     assert np.isclose(freq_mag_2d[n_pixels // 2, n_pixels // 2], 0)  # dc
     assert freq_mag_2d.shape == angles_rad.shape == (n_pixels, n_pixels)
@@ -21,7 +21,7 @@ def test_ctf_freqs():
 def test_eval_ctf():
     """Test for eval_ctf."""
     n_pixels = (np.random.randint(low=8, high=128) // 2) * 2
-    freq_mag_2d, angles_rad = transfer.ctf_freqs(n_pixels, d=2)
+    freq_mag_2d, angles_rad = transfer.ctf_freqs(n_pixels, dim=2)
     ac = np.random.uniform(low=0.07, high=0.1)
     ctf = transfer.eval_ctf(
         s=freq_mag_2d,
