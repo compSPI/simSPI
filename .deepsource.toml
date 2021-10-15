@@ -1,21 +1,13 @@
 version = 1
 
-test_patterns = ["test/**"]
+test_patterns = ["tests/**"]
 
-exclude_patterns = ["README.md"]
-
-[[analyzers]]
-name = "python"
-enabled = true
+exclude_patterns = ["[\"README.md\"]"]
 
 [[analyzers]]
 name = "test-coverage"
 enabled = true
 
-[[transformers]]
-name = "isort"
-enabled = true
-
-[[transformers]]
-name = "black"
+[[analyzers]]
+name = "python"
 enabled = true
