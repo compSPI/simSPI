@@ -20,6 +20,7 @@ See our [contributing](https://github.com/compspi/compspi/blob/master/docs/contr
 **Main functions**
 
 Parameters:
+
 TEMSimulator(inputfile,configuration_yaml,output_mrc=None,output_config=None) -> output: numpy data
 
 Output:
@@ -27,6 +28,8 @@ Output:
 TEMSimulator(inputfile,configuration_yaml) -> output : simulation object
 
 simulation object
+
+
 key/property : type
 data: np array,
 configuration: object,
@@ -34,12 +37,12 @@ write_mrc: function(output_file,config = true)
 
 
 **Utility functions**
-#cryoemio.simio() but accepts all formats including cif,3d maps,
-generate_simulation_file_dirs(input_file, output_mrc,output_config)
 
-fill_parameters_dictionary(yaml_file)
 
-fill_grid_in_fov(sample_dimensions, optics_params,detector_params, input_file=input_file,Dmax=30, pad=5.) 
+
+- generate_simulation_file_dirs(input_file, output_mrc,output_config) //(cryoemio.simio() but accepts all formats including cif,3d maps)
+- fill_parameters_dictionary(yaml_file)
+- fill_grid_in_fov(sample_dimensions, optics_params,detector_params, input_file=input_file,Dmax=30, pad=5.) 
                                         
 
 **Work flow**
