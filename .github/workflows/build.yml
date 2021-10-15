@@ -56,7 +56,7 @@ jobs:
           $CONDA/bin/flake8 simSPI tests
       - name: unit testing [pytest]
         run: |
-          $CONDA/bin/pytest --cov-report term --cov-report xml:coverage.xml --cov=ioSPI ${{matrix.test-folder}}
+          $CONDA/bin/pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
       - name: uploading code coverage [codecov]
         if: ${{matrix.python-version == 3.7}}
         run: |
