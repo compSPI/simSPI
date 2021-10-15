@@ -7,7 +7,8 @@ Methods and tools for simulating SPI data.
 
 See our [contributing](https://github.com/compspi/compspi/blob/master/docs/contributing.rst) guidelines!
 
-##Questions for wrapper
+## Questions for wrapper
+
 - Write utility functions in ioSPI allowing to go from one data format to another - utility functions that convert pdb to cif to 3d or accept all 3 ?
 - Ask if classy?
 - Ask configuration format? 
@@ -15,7 +16,8 @@ See our [contributing](https://github.com/compspi/compspi/blob/master/docs/contr
 - do we care about interim files?
 
 ## Notes
-**Main functions **
+
+**Main functions**
 
 Parameters:
 TEMSimulator(inputfile,configuration_yaml,output_mrc=None,output_config=None) -> output: numpy data
@@ -31,7 +33,7 @@ configuration: object,
 write_mrc: function(output_file,config = true)
 
 
-** Utility functions **
+**Utility functions**
 #cryoemio.simio() but accepts all formats including cif,3d maps,
 generate_simulation_file_dirs(input_file, output_mrc,output_config)
 
