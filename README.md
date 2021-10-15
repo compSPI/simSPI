@@ -7,41 +7,31 @@ Methods and tools for simulating SPI data.
 
 See our [contributing](https://github.com/compspi/compspi/blob/master/docs/contributing.rst) guidelines!
 
-Questions for 	wrapper
-Write utility functions in ioSPI allowing to go from one data format to another.
-- utility functions that convert pdb to cif to 3d or accept all 3
+##Questions for wrapper
+- Write utility functions in ioSPI allowing to go from one data format to another - utility functions that convert pdb to cif to 3d or accept all 3 ?
 - Ask if classy?
 - Ask configuration format? 
 - seperate input file for pdb,cif?
 - do we care about interim files?
 
-Main functions :
-	
-TEMSimulator(inputfile,configuration_yaml,output_mrc=) 
--> output a simulation object 
-
-
+## Notes
+**Main functions **
 
 Parameters:
-
 TEMSimulator(inputfile,configuration_yaml,output_mrc=None,output_config=None) -> output: numpy data
-
-
 
 Output:
 
+TEMSimulator(inputfile,configuration_yaml) -> output : simulation object
 
-TEMSimulator(inputfile,configuration_yaml) -> simulation object
-
-simulation {
+simulation object
 key/property : type
 data: np array,
 configuration: object,
 write_mrc: function(output_file,config = true)
-}
------
 
-Utility functions:
+
+** Utility functions **
 #cryoemio.simio() but accepts all formats including cif,3d maps,
 generate_simulation_file_dirs(input_file, output_mrc,output_config)
 
@@ -50,7 +40,7 @@ fill_parameters_dictionary(yaml_file)
 fill_grid_in_fov(sample_dimensions, optics_params,detector_params, input_file=input_file,Dmax=30, pad=5.) 
                                         
 
-work flow 
+**Work flow**
 
 configurations -> 
 define-grid (write crd file) -> 
