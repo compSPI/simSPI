@@ -1,6 +1,9 @@
+"""Transfer (CTF)."""
+
+import logging
+
 import numba as nb
 import numpy as np
-import logging
 
 
 def ctf_freqs(n_pixels, psize=1.0, dim=2):
@@ -42,9 +45,7 @@ def ctf_freqs(n_pixels, psize=1.0, dim=2):
 
 
 @nb.jit(cache=True, nopython=True, nogil=True)
-def eval_ctf(
-    s, a, def1, def2, angast=0, phase=0, kv=300, ac=0.1, cs=2.0, bf=0, lp=0
-):
+def eval_ctf(s, a, def1, def2, angast=0, phase=0, kv=300, ac=0.1, cs=2.0, bf=0, lp=0):
     """
     Evaluate CTF.
 
@@ -152,14 +153,10 @@ def random_ctfs(
         Option to log progress.
     """
     dfs = np.random.uniform(low=df_min, high=df_max, size=n_particles)
-    df_diff = np.random.uniform(
-        low=df_diff_min, high=df_diff_max, size=n_particles
-    )
+    df_diff = np.random.uniform(low=df_diff_min, high=df_diff_max, size=n_particles)
     df1s = dfs - df_diff / 2
     df2s = dfs + df_diff / 2
-    df_ang_deg = np.random.uniform(
-        low=df_ang_min, high=df_ang_max, size=n_particles
-    )
+    df_ang_deg = np.random.uniform(low=df_ang_min, high=df_ang_max, size=n_particles)
     ctfs = np.empty((n_particles, n_pixels, n_pixels))
     freq_mag_2d, angles_rad = ctf_freqs(n_pixels, psize, dim=2)
     for idx in range(n_particles):

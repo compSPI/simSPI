@@ -1,15 +1,18 @@
+"""Unit test for multislice."""
+
 import numpy as np
 import raster_geometry
 from ioSPI import fourier
+
 from simSPI import multislice, transfer
 
 
 def test_exit_wave_to_image():
     """High dose, no ctf/dqe/ntf."""
     N = 64
-    sphere = raster_geometry.sphere(
-        [N, N, N], radius=N // 8, position=0.25
-    ).astype(np.float32)
+    sphere = raster_geometry.sphere([N, N, N], radius=N // 8, position=0.25).astype(
+        np.float32
+    )
     ones = np.ones((N, N))
     exit_wave = sphere.sum(-1)
     exit_wave_f = fourier.do_fft(exit_wave, dim=2)
@@ -60,6 +63,7 @@ def test_apply_poisson_shot_noise_sample():
 
 
 def test_apply_complex_ctf_to_exit_wave():
+    """Test apply_complex_ctf_to_exit_wave."""
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))  # even N
     i0 = multislice.apply_complex_ctf_to_exit_wave(
@@ -69,6 +73,7 @@ def test_apply_complex_ctf_to_exit_wave():
 
 
 def test_apply_dqe():
+    """Test apply_dqe."""
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
     ones = np.ones((N, N))
@@ -82,6 +87,7 @@ def test_apply_dqe():
 
 
 def test_apply_ntf():
+    """Test apply_ntf."""
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
     ones = np.ones((N, N))

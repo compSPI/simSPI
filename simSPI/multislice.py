@@ -1,3 +1,5 @@
+"""Multislice."""
+
 import numpy as np
 from ioSPI import fourier
 
@@ -20,9 +22,7 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
     i0 : numpy.ndarray, shape (N,N)
         Exit wave ctf convolution (in real space).
     """
-    i0 = np.abs(
-        fourier.do_ifft(exit_wave_f * complex_ctf, dim=2, only_real=False)
-    )
+    i0 = np.abs(fourier.do_ifft(exit_wave_f * complex_ctf, dim=2, only_real=False))
     return i0
 
 
