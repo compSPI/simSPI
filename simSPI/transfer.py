@@ -44,7 +44,6 @@ def ctf_freqs(n_pixels, psize=1.0, dim=2):
     return (freq_mag_2d, angles_rad)
 
 
-@nb.jit(cache=True, nopython=True, nogil=True)
 def eval_ctf(s, a, def1, def2, angast=0, phase=0, kv=300, ac=0.1, cs=2.0, bf=0, lp=0):
     """
     Evaluate CTF.
@@ -97,6 +96,10 @@ def eval_ctf(s, a, def1, def2, angast=0, phase=0, kv=300, ac=0.1, cs=2.0, bf=0, 
     if bf != 0:  # Enforce envelope.
         ctf *= np.exp(-k4 * s_2)
     return ctf
+
+
+# separate out so can test eval_ctf
+eval_ctf_jitted = nb.jit(cache=True, nopython=True, nogil=True)(eval_ctf)
 
 
 def random_ctfs(
@@ -162,7 +165,7 @@ def random_ctfs(
     for idx in range(n_particles):
         if do_log and idx % max(1, (n_particles // 10)) == 0:
             logging.debug(idx)  # needs work: logger
-        ctfs[idx] = eval_ctf(
+        ctfs[idx] = eval_ctf_jitted(
             freq_mag_2d,
             angles_rad,
             def1=df1s[idx],
