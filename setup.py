@@ -7,7 +7,7 @@ requirements = []
 setuptools.setup(
     name="simSPI",
     maintainer="Geoffrey Woollard",
-    version="0.0.1",
+    version="0.0.2",
     maintainer_email="geoffwoollard@gmail.com",
     description="Methods and tools for simulating single particle imaging data",
     long_description=open("README.md", encoding="utf8").read(),
