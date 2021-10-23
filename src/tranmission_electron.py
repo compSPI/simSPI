@@ -8,6 +8,7 @@ import yaml
 SIMULATOR='../Material/tem-Simulator/TEM-simulator/Release/TEM-simulator.exe'
 PDBFILE = './temp_workspace/input/4v6x.pdb'
 CONFIG = './temp_workspace/input/configurations.yaml'
+VAR = 'jed'
 
 
 # Have more verbose comments rn instead of docstrings
