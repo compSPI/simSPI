@@ -4,51 +4,46 @@ from TEM_utils.simutils import define_grid_in_fov, write_crd_file, fill_paramete
 from pathlib import Path
 import yaml
 
-# local path to simulator (change as needed)
-SIMULATOR = '../../TEM-simulator/src/TEM-simulator'
-PDBFILE = './temp_workspace/input/4v6x.pdb'
-CONFIG = './temp_workspace/input/configurations.yaml'
-
-
 # Have more verbose comments rn instead of docstrings
 
-class TEMSimulatorHelper:
+class TEMSimulator:
 
     # Most static functions are wrapper functions that can accept dictionaries for arguments.
     # Easier than dealing with a bunch of args
     #
     # TODO
     #   - add functionality to change configuration
-    #   - What should nameing convention be? camel case or underscores
+    #   - What should naming convention be? camel case or underscores
     #   - Verify functionality
     #   - Establish compatibility for later python versions
     #   - Figure out simulator wrapper
 
-    def __init__(self, configFile):
+    def __init__(self, path_config, sim_config):
         # Seperated constructor and running actual sim -> lets you run a  bunch of input files with same configs
         # not sure if the helper methods should be made static or not
 
-        self.configurations = self._getConfigFromYaml(configFile)
-        self.filePaths = {}
-        self.paramDict = {}
+        self.file_paths = self._getConfigFromYaml(path_config)
+        self.sim_dict = self._getConfigFromYaml(sim_config)
+
 
     def runSim(self, pdbFile):
         self.filePaths = self._getIOFilePaths(pdbFile)
-        self._buildCordFile(**self.filePaths, **self.configurations)
-        self.paramDict = self._buildParamDict(**self.filePaths, **self.configurations)
-        self._buildInpFile(self.paramDict, **self.filePaths)
+        self._buildCordFile(**self.file_paths, **self.sim_dict)
+        self.paramDict = self._buildParamDict(**self.file_paths, **self.sim_dict)
+        self._buildInpFile(self.paramDict, **self.file_paths)
 
         data = self._getImageData(**self.filePaths)
         return data
 
+
     @staticmethod
-    def _getConfigFromYaml(configFile):
+    def _getConfigFromYaml(config):
         #
         # Parses Yaml file and returns the following : seed,sample_dimensions,beam_params,optics_params,detector_params
         # ( seed is a random int)
         #
         # get configurations from yaml.
-        # For now, yaml must specify all configurations in the notebook in this format (configurations.yaml)
+        # For now, yaml must specify all configurations in the notebook in this format (sim_config.yaml)
         #
         # Questions:
         # - How do people usually format their YAMLS? Is it in arrays or key:value for each parameter?
@@ -57,11 +52,12 @@ class TEMSimulatorHelper:
         # - Have default configurations, overwrite from YAML
         # - update YAML parsing based on answers to questions above (rn kinda scuffed)
 
-        with open(configFile, 'r') as stream:
-            parsedConfig = yaml.load(stream)
-        parsedConfig['seed'] = 1234;
+        with open(config, 'r') as stream:
+            parsed_config = yaml.load(stream)
 
-        return parsedConfig
+        return parsed_config
+
+
 
     @staticmethod
     def _getIOFilePaths(pdbFile):
@@ -120,20 +116,9 @@ class TEMSimulatorHelper:
         write_inp_file(inp_file=inpFile, dict_params=paramDict)
 
 
-def TEMSimulator(configFile, pdbFile):
-    #
-    # for user, allows running sim in one step.
-    #
-    # TODO:
-    # - add flags for keeping generate files and mrc file
-    # - Final output should be particle stack with metadata
-
-    simHelper = TEMSimulatorHelper(configFile, pdbFile)
-    mrc_data = simHelper.runSim()
-
-
 def main():
-    data = TEMSimulator(CONFIG, PDBFILE)
+    sim = TEMSimulator('./temp_workspace/input/path_config.yaml', './temp_workspace/input/sim_config.yaml')
+    sim_data = sim.runSim()
 
 
 if __name__ == "__main__":
