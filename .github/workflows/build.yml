@@ -6,12 +6,17 @@ on:
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
+    - '.gitignore'
+    - 'setup.py'
+
 
   pull_request:
     branches: [master]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
+    - '.gitignore'
+    - 'setup.py'
 
 
 jobs:
@@ -27,6 +32,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Build using Python ${{matrix.python-version}}
         uses: actions/setup-python@v2
         with:
@@ -36,17 +43,21 @@ jobs:
         uses: actions/cache@v1
         with:
           path: $CONDA
-          key: ${{ runner.os }}-conda-${{ hashFiles('simSPI.yml') }}
+          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
           restore-keys: |
             ${{ runner.os }}-conda-
       - name: install dependencies
         run:  |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
-          $CONDA/bin/conda env update --file simSPI.yml --name base
+          $CONDA/bin/conda env update --file environment.yml --name base
           $CONDA/bin/pip install -e .
       - name: linting [flake8]
         run: |
           $CONDA/bin/flake8 simSPI tests
       - name: unit testing [pytest]
         run: |
-          $CONDA/bin/pytest
+          $CONDA/bin/pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
+      - name: uploading code coverage [codecov]
+        if: ${{matrix.python-version == 3.7}}
+        run: |
+          bash <(curl -s https://codecov.io/bash) -c
