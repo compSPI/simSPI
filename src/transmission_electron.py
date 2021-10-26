@@ -26,12 +26,12 @@ class TEMSimulator:
         self.sim_dict = self._getConfigFromYaml(sim_config)
 
 
-    def runSim(self, pdbFile):
+    def run_sim(self, pdb_file):
         """ Runs TEM simulator on input file and produces particle stacks with metadata
 
         Parameters
         ----------
-        pdbFile : str
+        pdb_file : str
             Relative file path to input .pdb file for sim
 
         Returns
@@ -39,10 +39,10 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        # self.filePaths = self._getIOFilePaths(pdbFile)
+        # self.file_paths = self._getIOFilePaths(pdb_file)
         # self._buildCordFile(**self.file_paths, **self.sim_dict)
-        # self.paramDict = self._buildParamDict(**self.file_paths, **self.sim_dict)
-        # self._buildInpFile(self.paramDict, **self.file_paths)
+        # self.param_dict = self._build_param_dict(**self.file_paths, **self.sim_dict)
+        # self._build_inpFile(self.param_dict, **self.file_paths)
         #
         # data = self._getImageData(**self.filePaths)
         return None
@@ -237,7 +237,7 @@ class TEMSimulator:
                                           seed=sim_params["seed"])
 
     @staticmethod
-    def write_inp_file(self, paramDict, file_paths):
+    def write_inp_file(self, param_dict, file_paths):
         """Writes simulation parameters to .inp file for use by the TEM-simulator.
 
         Parameters
@@ -249,7 +249,7 @@ class TEMSimulator:
                 inp_file
                     Relative path to input file to be populated with parameters
         """
-        write_inp_file(inp_file=paramDict["inpFile"], dict_params=paramDict)
+        write_inp_file(inp_file=param_dict["inpFile"], dict_params=param_dict)
 
     @staticmethod
     def extract_particles(self, micrograph, sim_param_arrays, file_paths, pad):
@@ -297,7 +297,7 @@ class TEMSimulator:
 
 def main():
     sim = TEMSimulator('./temp_workspace/input/path_config.yaml', './temp_workspace/input/sim_config.yaml')
-    sim_data = sim.runSim()
+    sim_data = sim.run_sim()
 
 
 if __name__ == "__main__":
