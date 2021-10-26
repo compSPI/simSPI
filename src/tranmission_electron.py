@@ -24,10 +24,8 @@ class TEMSimulator:
         Relative directory to YAML file containing desired TEM simulator parameters
     Methods
     -------
-    colorspace(c='rgb')
-        Represent the photo in the given colorspace.
-    gamma(n=1.0)
-        Change the photo's gamma exposure.
+    runSim(pdbFile)
+        Runs the TEM simulator on pdbFile. Return particle stack with appropriate metadata.
 
     """
 
@@ -50,8 +48,6 @@ class TEMSimulator:
         """
 
         return None
-
-
 
     def get_config_from_yaml(self, config_yaml):
         """Creates dictionary with parameters from YAML file and groups them into lists
@@ -104,7 +100,7 @@ class TEMSimulator:
         classified_params : dict of type str to {str,bool,int,list}
             Dictionary of grouped parameters
         """
-        classified_params ={}
+        classified_params = {}
         return classified_params
 
     @staticmethod
@@ -148,7 +144,7 @@ class TEMSimulator:
         return file_paths
 
     @staticmethod
-    def create_crd_file(file_paths, sim_param_arrays,pad):
+    def create_crd_file(file_paths, sim_param_arrays, pad):
         """Formats and writes molecular model data to crd_file for use in TEM-simulator.
 
               Parameters
@@ -172,10 +168,10 @@ class TEMSimulator:
 
               """
         x_range, y_range, num_part = define_grid_in_fov(sim_param_arrays["sample_dimensions"],
-                                                       sim_param_arrays["optics_params"],
-                                                       sim_param_arrays["detector_params"],
-                                                       pdb_file=file_paths["pdb_file"],
-                                                       Dmax=30, pad=pad)
+                                                        sim_param_arrays["optics_params"],
+                                                        sim_param_arrays["detector_params"],
+                                                        pdb_file=file_paths["pdb_file"],
+                                                        Dmax=30, pad=pad)
 
         write_crd_file(num_part, xrange=x_range, yrange=y_range, crd_file=file_paths["crd_file"])
 
@@ -210,7 +206,7 @@ class TEMSimulator:
         return mrc_data
 
     @staticmethod
-    def generate_parameters_dictionary(file_paths,sim_params):
+    def generate_parameters_dictionary(file_paths, sim_params):
         """Compiles all relevant experiment data into .inp friendly file for use in TEM-simulator.
 
         Parameters
@@ -266,7 +262,7 @@ class TEMSimulator:
         write_inp_file(inp_file=params_dict["inpFile"], dict_params=params_dict)
 
     @staticmethod
-    def extract_particles(micrograph,params_dict,file_paths,pad):
+    def extract_particles(micrograph, params_dict, file_paths, pad):
         """Formats and writes molecular model data to crd_file for use in TEM-simulator.
 
         Parameters
@@ -290,7 +286,7 @@ class TEMSimulator:
         """
 
     @staticmethod
-    def export_particle_stack(particles,file_paths,params_dict):
+    def export_particle_stack(particles, file_paths, params_dict):
         """Exports extracted particle data to h5 file
 
         Parameters
@@ -316,4 +312,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
