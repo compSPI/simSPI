@@ -1,9 +1,3 @@
-import os
-from TEM_utils.cryoemio import simio, mrc2data
-from TEM_utils.simutils import define_grid_in_fov, write_crd_file, fill_parameters_dictionary, write_inp_file
-from pathlib import Path
-import yaml
-
 
 class TEMSimulator:
     """Wrapper for TEMSimulator and relevant utilites
@@ -26,7 +20,6 @@ class TEMSimulator:
     -------
     runSim(pdbFile)
         Runs the TEM simulator on pdbFile. Return particle stack with appropriate metadata.
-
     """
 
     def __init__(self, path_config_yaml, sim_config_yaml):
@@ -63,7 +56,7 @@ class TEMSimulator:
                 seed : str maps to int
                     Seed for TEM Simulator
                 particle_mrcout : str maps to bool
-                    Flag for optional volume map of sample        # verify this, I think I saw this get mapped to mrc_file path in notebook
+                    Flag for optional volume map of sample
                 sample_dimensions : str maps to
                     List containing the specimen grid parameters
                 beam_params : str maps to list
@@ -74,16 +67,7 @@ class TEMSimulator:
                     List containing the optic parameters
         """
 
-        # Questions:
-        # - How do people usually format their YAMLS? Is it in arrays or key:value for each parameter?
-        # - If there is no standard YAML config format, do we specify? or do we support all sorts of config files?
-        # TODO:
-        # - Have default configurations, overwrite from YAML
-        # - update YAML parsing based on answers to questions above (rn kinda scuffed)
-
-        with open(config_yaml, 'r') as stream:
-            raw_params = yaml.load(stream)
-        classified_params = self.classify_input_config(raw_params)
+        classified_params = {}
 
         return classified_params
 
@@ -165,15 +149,10 @@ class TEMSimulator:
                            List containing the optic parameters
                pad : double
                    Pad to be added to maximal dimension of the object read from pdb_file
-
               """
-        x_range, y_range, num_part = define_grid_in_fov(sim_param_arrays["sample_dimensions"],
-                                                        sim_param_arrays["optics_params"],
-                                                        sim_param_arrays["detector_params"],
-                                                        pdb_file=file_paths["pdb_file"],
-                                                        Dmax=30, pad=pad)
 
-        write_crd_file(num_part, xrange=x_range, yrange=y_range, crd_file=file_paths["crd_file"])
+
+        return
 
     @staticmethod
     def get_image_data(file_paths):
@@ -193,16 +172,8 @@ class TEMSimulator:
         -------
         mrc_data : array
             Contains particle data parsed TEM simulator ouput mrc
-
         """
-
-        SIMULATOR_BIN = Path(file_paths["sim_file"])  # might have to change depending on OS
-        inp_file = Path(file_paths["inp_file"])
-
-        cmd = '{0} {1}'.format(SIMULATOR_BIN, inp_file)
-        os.system(cmd)
-
-        mrc_data = mrc2data(mrc_file=file_paths["mrc_file"])
+        mrc_data = []
         return mrc_data
 
     @staticmethod
@@ -235,16 +206,8 @@ class TEMSimulator:
         param_dictionary : dict
             .inp friendly dictionary containing simulation input parameters.
         """
-        return fill_parameters_dictionary(mrc_file=file_paths["mrc_file"],
-                                          pdb_file=file_paths["pdb_file"],
-                                          particle_mrcout=file_paths["particle_mrcout"],
-                                          crd_file=file_paths["crd_file"],
-                                          sample_dimensions=sim_params["sample_dimensions"],
-                                          beam_params=sim_params["beam_params"],
-                                          optics_params=sim_params["optic_params"],
-                                          detector_params=sim_params["detector_params"],
-                                          log_file=file_paths["log_file"],
-                                          seed=sim_params["seed"])
+        param_dictionary = {}
+        return param_dictionary
 
     @staticmethod
     def write_inp_file(params_dict, file_paths):
@@ -259,7 +222,7 @@ class TEMSimulator:
                 inp_file
                     Relative path to input file to be populated with parameters
         """
-        write_inp_file(inp_file=params_dict["inpFile"], dict_params=params_dict)
+        return
 
     @staticmethod
     def extract_particles(micrograph, params_dict, file_paths, pad):
@@ -282,9 +245,8 @@ class TEMSimulator:
         -------
         particles : arr
             Individual particle data extracted from micrograph
-        return
         """
-
+        return
     @staticmethod
     def export_particle_stack(particles, file_paths, params_dict):
         """Exports extracted particle data to h5 file
@@ -297,12 +259,8 @@ class TEMSimulator:
             Relative path to .h5 output file
         params_dict : arr
             .inp friendly dictionary containing simulation input parameters
-
-        Returns
-        -------
-
         """
-        return None
+        return
 
 
 def main():
