@@ -142,7 +142,7 @@ class TEMSimulator:
                     List containing the optic parameters
 
         """
-        return
+        return None
 
     @staticmethod
     def get_image_data(file_paths, sim_path):
@@ -217,7 +217,7 @@ class TEMSimulator:
                 inp_file
                     Relative path to input file to be populated with parameters
         """
-        return
+        return None
 
     @staticmethod
     def extract_particles(micrograph, sim_param_arrays, file_paths, pad):
