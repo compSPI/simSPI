@@ -1,8 +1,4 @@
 """Wrapper for the TEM Simulator."""
-import os
-import shlex
-from pathlib import Path
-
 import yaml
 
 
@@ -146,7 +142,7 @@ class TEMSimulator:
                     List containing the optic parameters
 
         """
-        pass
+        return
 
     @staticmethod
     def get_image_data(file_paths, sim_path):
@@ -167,11 +163,11 @@ class TEMSimulator:
         -------
         List containing parsed .mrc data from Simulator
         """
-        SIMULATOR_BIN = Path(sim_path)  # might have to change depending on OS
-        inp_file = Path(file_paths["inp_file"])
+        # SIMULATOR_BIN = Path(sim_path)  # might have to change depending on OS
+        # inp_file = Path(file_paths["inp_file"])
 
-        cmd = "{0} {1}".format(SIMULATOR_BIN, inp_file)
-        os.system(shlex.quote(cmd))
+        # cmd = "{0} {1}".format(SIMULATOR_BIN, inp_file)
+        # os.system(shlex.quote(cmd))
 
         return []
 
@@ -221,7 +217,7 @@ class TEMSimulator:
                 inp_file
                     Relative path to input file to be populated with parameters
         """
-        pass
+        return
 
     @staticmethod
     def extract_particles(micrograph, sim_param_arrays, file_paths, pad):
