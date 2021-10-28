@@ -13,7 +13,7 @@ RUN wget 'http://www.fftw.org/fftw-3.3.10.tar.gz' && \
 
 RUN wget 'https://iweb.dl.sourceforge.net/project/tem-simulator/TEM-simulator_1.3.zip' && \
     unzip TEM-simulator_1.3.zip && \
-    cd TEM-simulator/src && make && \
+    cd TEM-simulator_1.3/src && make && \
     cd /work && rm -f TEM-simulator_1.3.zip
 
 ENV PATH=/work/TEM-simulator/src:$PATH
