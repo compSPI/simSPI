@@ -65,9 +65,14 @@ class TEMSimulator:
 
         return classified_params
 
-    def classify_input_config(self):
+    @staticmethod
+    def classify_input_config(raw_params):
         """Take dictionary of individual parameters and groups them into lists.
 
+        Parameters
+        ----------
+        raw_params : dict of type str to {str,bool,int}
+            Dictionary of simulator parameters
         Returns
         -------
         classified_params : dict of type str to {str,bool,int,list}
