@@ -15,11 +15,11 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
-        self.file_paths = self._getConfigFromYaml(path_config)
-        self.sim_dict = self._getConfigFromYaml(sim_config)
+        self.path_dict = self._get_config_from_yaml(path_config)
+        self.sim_dict = self._get_config_from_yaml(sim_config)
         self.placeholder = 0
 
-    def run_sim(self, pdb_file):
+    def run(self, pdb_file):
         """Run TEM simulator on input file and produces particle stacks with metadata.
 
         Parameters
@@ -32,10 +32,10 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        # self.file_paths = self._getIOFilePaths(pdb_file)
-        # self._buildCordFile(**self.file_paths, **self.sim_dict)
-        # self.param_dict = self._build_param_dict(**self.file_paths, **self.sim_dict)
-        # self._build_inpFile(self.param_dict, **self.file_paths)
+        # self.path_dict = self._getIOFilePaths(pdb_file)
+        # self._buildCordFile(**self.path_dict, **self.sim_dict)
+        # self.param_dict = self._build_param_dict(**self.path_dict, **self.sim_dict)
+        # self._build_inpFile(self.param_dict, **self.path_dict)
         #
         # data = self._getImageData(**self.filePaths)
         pdb_file = "placeholder_to_pass_tests"
@@ -89,7 +89,7 @@ class TEMSimulator:
         return classified_params
 
     @staticmethod
-    def generate_file_paths(pdb_file, output_dir=None, mrc_keyword=None):
+    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
@@ -102,7 +102,7 @@ class TEMSimulator:
             user-specified keyword appended to output files
         Returns
         -------
-        file_paths : dict of type str to str
+        path_dict : dict of type str to str
             Dict of file paths that includes keys:
             pdb_file
                 relative path to pdb input file
@@ -117,16 +117,16 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-        file_paths = {}
-        return file_paths
+        path_dict = {}
+        return path_dict
 
     @staticmethod
-    def create_crd_file(file_paths, sim_param_arrays, pad):
+    def create_crd_file(path_dict, sim_param_arrays, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
 
         Parameters
         ----------
-        file_paths : dict of type str to str
+        path_dict : dict of type str to str
             Dict of file paths that includes keys:
                 pdb_file
                     Relative path to pdb input file
@@ -145,14 +145,14 @@ class TEMSimulator:
         return None
 
     @staticmethod
-    def get_image_data(file_paths, sim_path):
+    def get_image_data(path_dict, sim_path):
         """Run simulator and return data.
 
         Parameters
         ----------
         sim_path : str
             relative path to local TEM simulator installation
-        file_paths : dict of type str to str
+        path_dict : dict of type str to str
              Dict of file paths that includes keys:
                 inp_file
                     relative path to populated .inp file
@@ -164,7 +164,7 @@ class TEMSimulator:
         List containing parsed .mrc data from Simulator
         """
         # SIMULATOR_BIN = Path(sim_path)  # might have to change depending on OS
-        # inp_file = Path(file_paths["inp_file"])
+        # inp_file = Path(path_dict["inp_file"])
 
         # cmd = "{0} {1}".format(SIMULATOR_BIN, inp_file)
         # os.system(shlex.quote(cmd))
@@ -172,12 +172,12 @@ class TEMSimulator:
         return []
 
     @staticmethod
-    def generate_parameters_dictionary(file_paths, sim_params):
+    def generate_parameters_dictionary(path_dict, sim_params):
         """Compile experiment data into .inp friendly file for use in TEM-simulator.
 
         Parameters
         ----------
-        file_paths : dict of type str to str
+        path_dict : dict of type str to str
              Dict of file paths that includes keys:
                 pdb_file
                     Relative path to pdb input file
@@ -205,14 +205,14 @@ class TEMSimulator:
         return param_dictionary
 
     @staticmethod
-    def write_inp_file(param_dict, file_paths):
+    def write_inp_file(param_dict, path_dict):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
         Parameters
         ----------
         param_dict : dict
             .inp friendly dictionary containing simulation input parameters.
-        file_paths : dict of type str to str
+        path_dict : dict of type str to str
             Dict of file paths that includes keys:
                 inp_file
                     Relative path to input file to be populated with parameters
@@ -220,7 +220,7 @@ class TEMSimulator:
         return None
 
     @staticmethod
-    def extract_particles(micrograph, sim_param_arrays, file_paths, pad):
+    def extract_particles(micrograph, sim_param_arrays, path_dict, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
 
         Parameters
@@ -229,7 +229,7 @@ class TEMSimulator:
             Array containing TEM-simulator micrograph output
         sim_param_arrays : dict
             Dictionary containing arrays of simulation parameters
-        file_paths : dict
+        path_dict : dict
             Dictionary of file paths that includes keys:
                 pdb_file
                     Relative path to populated .inp file
@@ -244,14 +244,14 @@ class TEMSimulator:
         return []
 
     @staticmethod
-    def export_particle_stack(particles, file_paths, params_dict):
+    def export_particle_stack(particles, path_dict, params_dict):
         """Export extracted particle data to h5 file.
 
         Parameters
         ----------
         particles : arr
             Individual particle data extracted from micrograph
-        file_paths : arr
+        path_dict : arr
             Relative path to .h5 output file
         params_dict : arr
             .inp friendly dictionary containing simulation input parameters
@@ -267,7 +267,7 @@ def main():
         "./temp_workspace/input/sim_config.yaml",
     )
     pdb_file = "placeholder.pdb"
-    _ = sim.run_sim(pdb_file)
+    _ = sim.run(pdb_file)
 
 
 if __name__ == "__main__":
