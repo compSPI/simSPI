@@ -13,6 +13,7 @@ class TEMSimulator:
         Relative path to YAML file containing simulator paths for TEM Simulator.
 
     """
+
     def __init__(self, path_config, sim_config):
         self.path_dict = self._get_config_from_yaml(path_config)
         self.sim_dict = self._get_config_from_yaml(sim_config)
@@ -115,13 +116,13 @@ class TEMSimulator:
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
-        
+
         Parameters
         ----------
         pad : double
             Pad to be added to maximal dimension of the object read from pdb_file
         """
-        pass
+        return None
 
     def get_image_data(self):
         """Run simulator and return data.
@@ -148,13 +149,14 @@ class TEMSimulator:
 
         The .inp files contain the parameters controlling the simulation. These are text
         files whose format is described in the TEM Simulator documentation. They contain
-        component headings which divide the files into different sections (e.g. different
-        particles) and parameter assignments of the form "<parameter> = <value>".
+        component headings which divide the files into different sections (e.g. 
+        different particles) and parameter assignments of the form 
+        "<parameter> = <value>".
         """
         return None
 
     def extract_particles(self, micrograph, pad):
-        """Extract particle data from micrograph. 
+        """Extract particle data from micrograph.
 
         Parameters
         ----------
@@ -168,7 +170,7 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        return []
+        return [micrograph, pad]
 
     def export_particle_stack(self, particles):
         """Export extracted particle data to h5 file.
@@ -179,7 +181,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        return None
+        return particles
 
 
 def main():
