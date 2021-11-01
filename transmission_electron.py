@@ -149,7 +149,7 @@ class TEMSimulator:
         return None
 
     def extract_particles(self, micrograph, pad):
-        """Format and write molecular model data to crd_file for use in TEM-simulator.
+        """Extract particle data from micrograph. 
 
         Parameters
         ----------
