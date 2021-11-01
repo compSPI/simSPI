@@ -152,12 +152,12 @@ class TEMSimulator:
 
         The .inp files contain the parameters controlling the simulation. These are text
         files whose format is described in the TEM Simulator documentation. They contain
-        component headings which divide the files into different sections (e.g. 
+        component headings which divide the files into different sections (e.g.
         different particles) and parameter assignments of the form
         "<parameter> = <value>".
         """
         self.placeholder = 0
-        return None
+        return self.placeholder
 
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.
