@@ -122,7 +122,8 @@ class TEMSimulator:
         pad : double
             Pad to be added to maximal dimension of the object read from pdb_file
         """
-        return None
+        self.placeholder = 0
+        return pad
 
     def get_image_data(self):
         """Run simulator and return data.
@@ -131,6 +132,7 @@ class TEMSimulator:
         -------
         List containing parsed .mrc data from Simulator
         """
+        self.placeholder = 0
         return []
 
     def generate_parameters_dictionary(self):
@@ -141,6 +143,7 @@ class TEMSimulator:
         param_dictionary : dict
             .inp friendly dictionary containing simulation input parameters.
         """
+        self.placeholder = 0
         param_dictionary = {}
         return param_dictionary
 
@@ -150,9 +153,10 @@ class TEMSimulator:
         The .inp files contain the parameters controlling the simulation. These are text
         files whose format is described in the TEM Simulator documentation. They contain
         component headings which divide the files into different sections (e.g. 
-        different particles) and parameter assignments of the form 
+        different particles) and parameter assignments of the form
         "<parameter> = <value>".
         """
+        self.placeholder = 0
         return None
 
     def extract_particles(self, micrograph, pad):
@@ -170,6 +174,7 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
+        self.placeholder = 0
         return [micrograph, pad]
 
     def export_particle_stack(self, particles):
@@ -181,6 +186,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
+        self.placeholder = 0
         return particles
 
 
