@@ -2,10 +2,14 @@ name: "Building TEM simulator container"
 
 on:
   push:
-    branches: [ master, temsim-container ]
+    branches: [master,temsim-container]
+    paths:
+      - 'docker/TEM-simulator/Dockerfile'
 
   pull_request:
-    branch: [ master, temsim-container ]
+    branch: [master]
+    paths:
+      - 'docker/TEM-simulator/Dockerfile'
 
 jobs:
   build:
@@ -14,6 +18,10 @@ jobs:
 
       - name: Check Out Repo
         uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Cache Docker layers
         uses: actions/cache@v2
@@ -29,10 +37,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
@@ -44,5 +48,6 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi-temsimulator:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
