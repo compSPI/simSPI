@@ -66,6 +66,7 @@ def test_apply_complex_ctf_to_exit_wave():
     """Test apply_complex_ctf_to_exit_wave."""
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))  # even N
+    assert np.isclose(N % 2, 0), "must be even for test to work"
     i0 = multislice.apply_complex_ctf_to_exit_wave(
         exit_wave_f=np.ones((N, N)), complex_ctf=np.ones((N, N))
     )
@@ -76,6 +77,7 @@ def test_apply_dqe():
     """Test apply_dqe."""
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
+    assert np.isclose(N % 2, 0), "must be even for test to work"
     ones = np.ones((N, N))
     freq_A_2d = transfer.ctf_freqs(N, dim=2)[0]
     mtf_const = 1.5
@@ -90,6 +92,7 @@ def test_apply_ntf():
     """Test apply_ntf."""
     N_random = np.random.uniform(low=50, high=100)
     N = int(2 * (N_random // 2))
+    assert np.isclose(N % 2, 0), "must be even for test to work"
     ones = np.ones((N, N))
     freq_A_2d = transfer.ctf_freqs(N, dim=2)[0]
     ntf = np.sinc(freq_A_2d)
