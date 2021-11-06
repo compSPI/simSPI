@@ -7,14 +7,15 @@ from simSPI import transfer
 
 def test_ctf_freqs():
     """Test for ctf_freq."""
-    n_pixels = (np.random.randint(low=8, high=128) // 2) * 2
+    n_pixels = int((np.random.randint(low=8, high=128) // 2) * 2)
     assert np.isclose(
         n_pixels % 2, 0
     ), "must be even for test to work. n_pixels {}".format(n_pixels)
     freq_1d = transfer.ctf_freqs(n_pixels, dim=1)
-    assert freq_1d.shape == (n_pixels // 2 - 1,)
+    assert freq_1d.shape == (n_pixels // 2,)
     assert np.isclose(freq_1d.min(), 0)
     assert np.isclose(freq_1d[0], 0)
+    assert np.isclose(freq_1d.max(), n_pixels // 2 - 1)
     assert freq_1d[-1] < n_pixels // 2
     psize = np.random.uniform(low=1, high=10)
     freq_mag_2d, angles_rad = transfer.ctf_freqs(n_pixels, dim=2, psize=psize)
