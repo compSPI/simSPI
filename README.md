@@ -27,4 +27,5 @@ With this hook, your code will be automatically formatted with our style convent
 
 Note that the hooks do not reformat docstrings automatically. If hooks failed with an error related to the documentation, you should correct this error yourself, commit the result and check that the pre-commit marks "Passed".
 
+
 See our [contributing](https://github.com/compspi/compspi/blob/master/docs/contributing.rst) guidelines!
