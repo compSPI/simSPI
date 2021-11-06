@@ -19,7 +19,7 @@ def test_basic_sim():
     tmp_pdb = tempfile.NamedTemporaryFile(delete=False)
 
     try:
-        tmp_config.write(yaml.dump({0: True}))
+        tmp_config.write(yaml.dump({0: True}).encode("utf-8"))
         sim = tem.TEMSimulator(
             tmp_paths.name,
             tmp_config.name,
