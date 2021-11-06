@@ -191,7 +191,7 @@ class TEMSimulator:
 
 
 def main():
-    """Main function."""
+    """Returns 1 as a placeholder."""
     return 1
 
 
