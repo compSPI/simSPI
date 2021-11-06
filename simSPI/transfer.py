@@ -22,8 +22,12 @@ def ctf_freqs(n_pixels, psize=1.0, dim=2):
 
     Returns
     -------
-    freq_1d : numpy.ndarray, shape (N//2,)
+    freq_1d : numpy.ndarray, shape (n_pixels//2,)
         Frequencies in 1D, with dc at left most.
+        1 D goes from 0 to n_pixels//2-1
+        e.g. n_pixels=6 goes from 0 1 2
+        n_pixels//2 - 1 = 3 -1 = 2
+        only the positive part is returned; we skip over the negative part -3 -2 -1.
     freq_mag_2d : numpy.ndarray, shape (N,N)
         Magnitude of 2D frequency vector, with -ve frequencies in left half,
         and dc and +ve frequencies in right half.

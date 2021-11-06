@@ -7,7 +7,10 @@ from simSPI import transfer
 
 def test_ctf_freqs():
     """Test for ctf_freq."""
-    n_pixels = (np.random.randint(low=8, high=128) // 2) * 2
+    n_pixels = int(2 * (np.random.randint(low=8, high=128) // 2))
+    assert np.isclose(
+        n_pixels % 2, 0
+    ), "must be even for test to work. n_pixels {}".format(n_pixels)
     freq_1d = transfer.ctf_freqs(n_pixels, dim=1)
     assert freq_1d.shape == (n_pixels // 2,)
     assert np.isclose(freq_1d.min(), 0)
@@ -24,6 +27,9 @@ def test_ctf_freqs():
 def test_eval_ctf():
     """Test for eval_ctf."""
     n_pixels = (np.random.randint(low=8, high=128) // 2) * 2
+    assert np.isclose(
+        n_pixels % 2, 0
+    ), "must be even for test to work. n_pixels {}".format(n_pixels)
     freq_mag_2d, angles_rad = transfer.ctf_freqs(n_pixels, dim=2)
     ac = np.random.uniform(low=0.07, high=0.1)
     ctf = transfer.eval_ctf(
@@ -47,6 +53,9 @@ def test_eval_ctf():
 def test_random_ctfs():
     """Test for random_ctfs."""
     n_pixels = (np.random.randint(low=8, high=128) // 2) * 2
+    assert np.isclose(
+        n_pixels % 2, 0
+    ), "must be even for test to work. n_pixels {}".format(n_pixels)
     n_particles = np.random.randint(low=3, high=7)
     df_min = np.random.uniform(low=5000, high=30000)
     df_max = df_min + 100
