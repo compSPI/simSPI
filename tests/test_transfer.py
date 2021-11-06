@@ -12,7 +12,7 @@ def test_ctf_freqs():
         n_pixels % 2, 0
     ), "must be even for test to work. n_pixels {}".format(n_pixels)
     freq_1d = transfer.ctf_freqs(n_pixels, dim=1)
-    assert freq_1d.shape == (n_pixels // 2,)
+    assert freq_1d.shape == (n_pixels // 2 - 1,)
     assert np.isclose(freq_1d.min(), 0)
     assert np.isclose(freq_1d[0], 0)
     assert freq_1d[-1] < n_pixels // 2
