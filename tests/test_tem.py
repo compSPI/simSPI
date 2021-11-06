@@ -17,12 +17,9 @@ def test_basic_sim():
     tmp_config = tempfile.NamedTemporaryFile(delete=False)
     tmp_paths = tempfile.NamedTemporaryFile(delete=False)
     tmp_pdb = tempfile.NamedTemporaryFile(delete=False)
-    config_content = """
-    a: 1
-    """
 
     try:
-        tmp_config.write(yaml.dump(yaml.safe_load(config_content)))
+        tmp_config.write(yaml.dump({'a': 0}))
         sim = tem.TEMSimulator(
             tmp_paths.name,
             tmp_config.name,
