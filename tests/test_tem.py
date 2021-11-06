@@ -19,7 +19,7 @@ def test_basic_sim():
     tmp_pdb = tempfile.NamedTemporaryFile(delete=False)
 
     try:
-        tmp_config.write(yaml.dump({'a': 0}))
+        tmp_config.write(yaml.dump({0: True}))
         sim = tem.TEMSimulator(
             tmp_paths.name,
             tmp_config.name,
