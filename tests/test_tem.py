@@ -1,6 +1,6 @@
 """Unit test for TEM Simulator wrapper."""
-
 from simSPI import tem
+
 import tempfile
 import os
 
