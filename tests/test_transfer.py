@@ -7,7 +7,7 @@ from simSPI import transfer
 
 def test_ctf_freqs():
     """Test for ctf_freq."""
-    n_pixels = int((np.random.randint(low=8, high=128) // 2) * 2)
+    n_pixels = int(2 * (np.random.randint(low=8, high=128) // 2))
     assert np.isclose(
         n_pixels % 2, 0
     ), "must be even for test to work. n_pixels {}".format(n_pixels)
