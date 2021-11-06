@@ -15,8 +15,8 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
-        self.path_dict = self._get_config_from_yaml(path_config)
-        self.sim_dict = self._get_config_from_yaml(sim_config)
+        self.path_dict = self.get_config_from_yaml(path_config)
+        self.sim_dict = self.get_config_from_yaml(sim_config)
         self.placeholder = 0
 
     def run(self, pdb_file):
@@ -191,13 +191,8 @@ class TEMSimulator:
 
 
 def main():
-    """Start up the TEM Simulator for a particular pdb file."""
-    sim = TEMSimulator(
-        "./temp_workspace/input/path_config.yaml",
-        "./temp_workspace/input/sim_config.yaml",
-    )
-    pdb_file = "placeholder.pdb"
-    _ = sim.run(pdb_file)
+    """Main function."""
+    return 1
 
 
 if __name__ == "__main__":
