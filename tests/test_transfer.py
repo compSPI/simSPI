@@ -56,7 +56,6 @@ def test_random_ctfs():
     assert np.isclose(
         n_pixels % 2, 0
     ), "must be even for test to work. n_pixels {}".format(n_pixels)
-    print(n_pixels)
     n_particles = np.random.randint(low=3, high=7)
     df_min = np.random.uniform(low=5000, high=30000)
     df_max = df_min + 100
