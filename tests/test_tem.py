@@ -1,6 +1,8 @@
 """Unit test for TEM Simulator wrapper."""
 
 from simSPI import tem
+import tempfile
+import os
 
 
 def test_tem_main():
@@ -10,15 +12,28 @@ def test_tem_main():
 
 def test_basic_sim():
     """Tests simulator class initialization and basic functionality."""
-    simulator = tem.TEMSimulator("../test/paths.yml", "../test/sim.yml")
-    simulator.get_config_from_yaml("../test/config.yml")
-    tem.TEMSimulator.generate_path_dict("test.pdb")
+    tmp_config = tempfile.NamedTemporaryFile(delete=False)
+    tmp_paths = tempfile.NamedTemporaryFile(delete=False)
+    tmp_pdb = tempfile.NamedTemporaryFile(delete=False)
 
-    simulator.run("test.pdb")
+    try:
+        sim = tem.TEMSimulator(
+            tmp_paths.name,
+            tmp_config.name,
+        )
+        _ = sim.run(tmp_pdb.name)
+        tem.TEMSimulator.generate_path_dict(tmp_pdb.name)
 
-    simulator.create_crd_file(0)
-    simulator.get_image_data()
-    simulator.generate_parameters_dictionary()
-    simulator.write_inp_file()
-    simulator.extract_particles(None, 0)
-    simulator.export_particle_stack([])
+        sim.create_crd_file(0)
+        sim.get_image_data()
+        sim.generate_parameters_dictionary()
+        sim.write_inp_file()
+        sim.extract_particles(None, 0)
+        sim.export_particle_stack([])
+    finally:
+        tmp_config.close()
+        tmp_paths.close()
+        tmp_pdb.close()
+        os.unlink(tmp_config)
+        os.unlink(tmp_paths)
+        os.unlink(tmp_pdb)
