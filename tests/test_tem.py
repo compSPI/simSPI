@@ -3,6 +3,7 @@ from simSPI import tem
 
 import tempfile
 import os
+import yaml
 
 
 def test_tem_main():
@@ -17,6 +18,7 @@ def test_basic_sim():
     tmp_pdb = tempfile.NamedTemporaryFile(delete=False)
 
     try:
+        tmp_config.write(yaml.dump(yaml.load("a: 1")))
         sim = tem.TEMSimulator(
             tmp_paths.name,
             tmp_config.name,
