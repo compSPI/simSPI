@@ -22,7 +22,7 @@ def test_basic_sim():
     """
 
     try:
-        tmp_config.write(yaml.dump(yaml.load(config_content)))
+        tmp_config.write(yaml.dump(yaml.safe_load(config_content)))
         sim = tem.TEMSimulator(
             tmp_paths.name,
             tmp_config.name,
