@@ -65,7 +65,7 @@ def test_apply_poisson_shot_noise_sample():
 def test_apply_complex_ctf_to_exit_wave():
     """Test apply_complex_ctf_to_exit_wave."""
     n_random = np.random.uniform(low=50, high=100)
-    n_pixels = int(2 * (n_random // 2))  # even N
+    n_pixels = int((n_random // 2) * 2)  # even N
     assert np.isclose(n_pixels % 2, 0), "must be even for test to work"
     i0 = multislice.apply_complex_ctf_to_exit_wave(
         exit_wave_f=np.ones((n_pixels, n_pixels)),
