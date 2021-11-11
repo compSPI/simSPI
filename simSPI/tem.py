@@ -15,7 +15,9 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
-        self.path_dict = self.get_config_from_yaml(path_config)
+        print('\n')
+       # self.path_dict = self.get_config_from_yaml(path_config)
+        print('\n')
         self.sim_dict = self.get_config_from_yaml(sim_config)
         self.placeholder = 0
 
@@ -62,6 +64,9 @@ class TEMSimulator:
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
+        
+        print(raw_params)
+        print('\n')
         classified_params = self.classify_input_config(raw_params)
 
         return classified_params
@@ -79,7 +84,23 @@ class TEMSimulator:
         classified_params : dict of type str to {str,bool,int,list}
             Dictionary of grouped parameters
         """
-        classified_params = {}
+
+        # jed
+        molecular_model = raw_params['molecular_model']
+        specimen_grid_params = raw_params['specimen_grid_params']
+        beam_parameters = raw_params['beam_parameters']
+        optics_parameters = raw_params['optics_parameters']
+        detector_parameters = raw_params['detector_parameters']
+
+        print(list(molecular_model.values()))
+
+        classified_params = {
+            'molecular_model': list(molecular_model.values()),
+            'specimen_grid_params': list(specimen_grid_params.values()),
+            'beam_parameters': list(beam_parameters.values()),
+            'optics_parameters': list(optics_parameters.values()),
+            'detector_parameters': list(detector_parameters.values())
+        }
         return classified_params
 
     @staticmethod
@@ -111,6 +132,7 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
+        # jed
         path_dict = {}
         return path_dict
 
@@ -192,6 +214,7 @@ class TEMSimulator:
 
 def main():
     """Return 1 as a placeholder."""
+    t = TEMSimulator('../temp_workspace/input/path_config.yaml', '../temp_workspace/input/sim_config.yaml')
     return 1
 
 
