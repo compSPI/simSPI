@@ -92,8 +92,6 @@ class TEMSimulator:
         optics_parameters = raw_params['optics_parameters']
         detector_parameters = raw_params['detector_parameters']
 
-        print(list(molecular_model.values()))
-
         classified_params = {
             'molecular_model': list(molecular_model.values()),
             'specimen_grid_params': list(specimen_grid_params.values()),
@@ -101,6 +99,7 @@ class TEMSimulator:
             'optics_parameters': list(optics_parameters.values()),
             'detector_parameters': list(detector_parameters.values())
         }
+
         return classified_params
 
     @staticmethod
