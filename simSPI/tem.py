@@ -77,15 +77,14 @@ class TEMSimulator:
 
         Parameters
         ----------
-        raw_params : dict of type str to {str,bool,int}
+        raw_params : dict of type str to {str, double, int}
             Dictionary of simulator parameters
         Returns
         -------
-        classified_params : dict of type str to {str,bool,int,list}
+        classified_params : dict of type str to list
             Dictionary of grouped parameters
         """
 
-        # jed
         molecular_model = raw_params['molecular_model']
         specimen_grid_params = raw_params['specimen_grid_params']
         beam_parameters = raw_params['beam_parameters']
