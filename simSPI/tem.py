@@ -18,7 +18,10 @@ class TEMSimulator:
         print('\n')
        # self.path_dict = self.get_config_from_yaml(path_config)
         print('\n')
+        self.path_dict = self.get_config_from_yaml(path_config)
         self.sim_dict = self.get_config_from_yaml(sim_config)
+
+        self.classified_sim_dict = self.classify_input_config(self.sim_dict)
         self.placeholder = 0
 
     def run(self, pdb_file):
@@ -67,9 +70,8 @@ class TEMSimulator:
         
         print(raw_params)
         print('\n')
-        classified_params = self.classify_input_config(raw_params)
 
-        return classified_params
+        return raw_params
 
     @staticmethod
     def classify_input_config(raw_params):
