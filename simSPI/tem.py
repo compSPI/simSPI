@@ -41,14 +41,13 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-
         self.create_crd_file(pad=5)
         self.create_inp_file(seed=1234)
 
         micrograph_data = self.get_image_data()
 
         if display_data:
-            fig = plt.figure(figsize=(18, 12))
+            _ = plt.figure(figsize=(18, 12))
             plt.imshow(micrograph_data, origin='lower', cmap='Greys')
             plt.colorbar()
             plt.show()
@@ -158,7 +157,6 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-
         file_path_dict = {}
 
         output_file_path = path_dict['output_dir'] \
@@ -182,7 +180,6 @@ class TEMSimulator:
         pad : double
             Pad to be added to maximal dimension of the object read from pdb_file
         """
-
         x_range, y_range, num_part = simutils.define_grid_in_fov(
             self.sim_dict['specimen_grid_params'],
             self.sim_dict['optics_parameters'],
@@ -206,7 +203,6 @@ class TEMSimulator:
         -------
         List containing parsed .mrc data from Simulator
         """
-
         os.system('{} {}'.format(
             self.path_dict['simulator_dir'],
             self.output_path_dict['inp_file']
@@ -254,7 +250,7 @@ class TEMSimulator:
         inp_file = self.output_path_dict['inp_file']
 
         simutils.write_inp_file(inp_file=inp_file, dict_params=parameter_dict)
-        
+
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.
 
@@ -295,3 +291,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
