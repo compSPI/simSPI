@@ -1,5 +1,6 @@
 """Wrapper for the TEM Simulator."""
 import yaml
+import simutils
 
 
 class TEMSimulator:
@@ -15,12 +16,10 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
-        print('\n')
-       # self.path_dict = self.get_config_from_yaml(path_config)
-        print('\n')
         self.path_dict = self.get_config_from_yaml(path_config)
         self.sim_dict = self.get_config_from_yaml(sim_config)
 
+        self.output_path_dict = self.generate_path_dict()
         self.classified_sim_dict = self.classify_input_config(self.sim_dict)
         self.placeholder = 0
 
@@ -67,7 +66,7 @@ class TEMSimulator:
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
-        
+
         print(raw_params)
         print('\n')
 
@@ -103,8 +102,7 @@ class TEMSimulator:
 
         return classified_params
 
-    @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None):
+    def generate_path_dict(self):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
@@ -132,9 +130,21 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-        # jed
-        path_dict = {}
-        return path_dict
+
+        file_path_dict = {}
+
+        output_file_path = self.path_dict['output_dir'] \
+                           + self.path_dict['pdb_keyword'] \
+                           + self.path_dict['micrograph_keyword']
+
+        file_path_dict['pdb_file'] = self.path_dict['pdb_dir'] + self.path_dict['pdb_keyword'] + '.pdb'
+        file_path_dict['crd_file'] = output_file_path + '.txt'
+        file_path_dict['mrc_file'] = output_file_path + '.mrc'
+        file_path_dict['log_file'] = output_file_path + '.log'
+        file_path_dict['inp_file'] = output_file_path + '.inp'
+        file_path_dict['h5_file'] = output_file_path + '.h5'
+
+        return file_path_dict
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
@@ -144,8 +154,22 @@ class TEMSimulator:
         pad : double
             Pad to be added to maximal dimension of the object read from pdb_file
         """
-        self.placeholder = 0
-        return pad
+
+        x_range, y_range, num_part = simutils.define_grid_in_fov(
+            self.classified_sim_dict['sample_dimensions'],
+            self.classified_sim_dict['optics_params'],
+            self.classified_sim_dict['detector_params'],
+            self.output_path_dict['pdb_file'],
+            Dmax=30,
+            pad=pad
+        )
+
+        simutils.write_crd_file(
+            num_part,
+            xrange=x_range,
+            yrange=y_range,
+            crd_file=self.output_path_dict['crd_file']
+        )
 
     def get_image_data(self):
         """Run simulator and return data.
