@@ -1,7 +1,6 @@
 """Wrapper for the TEM Simulator."""
 import yaml
 
-
 class TEMSimulator:
     """Wrapper for the TEM Simulator.
 
@@ -15,13 +14,10 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
-        print('\n')
-       # self.path_dict = self.get_config_from_yaml(path_config)
-        print('\n')
-        self.path_dict = self.get_config_from_yaml(path_config)
-        self.sim_dict = self.get_config_from_yaml(sim_config)
+        self.path_dict = self.get_raw_config_from_yaml(path_config)
+        self.raw_sim_dict = self.get_raw_config_from_yaml(sim_config)
 
-        self.classified_sim_dict = self.classify_input_config(self.sim_dict)
+        self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
         self.placeholder = 0
 
     def run(self, pdb_file):
@@ -41,7 +37,7 @@ class TEMSimulator:
         particles = [self.placeholder, pdb_file]
         return particles
 
-    def get_config_from_yaml(self, config_yaml):
+    def get_raw_config_from_yaml(self, config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
 
         Parameters
@@ -67,33 +63,29 @@ class TEMSimulator:
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
-        
-        print(raw_params)
-        print('\n')
 
         return raw_params
 
     @staticmethod
-    def classify_input_config(raw_params):
-        """Take dictionary of individual parameters and groups them into lists.
+    def classify_sim_params(raw_sim_params):
+        """Take dictionary of individual simulation parameters and groups them into lists.
 
         Parameters
         ----------
-        raw_params : dict of type str to {str, double, int}
+        raw_sim_params : dict of type str to (dict of type str to {str, int, double})
             Dictionary of simulator parameters
         Returns
         -------
-        classified_params : dict of type str to list
-            Dictionary of grouped parameters
+        classified_sim_params : dict of type str to list
+            Dictionary of grouped simulator parameters
         """
+        molecular_model = raw_sim_params['molecular_model']
+        specimen_grid_params = raw_sim_params['specimen_grid_params']
+        beam_parameters = raw_sim_params['beam_parameters']
+        optics_parameters = raw_sim_params['optics_parameters']
+        detector_parameters = raw_sim_params['detector_parameters']
 
-        molecular_model = raw_params['molecular_model']
-        specimen_grid_params = raw_params['specimen_grid_params']
-        beam_parameters = raw_params['beam_parameters']
-        optics_parameters = raw_params['optics_parameters']
-        detector_parameters = raw_params['detector_parameters']
-
-        classified_params = {
+        classified_sim_params = {
             'molecular_model': list(molecular_model.values()),
             'specimen_grid_params': list(specimen_grid_params.values()),
             'beam_parameters': list(beam_parameters.values()),
@@ -101,7 +93,7 @@ class TEMSimulator:
             'detector_parameters': list(detector_parameters.values())
         }
 
-        return classified_params
+        return classified_sim_params
 
     @staticmethod
     def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None):
@@ -132,7 +124,6 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-        # jed
         path_dict = {}
         return path_dict
 
