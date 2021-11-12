@@ -3,6 +3,7 @@ import yaml
 import simutils
 import cryoemio
 import os
+
 import matplotlib.pyplot as plt
 
 
@@ -26,7 +27,7 @@ class TEMSimulator:
         self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
         self.placeholder = 0
 
-    def run(self, display_data=False):
+    def run(self, display_data):
         """Run TEM simulator on input file and produce particle stacks with metadata.
 
         Parameters
@@ -42,7 +43,7 @@ class TEMSimulator:
         """
 
         self.create_crd_file(pad=5)
-        # self.create_inp_file()
+        self.create_inp_file(seed=1234)
 
         micrograph_data = self.get_image_data()
 
@@ -102,12 +103,24 @@ class TEMSimulator:
         optics_parameters = raw_sim_params['optics_parameters']
         detector_parameters = raw_sim_params['detector_parameters']
 
+        def flatten_detector_array(arr):
+
+            flattened_params = []
+
+            for i in range(6):
+                flattened_params.append(arr[i])
+
+            for i in range(5):
+                flattened_params.append(arr[6][i])
+
+            return flattened_params
+
         classified_sim_params = {
             'molecular_model': list(molecular_model.values()),
             'specimen_grid_params': list(specimen_grid_params.values()),
             'beam_parameters': list(beam_parameters.values()),
             'optics_parameters': list(optics_parameters.values()),
-            'detector_parameters': list(detector_parameters.values())
+            'detector_parameters': flatten_detector_array(list(detector_parameters.values()))
         }
 
         return classified_sim_params
@@ -170,9 +183,9 @@ class TEMSimulator:
         """
 
         x_range, y_range, num_part = simutils.define_grid_in_fov(
-            self.sim_dict['sample_dimensions'],
-            self.sim_dict['optics_params'],
-            self.sim_dict['detector_params'],
+            self.sim_dict['specimen_grid_params'],
+            self.sim_dict['optics_parameters'],
+            self.sim_dict['detector_parameters'],
             self.output_path_dict['pdb_file'],
             Dmax=30,
             pad=pad
@@ -194,16 +207,20 @@ class TEMSimulator:
         """
 
         os.system('{} {}'.format(
-            self.path_dict['simulator_bin'],
+            self.path_dict['simulator_dir'],
             self.output_path_dict['inp_file']
         ))
 
-        data = cryoemio.mrc2data(self.path_dict['mrc_file'])
+        print('done')
+
+        data = cryoemio.mrc2data(self.output_path_dict['mrc_file'])
         micrograph = data[0, ...]
+
+        print('donezo')
 
         return micrograph
 
-    def write_inp_file(self, seed=1234):
+    def create_inp_file(self, seed=1234):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
         The .inp files contain the parameters controlling the simulation. These are text
@@ -214,13 +231,15 @@ class TEMSimulator:
         """
         mrc_file = self.output_path_dict['mrc_file']
         pdb_file = self.output_path_dict['pdb_file']
-        particle_mrcout = self.raw_sim_dict['molecular_model']['particle_mrcout']
         crd_file = self.output_path_dict['crd_file']
+        log_file = self.output_path_dict['log_file']
+
+        particle_mrcout = self.raw_sim_dict['molecular_model']['particle_mrcout']
+
         sample_dimensions = self.sim_dict['specimen_grid_params']
         beam_params = self.sim_dict['beam_parameters']
-        optics_params = self.sim_dict['optic_parameters']
+        optics_params = self.sim_dict['optics_parameters']
         detector_params = self.sim_dict['detector_parameters']
-        log_file = self.output_path_dict['log_file']
 
         parameter_dict = simutils.fill_parameters_dictionary(
             mrc_file=mrc_file,
@@ -273,7 +292,7 @@ class TEMSimulator:
 def main():
     """Return 1 as a placeholder."""
     t = TEMSimulator('../temp_workspace/input/path_config.yaml', '../temp_workspace/input/sim_config.yaml')
-    # t.run(True)
+    t.run(True)
     return 1
 
 
