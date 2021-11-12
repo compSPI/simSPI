@@ -118,7 +118,7 @@ class TEMSimulator:
 
         Parameters
         ----------
-        path_dict : dict of stype str to str
+        path_dict : dict of type str to str
             Dict of user inputted path config parameters containing keys:
             pdb_file : str
                 Relative path to the pdb file
@@ -215,7 +215,7 @@ class TEMSimulator:
         param_dictionary = {}
         return param_dictionary
 
-    def write_inp_file(self):
+    def write_inp_file(self, seed=1234):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
         The .inp files contain the parameters controlling the simulation. These are text
@@ -224,9 +224,33 @@ class TEMSimulator:
         different particles) and parameter assignments of the form
         "<parameter> = <value>".
         """
-        self.placeholder = 0
-        return self.placeholder
+        mrc_file = self.output_path_dict['mrc_file']
+        pdb_file = self.output_path_dict['pdb_file']
+        particle_mrcout = self.raw_sim_dict['molecular_model']['particle_mrcout']
+        crd_file = self.output_path_dict['crd_file']
+        sample_dimensions = self.sim_dict['specimen_grid_params']
+        beam_params = self.sim_dict['beam_parameters']
+        optics_params = self.sim_dict['optic_parameters']
+        detector_params = self.sim_dict['detector_parameters']
+        log_file = self.output_path_dict['log_file']
 
+        parameter_dict = simutils.fill_parameters_dictionary(
+            mrc_file=mrc_file,
+            pdb_file=pdb_file,
+            particle_mrcout=particle_mrcout,
+            crd_file=crd_file,
+            sample_dimensions=sample_dimensions,
+            beam_params=beam_params,
+            optics_params=optics_params,
+            detector_params=detector_params,
+            log_file=log_file,
+            seed=seed
+        )
+
+        inp_file = self.output_path_dict['inp_file']
+
+        simutils.write_inp_file(inp_file=inp_file, dict_params=parameter_dict)
+        
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.
 
