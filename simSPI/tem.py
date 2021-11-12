@@ -1,6 +1,9 @@
 """Wrapper for the TEM Simulator."""
 import yaml
 import simutils
+import cryoemio
+import os
+import matplotlib.pyplot as plt
 
 
 class TEMSimulator:
@@ -23,22 +26,32 @@ class TEMSimulator:
         self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
         self.placeholder = 0
 
-    def run(self, pdb_file):
+    def run(self, display_data=False):
         """Run TEM simulator on input file and produce particle stacks with metadata.
 
         Parameters
         ----------
-        pdb_file : str
-            Relative file path to input .pdb file for sim
+        display_data : Bool
+            Flag to determine whether to display micrograph data after generation
+
 
         Returns
         -------
         particles : arr
             Individual particle data extracted from micrograph
         """
-        pdb_file = "placeholder_to_pass_tests"
-        particles = [self.placeholder, pdb_file]
-        return particles
+
+        self.create_crd_file(pad=5)
+        # self.create_inp_file()
+
+        micrograph_data = self.get_image_data()
+
+        if display_data:
+            fig = plt.figure(figsize=(18, 12))
+            plt.imshow(micrograph_data, origin='lower', cmap='Greys')
+            plt.colorbar()
+
+        return micrograph_data
 
     @staticmethod
     def get_raw_config_from_yaml(config_yaml):
@@ -179,8 +192,16 @@ class TEMSimulator:
         -------
         List containing parsed .mrc data from Simulator
         """
-        self.placeholder = 0
-        return []
+
+        os.system('{} {}'.format(
+            self.path_dict['simulator_bin'],
+            self.output_path_dict['inp_file']
+        ))
+
+        data = cryoemio.mrc2data(self.path_dict['mrc_file'])
+        micrograph = data[0, ...]
+
+        return micrograph
 
     def generate_parameters_dictionary(self):
         """Compile experiment data into .inp friendly file for use in TEM-simulator.
@@ -240,6 +261,7 @@ class TEMSimulator:
 def main():
     """Return 1 as a placeholder."""
     t = TEMSimulator('../temp_workspace/input/path_config.yaml', '../temp_workspace/input/sim_config.yaml')
+    # t.run(True)
     return 1
 
 
