@@ -27,7 +27,7 @@ class TEMSimulator:
         self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
         self.placeholder = 0
 
-    def run(self, display_data):
+    def run(self, display_data=False):
         """Run TEM simulator on input file and produce particle stacks with metadata.
 
         Parameters
@@ -51,6 +51,7 @@ class TEMSimulator:
             fig = plt.figure(figsize=(18, 12))
             plt.imshow(micrograph_data, origin='lower', cmap='Greys')
             plt.colorbar()
+            plt.show()
 
         return micrograph_data
 
@@ -211,12 +212,8 @@ class TEMSimulator:
             self.output_path_dict['inp_file']
         ))
 
-        print('done')
-
         data = cryoemio.mrc2data(self.output_path_dict['mrc_file'])
         micrograph = data[0, ...]
-
-        print('donezo')
 
         return micrograph
 
