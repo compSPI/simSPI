@@ -203,18 +203,6 @@ class TEMSimulator:
 
         return micrograph
 
-    def generate_parameters_dictionary(self):
-        """Compile experiment data into .inp friendly file for use in TEM-simulator.
-
-        Returns
-        -------
-        param_dictionary : dict
-            .inp friendly dictionary containing simulation input parameters.
-        """
-        self.placeholder = 0
-        param_dictionary = {}
-        return param_dictionary
-
     def write_inp_file(self, seed=1234):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
