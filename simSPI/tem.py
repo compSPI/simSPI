@@ -378,7 +378,7 @@ class TEMSimulator:
 def main():
     """Return 1 as a placeholder."""
     t = TEMSimulator('../temp_workspace/input/path_config.yaml', '../temp_workspace/input/sim_config.yaml')
-    t.run(display_data=True)
+    t.run(display_data=True, export_particles=True)
     return 1
 
 
