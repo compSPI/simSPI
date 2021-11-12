@@ -19,7 +19,7 @@ class TEMSimulator:
         self.path_dict = self.get_raw_config_from_yaml(path_config)
         self.raw_sim_dict = self.get_raw_config_from_yaml(sim_config)
 
-        self.output_path_dict = self.generate_path_dict()
+        self.output_path_dict = self.generate_path_dict(self.path_dict)
         self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
         self.placeholder = 0
 
@@ -40,7 +40,8 @@ class TEMSimulator:
         particles = [self.placeholder, pdb_file]
         return particles
 
-    def get_raw_config_from_yaml(self, config_yaml):
+    @staticmethod
+    def get_raw_config_from_yaml(config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
 
         Parameters
@@ -98,17 +99,21 @@ class TEMSimulator:
 
         return classified_sim_params
 
-    def generate_path_dict(self):
+    @staticmethod
+    def generate_path_dict(path_dict):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
         ----------
-        pdb_file : str
-            Relative path to the pdb file
-        output_dir : str, (default = None)
-            Relative path to output directory
-        mrc_keyword : str, (default = None)
-            user-specified keyword appended to output files
+        path_dict : dict of stype str to str
+            Dict of user inputted path config parameters containing keys:
+            pdb_file : str
+                Relative path to the pdb file
+            output_dir : str, (default = None)
+                Relative path to output directory
+            mrc_keyword : str, (default = None)
+                user-specified keyword appended to output files
+
         Returns
         -------
         path_dict : dict of type str to str
@@ -129,11 +134,11 @@ class TEMSimulator:
 
         file_path_dict = {}
 
-        output_file_path = self.path_dict['output_dir'] \
-                           + self.path_dict['pdb_keyword'] \
-                           + self.path_dict['micrograph_keyword']
+        output_file_path = path_dict['output_dir'] \
+                           + path_dict['pdb_keyword'] \
+                           + path_dict['micrograph_keyword']
 
-        file_path_dict['pdb_file'] = self.path_dict['pdb_dir'] + self.path_dict['pdb_keyword'] + '.pdb'
+        file_path_dict['pdb_file'] = path_dict['pdb_dir'] + path_dict['pdb_keyword'] + '.pdb'
         file_path_dict['crd_file'] = output_file_path + '.txt'
         file_path_dict['mrc_file'] = output_file_path + '.mrc'
         file_path_dict['log_file'] = output_file_path + '.log'
