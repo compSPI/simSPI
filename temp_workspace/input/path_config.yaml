@@ -1,0 +1,5 @@
+  pdb_dir: '../temp_workspace/input/'
+  micrograph_keyword: '_randomrot'
+  pdb_keyword: '4v6x'
+  output_dir: '../temp_workspace/output/'
+  simulator_dir: '../../../TEM-simulator/src/TEM-simulator'
