@@ -1,11 +1,11 @@
 """Wrapper for the TEM Simulator."""
-import yaml
-import simutils
-import cryoemio
 import os
 
+import cryoemio
 import matplotlib.pyplot as plt
 import numpy as np
+import simutils
+import yaml
 
 
 class TEMSimulator:
@@ -27,10 +27,8 @@ class TEMSimulator:
         self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
 
         self.parameter_dict = self.generate_parameter_dict(
-            self.output_path_dict,
-            self.sim_dict,
-            self.raw_sim_dict,
-            seed=1234)
+            self.output_path_dict, self.sim_dict, self.raw_sim_dict, seed=1234
+        )
 
         self.placeholder = 0
 
@@ -49,7 +47,6 @@ class TEMSimulator:
         particle_data : arr
             Individual particle data extracted from micrograph
         """
-
         self.create_crd_file(pad=5)
         self.create_inp_file()
 
@@ -57,7 +54,8 @@ class TEMSimulator:
         particle_data = self.extract_particles(
             micrograph_data,
             export_particles=export_particles,
-            display_data=display_data)
+            display_data=display_data,
+        )
 
         return particle_data
 
@@ -94,11 +92,11 @@ class TEMSimulator:
         classified_sim_params : dict of type str to list
             Dictionary of grouped simulator parameters
         """
-        molecular_model = raw_sim_params['molecular_model']
-        specimen_grid_params = raw_sim_params['specimen_grid_params']
-        beam_parameters = raw_sim_params['beam_parameters']
-        optics_parameters = raw_sim_params['optics_parameters']
-        detector_parameters = raw_sim_params['detector_parameters']
+        molecular_model = raw_sim_params["molecular_model"]
+        specimen_grid_params = raw_sim_params["specimen_grid_params"]
+        beam_parameters = raw_sim_params["beam_parameters"]
+        optics_parameters = raw_sim_params["optics_parameters"]
+        detector_parameters = raw_sim_params["detector_parameters"]
 
         def flatten_detector_array(arr):
 
@@ -113,11 +111,13 @@ class TEMSimulator:
             return flattened_params
 
         classified_sim_params = {
-            'molecular_model': list(molecular_model.values()),
-            'specimen_grid_params': list(specimen_grid_params.values()),
-            'beam_parameters': list(beam_parameters.values()),
-            'optics_parameters': list(optics_parameters.values()),
-            'detector_parameters': flatten_detector_array(list(detector_parameters.values()))
+            "molecular_model": list(molecular_model.values()),
+            "specimen_grid_params": list(specimen_grid_params.values()),
+            "beam_parameters": list(beam_parameters.values()),
+            "optics_parameters": list(optics_parameters.values()),
+            "detector_parameters": flatten_detector_array(
+                list(detector_parameters.values())
+            ),
         }
 
         return classified_sim_params
@@ -154,17 +154,22 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-
         file_path_dict = {}
 
-        output_file_path = path_dict['output_dir'] + path_dict['pdb_keyword'] + path_dict['micrograph_keyword']
+        output_file_path = (
+            path_dict["output_dir"]
+            + path_dict["pdb_keyword"]
+            + path_dict["micrograph_keyword"]
+        )
 
-        file_path_dict['pdb_file'] = path_dict['pdb_dir'] + path_dict['pdb_keyword'] + '.pdb'
-        file_path_dict['crd_file'] = output_file_path + '.txt'
-        file_path_dict['mrc_file'] = output_file_path + '.mrc'
-        file_path_dict['log_file'] = output_file_path + '.log'
-        file_path_dict['inp_file'] = output_file_path + '.inp'
-        file_path_dict['h5_file'] = output_file_path + '.h5'
+        file_path_dict["pdb_file"] = (
+            path_dict["pdb_dir"] + path_dict["pdb_keyword"] + ".pdb"
+        )
+        file_path_dict["crd_file"] = output_file_path + ".txt"
+        file_path_dict["mrc_file"] = output_file_path + ".mrc"
+        file_path_dict["log_file"] = output_file_path + ".log"
+        file_path_dict["inp_file"] = output_file_path + ".inp"
+        file_path_dict["h5_file"] = output_file_path + ".h5"
 
         return file_path_dict
 
@@ -181,21 +186,20 @@ class TEMSimulator:
         Leverages methods developed in:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
-
         x_range, y_range, num_part = simutils.define_grid_in_fov(
-            self.sim_dict['specimen_grid_params'],
-            self.sim_dict['optics_parameters'],
-            self.sim_dict['detector_parameters'],
-            self.output_path_dict['pdb_file'],
+            self.sim_dict["specimen_grid_params"],
+            self.sim_dict["optics_parameters"],
+            self.sim_dict["detector_parameters"],
+            self.output_path_dict["pdb_file"],
             Dmax=30,
-            pad=pad
+            pad=pad,
         )
 
         simutils.write_crd_file(
             num_part,
             xrange=x_range,
             yrange=y_range,
-            crd_file=self.output_path_dict['crd_file']
+            crd_file=self.output_path_dict["crd_file"],
         )
 
     def get_image_data(self, display_data=False):
@@ -214,18 +218,18 @@ class TEMSimulator:
         ---------
         Leverages methods developed in https://github.com/slaclab/cryoEM-notebooks
         """
+        os.system(
+            "{} {}".format(
+                self.path_dict["simulator_dir"], self.output_path_dict["inp_file"]
+            )
+        )
 
-        os.system('{} {}'.format(
-            self.path_dict['simulator_dir'],
-            self.output_path_dict['inp_file']
-        ))
-
-        data = cryoemio.mrc2data(self.output_path_dict['mrc_file'])
+        data = cryoemio.mrc2data(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
 
         if display_data:
             # fig = plt.figure(figsize=(18, 12))
-            plt.imshow(micrograph, origin='lower', cmap='Greys')
+            plt.imshow(micrograph, origin="lower", cmap="Greys")
             plt.colorbar()
             plt.show()
 
@@ -233,39 +237,43 @@ class TEMSimulator:
 
     @staticmethod
     def generate_parameter_dict(output_path_dict, sim_dict, raw_sim_dict, seed=1234):
-        """Generate class variable parameter_dict from cleaned user config data for use in class methods
+        """Generate class variable parameter_dict from cleaned user config data.
+
+        Output is for use in class methods.
 
         Parameters
         ----------
         output_path_dict : dict
-            Dictionary containing file paths to input pdb file and simulator generated output files
+            Dictionary containing file paths to input pdb file and simulator generated
+            output files.
         sim_dict : dict
-            Dictionary of grouped simulator parameters
+            Dictionary of grouped simulator parameters.
         raw_sim_dict : dict
-            Dictionary containing grouped parameters from yaml config file
+            Dictionary containing grouped parameters from yaml config file.
         seed : int
-            Integer seed passed to TEM-Simulator through inp_file
+            Integer seed passed to TEM-Simulator through inp_file.
+
         Returns
         -------
         particles : arr
-            Individual particle data extracted from micrograph
+            Individual particle data extracted from micrograph.
 
         Reference
         ---------
         Leverages methods developed in:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
-        mrc_file = output_path_dict['mrc_file']
-        pdb_file = output_path_dict['pdb_file']
-        crd_file = output_path_dict['crd_file']
-        log_file = output_path_dict['log_file']
+        mrc_file = output_path_dict["mrc_file"]
+        pdb_file = output_path_dict["pdb_file"]
+        crd_file = output_path_dict["crd_file"]
+        log_file = output_path_dict["log_file"]
 
-        particle_mrcout = raw_sim_dict['molecular_model']['particle_mrcout']
+        particle_mrcout = raw_sim_dict["molecular_model"]["particle_mrcout"]
 
-        sample_dimensions = sim_dict['specimen_grid_params']
-        beam_params = sim_dict['beam_parameters']
-        optics_params = sim_dict['optics_parameters']
-        detector_params = sim_dict['detector_parameters']
+        sample_dimensions = sim_dict["specimen_grid_params"]
+        beam_params = sim_dict["beam_parameters"]
+        optics_params = sim_dict["optics_parameters"]
+        detector_params = sim_dict["detector_parameters"]
 
         parameter_dict = simutils.fill_parameters_dictionary(
             mrc_file=mrc_file,
@@ -277,7 +285,7 @@ class TEMSimulator:
             optics_params=optics_params,
             detector_params=detector_params,
             log_file=log_file,
-            seed=seed
+            seed=seed,
         )
 
         return parameter_dict
@@ -296,8 +304,7 @@ class TEMSimulator:
         Leverages methods developed in:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
-
-        inp_file = self.output_path_dict['inp_file']
+        inp_file = self.output_path_dict["inp_file"]
         simutils.write_inp_file(inp_file=inp_file, dict_params=self.parameter_dict)
 
     def extract_particles(self, micrograph, export_particles=True, display_data=False):
@@ -323,21 +330,23 @@ class TEMSimulator:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/cryoemio.py
         """
-
         particles = simutils.microgaph2particles(
             micrograph,
-            self.sim_dict['molecular_model'],
-            self.sim_dict['optics_parameters'],
-            self.sim_dict['detector_parameters'],
-            pdb_file=self.output_path_dict['pdb_file'],
+            self.sim_dict["molecular_model"],
+            self.sim_dict["optics_parameters"],
+            self.sim_dict["detector_parameters"],
+            pdb_file=self.output_path_dict["pdb_file"],
             Dmax=30,
-            pad=5.)
+            pad=5.0,
+        )
 
         if display_data:
             self.view_particles(particles, ncol=5)
 
         if export_particles:
-            cryoemio.data_and_dic_2hdf5(particles, self.output_path_dict['h5_file'], dic=self.parameter_dict)
+            cryoemio.data_and_dic_2hdf5(
+                particles, self.output_path_dict["h5_file"], dic=self.parameter_dict
+            )
 
         return particles
 
@@ -361,15 +370,14 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-
-        view = data[::slicing[0], ::slicing[1], ::slicing[2]]
+        view = data[:: slicing[0], :: slicing[1], :: slicing[2]]
         figsize = int(figsize * ncol)
         nrow = np.ceil(view.shape[0] / ncol)
         fig = plt.figure(figsize=(ncol * figsize, nrow * figsize))
 
         for i in np.arange(view.shape[0]):
             fig.add_subplot(int(nrow), int(ncol), int(i + 1))
-            plt.imshow(view[i], cmap='Greys')
+            plt.imshow(view[i], cmap="Greys")
 
         plt.tight_layout()
         plt.show()
@@ -377,7 +385,10 @@ class TEMSimulator:
 
 def main():
     """Return 1 as a placeholder."""
-    t = TEMSimulator('../temp_workspace/input/path_config.yaml', '../temp_workspace/input/sim_config.yaml')
+    t = TEMSimulator(
+        "../path_config.yaml",
+        "../sim_config.yaml",
+    )
     t.run(display_data=True, export_particles=True)
     return 1
 
