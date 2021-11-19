@@ -92,11 +92,41 @@ class TEMSimulator:
         classified_sim_params : dict of type str to list
             Dictionary of grouped simulator parameters
         """
-        molecular_model = raw_sim_params["molecular_model"]
-        specimen_grid_params = raw_sim_params["specimen_grid_params"]
-        beam_parameters = raw_sim_params["beam_parameters"]
-        optics_parameters = raw_sim_params["optics_parameters"]
-        detector_parameters = raw_sim_params["detector_parameters"]
+        sim_params_structure = {
+            "molecular_model": ["voxel_size", "particle_name", "particle_mrcout"],
+            "specimen_grid_params": [
+                "hole_diameter",
+                "hole_thickness_center",
+                "hole_thickness_edge",
+            ],
+            "breeam_parameters": [
+                "voltage",
+                "energy_spread",
+                "electron_dose",
+                "electron_dose_std",
+            ],
+            "optics_parameters": [
+                "magnification",
+                "spherical_aberration",
+                "chromatic_aberration",
+                "aperture_diameter",
+                "focal_length",
+                "aperture_angle",
+                "defocus",
+                "defocus_syst_error",
+                "defocus_nonsyst_error",
+                "optics_defocusout",
+            ],
+            "detector_parameters": [
+                "detector_Nx",
+                "detector_Ny",
+                "detector_pixel_size",
+                "detector_gain",
+                "noise",
+                "detector_Q_efficiency",
+                "MTF_params",
+            ],
+        }
 
         def flatten_detector_array(arr):
 
@@ -110,15 +140,18 @@ class TEMSimulator:
 
             return flattened_params
 
-        classified_sim_params = {
-            "molecular_model": list(molecular_model.values()),
-            "specimen_grid_params": list(specimen_grid_params.values()),
-            "beam_parameters": list(beam_parameters.values()),
-            "optics_parameters": list(optics_parameters.values()),
-            "detector_parameters": flatten_detector_array(
-                list(detector_parameters.values())
-            ),
-        }
+        classified_sim_params = {}
+
+        for param_type, param_order in sim_params_structure.items():
+            if param_type != "detector_parameters":
+                classified_sim_params[param_type] = [
+                    raw_sim_params[param_type].get(key) for key in param_order
+                ]
+            elif param_type == "detector_parameters":
+                ordered_list = [
+                    raw_sim_params[param_type].get(key) for key in param_order
+                ]
+                classified_sim_params[param_type] = flatten_detector_array(ordered_list)
 
         return classified_sim_params
 
