@@ -99,7 +99,7 @@ class TEMSimulator:
                 "hole_thickness_center",
                 "hole_thickness_edge",
             ],
-            "breeam_parameters": [
+            "beam_parameters": [
                 "voltage",
                 "energy_spread",
                 "electron_dose",
