@@ -20,8 +20,9 @@ def mrc2data(mrc_file=None):
                 micrograph = micrograph[np.newaxis, ...]
         else:
             print("Warning! Data in {} is None...".format(mrc_file))
-            return None
         return micrograph
+    else:
+        return None
 
 
 def data_and_dic_2hdf5(data, h5_file, dic=None):
@@ -100,6 +101,8 @@ def get_dmax(filename=None):
         xyz = get_xyz_from_pdb(filename)
         distance = pdist(xyz[0, ...])
         return np.amax(distance)
+    else:
+        return None
 
 
 def get_xyz_from_pdb(filename=None):
@@ -109,6 +112,8 @@ def get_xyz_from_pdb(filename=None):
         atom_indices = traj.topology.select("name CA or name P")
         traj_small = traj.atom_slice(atom_indices)
         return traj_small.xyz
+    else:
+        return None
 
 
 def write_crd_file(
