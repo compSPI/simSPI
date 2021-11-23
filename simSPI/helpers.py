@@ -11,7 +11,13 @@ from scipy.stats import special_ortho_group
 
 
 def mrc2data(mrc_file=None):
-    """mrc2data."""
+    """Return micrograph from an input .mrc file.
+
+    Parameters
+    ----------
+    mrc_file : str
+        File name for .mrc file to turn into micrograph
+    """
     if mrc_file is not None:
         with mrcfile.open(mrc_file, "r", permissive=True) as mrc:
             micrograph = mrc.data
@@ -25,7 +31,17 @@ def mrc2data(mrc_file=None):
 
 
 def data_and_dic_2hdf5(data, h5_file, dic=None):
-    """data_and_dic_2hdf5."""
+    """Save a dictionary which might contain different data types to a .hdf5 file.
+
+    Parameters
+    ----------
+    data : Object
+        Data to store.
+    h5_file : str
+        Relative path to write .h5 file to.
+    dic : dict
+        Dictionary containing fields to save.
+    """
     if dic is None:
         dic = {}
     dic["data"] = data
@@ -34,7 +50,17 @@ def data_and_dic_2hdf5(data, h5_file, dic=None):
 
 
 def recursively_save_dict_contents_to_group(h5file, path, dic):
-    """recursively_save_dict_contents_to_group."""
+    """Recursively save dictionary contents to group.
+
+    Parameters
+    ----------
+    h5file : File
+        .hdf5 file to write to.
+    path : str
+        Relative path to save dictionary contents.
+    dic : dict
+        Dictionary containing data.
+    """
     for k, v in dic.items():
         if isinstance(v, (np.ndarray, np.int64, np.float64, int, float, str, bytes)):
             h5file[path + k] = v
@@ -49,7 +75,21 @@ def recursively_save_dict_contents_to_group(h5file, path, dic):
 def define_grid_in_fov(
     optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
 ):
-    """define_grid_in_fov."""
+    """Define field of view for graph.
+
+    Parameters
+    ----------
+    optic_params : list
+        List of sim parameters pertaining to microscope settings.
+    detector_params : dict
+        List of sim parameters pertaining to detector settings.
+    pdb_file : str
+        Relative path to write .pdb file to.
+    dmax : int
+        Maximum dimension of molecule.
+    pad : int
+        Amount of padding.
+    """
     fov_Lx, fov_Ly, boxsize = get_fov(
         optics_params,
         detector_params,
@@ -73,7 +113,21 @@ def define_grid_in_fov(
 
 
 def get_fov(optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0):
-    """get_fov."""
+    """Define field of view dimensions for displaying particle.
+
+    Parameters
+    ----------
+    optic_params : list
+        List of sim parameters pertaining to microscope settings.
+    detector_params : dict
+        List of sim parameters pertaining to detector settings.
+    pdb_file : str
+        Relative path to .pdb file output.
+    dmax : int
+        Maximum dimension of molecule
+    pad : int
+        Amount of padding.
+    """
     detector_Nx = detector_params[0]
     detector_Ny = detector_params[1]
     detector_pixel_size = detector_params[2] * 1e3
@@ -95,7 +149,13 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0):
 
 
 def get_dmax(filename=None):
-    """get_dmax."""
+    """Get maximmum dimension of particle.
+
+    Parameters
+    ----------
+    filename : str
+        Relative path to file containing topological information of particle
+    """
     if filename is not None:
         xyz = get_xyz_from_pdb(filename)
         distance = pdist(xyz[0, ...])
@@ -104,7 +164,13 @@ def get_dmax(filename=None):
 
 
 def get_xyz_from_pdb(filename=None):
-    """get_xyz_from_pdb."""
+    """Get particle coordinates from .pdb file.
+
+    Parameters
+    ----------
+    filename : str
+        Relative path to file containing topological information of particle
+    """
     if filename is not None:
         traj = md.load(filename)
         atom_indices = traj.topology.select("name CA or name P")
@@ -118,20 +184,24 @@ def write_crd_file(
     xrange=np.arange(-100, 110, 10),
     yrange=np.arange(-100, 110, 10),
     crd_file="crd.txt",
-    pre_rotate=None,
 ):
-    """write_crd_file.
+    """Write particle data to .crd file.
 
-    The table should have 6 columns. The first three columns are
-    x, y, and z coordinates of the particle center.
-    The following three columns are Euler angles for rotation
-    around the z axis, then around the x axis, and again around the z axis.
-    Coordinates are in nm units, and angles in degrees.
+    Parameters
+    ----------
+    numpart : int
+        Number of particles.
+    xrange : ndarray
+        Valid horizontal range for display.
+    yrange : ndarray
+        Valid vertical range for display.
+    crd_file : str
+        Relative path to output .crd file.
     """
     if os.path.exists(crd_file):
         print(crd_file + " already exists.")
     else:
-        rotlist = get_rotlist(numpart, pre_rotate=pre_rotate)
+        rotlist = get_rotlist(numpart)
         with open(crd_file, "w") as crd:
             crd.write("# File created by TEM-simulator, version 1.3.\n")
             crd.write("{numpart}  6\n".format(numpart=numpart))
@@ -170,22 +240,30 @@ def write_crd_file(
                     i += 1
 
 
-def get_rotlist(numpart, pre_rotate=None):
-    """get_rotlist."""
+def get_rotlist(numpart):
+    """Return a rotation list containing Euler angles.
+
+    Parameters
+    ----------
+    numpart : int
+        Number of particles.
+    """
     rotlist = []
     for x in range(0, numpart + 1):
-        if pre_rotate is None:
-            x = special_ortho_group.rvs(3)
-            y = rotation_matrix_to_euler_angles(x)
-        else:
-            angle = 360.0 * np.random.random_sample() - 180.0
-            y = np.array([angle, pre_rotate[0], pre_rotate[1]])
+        x = special_ortho_group.rvs(3)
+        y = rotation_matrix_to_euler_angles(x)
         rotlist.append(y)
     return rotlist
 
 
 def rotation_matrix_to_euler_angles(R):
-    """rotation_matrix_to_euler_angles."""
+    """Compute Euler angles given a rotation matrix.
+
+    Parameters
+    ----------
+    R : ndarray
+        Rotation matrix.
+    """
     if not is_rotation_matrix(R):
         raise ValueError()
 
@@ -206,12 +284,24 @@ def rotation_matrix_to_euler_angles(R):
 
 
 def rad2deg(x):
-    """rad2deg."""
+    """Take a value x in radians and convert to degrees.
+
+    Parameters
+    ----------
+    x : float
+        Degree value to convert to degrees.
+    """
     return (x * 180) / np.pi
 
 
 def is_rotation_matrix(matrix):
-    """is_rotation_matrix."""
+    """Determine whether a given matrix is a valid rotation matrix.
+
+    Parameters
+    ----------
+    matrix : ndarray
+        Matrix to check.
+    """
     transposed_matrix = np.transpose(matrix)
     identity_matrix = np.identity(3, dtype=matrix.dtype)
     n = np.linalg.norm(identity_matrix - np.dot(transposed_matrix, matrix))
