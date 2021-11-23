@@ -13,9 +13,8 @@ def mrc2data(mrc_file):
     """
     with mrcfile.open(mrc_file, "r", permissive=True) as mrc:
         micrograph = mrc.data
-    if micrograph is not None:
-        if len(micrograph.shape) == 2:
-            micrograph = micrograph[np.newaxis, ...]
+    if len(micrograph.shape) == 2:
+        micrograph = micrograph[np.newaxis, ...]
     return micrograph
 
 
