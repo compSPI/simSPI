@@ -20,6 +20,7 @@ def mrc2data(mrc_file=None):
                 micrograph = micrograph[np.newaxis, ...]
         else:
             print("Warning! Data in {} is None...".format(mrc_file))
+            return None
         return micrograph
 
 
@@ -46,11 +47,10 @@ def recursively_save_dict_contents_to_group(h5file, path, dic):
 
 
 def define_grid_in_fov(
-    sample_dimensions, optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
+    optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
 ):
     """define_grid_in_fov."""
     fov_Lx, fov_Ly, boxsize = get_fov(
-        sample_dimensions,
         optics_params,
         detector_params,
         pdb_file=pdb_file,
@@ -72,9 +72,7 @@ def define_grid_in_fov(
     return x_range, y_range, n_particles
 
 
-def get_fov(
-    sample_dimensions, optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
-):
+def get_fov(optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0):
     """get_fov."""
     detector_Nx = detector_params[0]
     detector_Ny = detector_params[1]
@@ -132,43 +130,42 @@ def write_crd_file(
         print(crd_file + " already exists.")
     else:
         rotlist = get_rotlist(numpart, pre_rotate=pre_rotate)
-        crd = open(crd_file, "w")
-        crd.write("# File created by TEM-simulator, version 1.3.\n")
-        crd.write("{numpart}  6\n".format(numpart=numpart))
-        crd.write(
-            "#            \
-            x             \
-            y             \
-            z             \
-            phi           \
-            theta         \
-            psi  \n"
-        )
-        i = 0
-        for y in yrange:
-            for x in xrange:
-                if i == int(numpart):
-                    break
-                crd_table = {
-                    "x": x,
-                    "y": y,
-                    "z": 0,
-                    "phi": rotlist[i][0],
-                    "theta": rotlist[i][1],
-                    "psi": rotlist[i][2],
-                }
-                crd.write(
-                    "{0[x]:14.4f} \
-                    {0[y]:14.4f} \
-                    {0[z]:14.4f} \
-                    {0[phi]:14.4f} \
-                    {0[theta]:14.4f} \
-                    {0[psi]:14.4f}\n".format(
-                        crd_table
+        with open(crd_file, "w") as crd:
+            crd.write("# File created by TEM-simulator, version 1.3.\n")
+            crd.write("{numpart}  6\n".format(numpart=numpart))
+            crd.write(
+                "#            \
+                x             \
+                y             \
+                z             \
+                phi           \
+                theta         \
+                psi  \n"
+            )
+            i = 0
+            for y in yrange:
+                for x in xrange:
+                    if i == int(numpart):
+                        break
+                    crd_table = {
+                        "x": x,
+                        "y": y,
+                        "z": 0,
+                        "phi": rotlist[i][0],
+                        "theta": rotlist[i][1],
+                        "psi": rotlist[i][2],
+                    }
+                    crd.write(
+                        "{0[x]:14.4f} \
+                        {0[y]:14.4f} \
+                        {0[z]:14.4f} \
+                        {0[phi]:14.4f} \
+                        {0[theta]:14.4f} \
+                        {0[psi]:14.4f}\n".format(
+                            crd_table
+                        )
                     )
-                )
-                i += 1
-        crd.close()
+                    i += 1
 
 
 def get_rotlist(numpart, pre_rotate=None):
@@ -187,7 +184,9 @@ def get_rotlist(numpart, pre_rotate=None):
 
 def rotation_matrix_to_euler_angles(R):
     """rotation_matrix_to_euler_angles."""
-    assert is_rotation_matrix(R)
+    if not is_rotation_matrix(R):
+        raise ValueError()
+
     sy = math.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
     singular = sy < 1e-6
     if not singular:
