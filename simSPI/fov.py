@@ -1,4 +1,6 @@
 """Helper functions for tem.py to define grid FOV for displaying particles."""
+import math
+
 import mdtraj as md
 import numpy as np
 from scipy.spatial.distance import pdist
@@ -104,3 +106,92 @@ def get_xyz_from_pdb(filename=None):
     atom_indices = traj.topology.select("name CA or name P")
     traj_small = traj.atom_slice(atom_indices)
     return traj_small.xyz
+
+
+def microgaph2particles(
+    micrograph, optics_params, detector_params, pdb_file=None, dmax=30, pad=5.0
+):
+    """Extract particles from given micrograph.
+
+    Parameters
+    ----------
+    micrograph : ndarray
+        Particle micrograph to extract from.
+    optic_params : list
+        List of sim parameters pertaining to microscope settings.
+    detector_params : dict
+        List of sim parameters pertaining to detector settings.
+    pdb_file : str
+        Relative path to write .pdb file to.
+    dmax : int
+        Maximum dimension of molecule.
+    pad : int
+        Amount of padding.
+    """
+    fov_Lx, fov_Ly, boxsize = get_fov(
+        optics_params, detector_params, pdb_file=pdb_file, dmax=dmax, pad=pad
+    )
+    fov_Nx = np.floor(fov_Lx / boxsize)
+    fov_Ny = np.floor(fov_Ly / boxsize)
+    pixel_size = (fov_Lx / micrograph.shape[1] + fov_Ly / micrograph.shape[0]) / 2.0
+    n_boxsize = np.int(boxsize / pixel_size)
+    Nx = np.int(fov_Nx * n_boxsize)
+    Ny = np.int(fov_Ny * n_boxsize)
+    data = micrograph[0:Ny, 0:Nx]
+    particles = slicenstack(data, n_boxsize=n_boxsize)
+    return particles
+
+
+def slicenstack(data, n_boxsize=256, n_ovl=0):
+    """Convert a 2D numpy array into a 3D numpy array.
+
+    Parameters
+    ----------
+    data : ndarray
+        2D array to stack.
+    n_boxsize : int
+        Boxsize.
+    n_ovl : int
+        Overlap.
+    """
+    if n_ovl == 0:
+        data_stack = blockshaped(data, n_boxsize, n_boxsize)
+    else:
+        n_split = math.floor((data.shape[0] - 2 * n_ovl) / (n_boxsize))
+        n_dilat = n_boxsize + 2 * n_ovl
+        data_stack = np.zeros((n_split * n_split, n_dilat, n_dilat))
+        print("Array dimensions: ", data_stack.shape)
+        i_stack = 0
+        for i in np.arange(n_split):
+            for j in np.arange(n_split):
+                istart = i * n_boxsize
+                istop = istart + n_dilat
+                jstart = j * n_boxsize
+                jstop = jstart + n_dilat
+                rows = np.arange(istart, istop)
+                columns = np.arange(jstart, jstop)
+                data_tmp = data[np.ix_(rows, columns)]
+                data_stack[i_stack, ...] = data_tmp[np.newaxis, ...]
+                i_stack += 1
+
+    return data_stack
+
+
+def blockshaped(arr, nrows, ncols):
+    """Return an array of shape (n, nrows, ncols) where n * nrows * ncols = arr.size.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Array to reshape.
+    nrows : int
+        Number of rows.
+    ncols : int
+        Number of cols.
+    """
+    h, _ = arr.shape
+    return (
+        arr.reshape(h // nrows, nrows, -1, ncols)
+        .swapaxes(1, 2)
+        .reshape(-1, nrows, ncols)
+    )
