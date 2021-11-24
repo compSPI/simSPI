@@ -19,9 +19,9 @@ def write_crd_file(
     numpart : int
         Number of particles.
     xrange : ndarray
-        Valid horizontal range for display.
+        Range of particle center x-coordinates to write.
     yrange : ndarray
-        Valid vertical range for display.
+        Range of particle center y-coordinates to write.
     crd_file : str
         Relative path to output .crd file.
     """
@@ -83,42 +83,31 @@ def get_rotlist(numpart):
     return rotlist
 
 
-def rotation_matrix_to_euler_angles(R):
+def rotation_matrix_to_euler_angles(mat):
     """Compute Euler angles given a rotation matrix.
 
     Parameters
     ----------
-    R : ndarray
-        Rotation matrix.
+    mat : ndarray
+        Matrix to compute Euler angles from.
     """
-    if not is_rotation_matrix(R):
+    if not is_rotation_matrix(mat):
         raise ValueError()
 
-    sy = math.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
+    sy = math.sqrt(mat[0, 0] * mat[0, 0] + mat[1, 0] * mat[1, 0])
     singular = sy < 1e-6
     if not singular:
-        x = math.atan2(R[2, 1], R[2, 2])
-        y = math.atan2(-R[2, 0], sy)
-        z = math.atan2(R[1, 0], R[0, 0])
+        x = math.atan2(mat[2, 1], mat[2, 2])
+        y = math.atan2(-mat[2, 0], sy)
+        z = math.atan2(mat[1, 0], mat[0, 0])
     else:
-        x = math.atan2(-R[1, 2], R[1, 1])
-        y = math.atan2(-R[2, 0], sy)
+        x = math.atan2(-mat[1, 2], mat[1, 1])
+        y = math.atan2(-mat[2, 0], sy)
         z = 0
-    x = rad2deg(x)
-    y = rad2deg(y)
-    z = rad2deg(z)
+    x = np.rad2deg(x)
+    y = np.rad2deg(y)
+    z = np.rad2deg(z)
     return np.array([x, y, z])
-
-
-def rad2deg(x):
-    """Take a value x in radians and convert to degrees.
-
-    Parameters
-    ----------
-    x : float
-        Degree value to convert to degrees.
-    """
-    return (x * 180) / np.pi
 
 
 def is_rotation_matrix(matrix):
@@ -127,9 +116,8 @@ def is_rotation_matrix(matrix):
     Parameters
     ----------
     matrix : ndarray
-        Matrix to check.
+        Matrix to check if it is a valid rotation matrix.
     """
-    transposed_matrix = np.transpose(matrix)
-    identity_matrix = np.identity(3, dtype=matrix.dtype)
-    n = np.linalg.norm(identity_matrix - np.dot(transposed_matrix, matrix))
-    return n < 1e-6
+    is_symmetric = np.allclose(matrix, matrix.T)
+    is_det_one = np.isclose(np.linalg.det(matrix), 1)
+    return is_symmetric and is_det_one
