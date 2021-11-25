@@ -137,7 +137,9 @@ def micrograph2particles(
     n_boxsize = np.int(boxsize / pixel_size)
     x_pixels = np.int(fov_Nx * n_boxsize)
     y_pixels = np.int(fov_Ny * n_boxsize)
-    data = micrograph[0:x_pixels, 0:y_pixels]
+    data = micrograph[0:y_pixels, 0:x_pixels]
+    print(data.shape)
+    print(n_boxsize)
     particles = slice_and_stack(data, n_boxsize=n_boxsize)
     return particles
 
@@ -156,7 +158,7 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
     """
     if n_ovl == 0:
         data_stack = blockshaped(data, n_boxsize, n_boxsize)
-    else:
+    else:  # this stuff doesnt happen because overlay == 0
         n_split = math.floor((data.shape[0] - 2 * n_ovl) / (n_boxsize))
         n_dilat = n_boxsize + 2 * n_ovl
         data_stack = np.zeros((n_split * n_split, n_dilat, n_dilat))
@@ -189,7 +191,7 @@ def blockshaped(arr, nrows, ncols):
     ncols : int
         Number of cols.
     """
-    h, _, _ = arr.shape
+    h, _ = arr.shape
     return (
         arr.reshape(h // nrows, nrows, -1, ncols)
         .swapaxes(1, 2)

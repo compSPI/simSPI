@@ -1,10 +1,11 @@
 """Wrapper for the TEM Simulator."""
 import os
 
-import cryoemio
+import crd
+import fov
+import io_cryo
 import matplotlib.pyplot as plt
 import numpy as np
-import simutils
 import yaml
 
 
@@ -219,16 +220,15 @@ class TEMSimulator:
         Leverages methods developed in:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
-        x_range, y_range, num_part = simutils.define_grid_in_fov(
-            self.sim_dict["specimen_grid_params"],
+        x_range, y_range, num_part = fov.define_grid_in_fov(
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
             self.output_path_dict["pdb_file"],
-            Dmax=30,
+            dmax=30,
             pad=pad,
         )
 
-        simutils.write_crd_file(
+        crd.write_crd_file(
             num_part,
             xrange=x_range,
             yrange=y_range,
@@ -257,7 +257,7 @@ class TEMSimulator:
             )
         )
 
-        data = cryoemio.mrc2data(self.output_path_dict["mrc_file"])
+        data = io_cryo.mrc2data(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
 
         if display_data:
@@ -308,7 +308,7 @@ class TEMSimulator:
         optics_params = sim_dict["optics_parameters"]
         detector_params = sim_dict["detector_parameters"]
 
-        parameter_dict = simutils.fill_parameters_dictionary(
+        parameter_dict = io_cryo.fill_parameters_dictionary(
             mrc_file=mrc_file,
             pdb_file=pdb_file,
             particle_mrcout=particle_mrcout,
@@ -338,7 +338,7 @@ class TEMSimulator:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
         inp_file = self.output_path_dict["inp_file"]
-        simutils.write_inp_file(inp_file=inp_file, dict_params=self.parameter_dict)
+        io_cryo.write_inp_file(inp_file=inp_file, dict_params=self.parameter_dict)
 
     def extract_particles(self, micrograph, export_particles=True, display_data=False):
         """Extract particle data from micrograph.
@@ -363,13 +363,12 @@ class TEMSimulator:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/cryoemio.py
         """
-        particles = simutils.microgaph2particles(
+        particles = fov.micrograph2particles(
             micrograph,
-            self.sim_dict["molecular_model"],
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
             pdb_file=self.output_path_dict["pdb_file"],
-            Dmax=30,
+            dmax=30,
             pad=5.0,
         )
 
@@ -377,7 +376,7 @@ class TEMSimulator:
             self.view_particles(particles, ncol=5)
 
         if export_particles:
-            cryoemio.data_and_dic_2hdf5(
+            io_cryo.data_and_dic_2hdf5(
                 particles, self.output_path_dict["h5_file"], dic=self.parameter_dict
             )
 
