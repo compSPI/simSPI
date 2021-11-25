@@ -108,7 +108,7 @@ def get_xyz_from_pdb(filename=None):
     return traj_small.xyz
 
 
-def microgaph2particles(
+def micrograph2particles(
     micrograph, optics_params, detector_params, pdb_file=None, dmax=30, pad=5.0
 ):
     """Extract particles from given micrograph.
