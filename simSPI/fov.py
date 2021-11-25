@@ -135,14 +135,14 @@ def microgaph2particles(
     fov_Ny = np.floor(fov_Ly / boxsize)
     pixel_size = (fov_Lx / micrograph.shape[1] + fov_Ly / micrograph.shape[0]) / 2.0
     n_boxsize = np.int(boxsize / pixel_size)
-    Nx = np.int(fov_Nx * n_boxsize)
-    Ny = np.int(fov_Ny * n_boxsize)
-    data = micrograph[0:Ny, 0:Nx]
-    particles = slicenstack(data, n_boxsize=n_boxsize)
+    x_pixels = np.int(fov_Nx * n_boxsize)
+    y_pixels = np.int(fov_Ny * n_boxsize)
+    data = micrograph[0:x_pixels, 0:y_pixels]
+    particles = slice_and_stack(data, n_boxsize=n_boxsize)
     return particles
 
 
-def slicenstack(data, n_boxsize=256, n_ovl=0):
+def slice_and_stack(data, n_boxsize=256, n_ovl=0):
     """Convert a 2D numpy array into a 3D numpy array.
 
     Parameters
@@ -189,7 +189,7 @@ def blockshaped(arr, nrows, ncols):
     ncols : int
         Number of cols.
     """
-    h, _ = arr.shape
+    h, _, _ = arr.shape
     return (
         arr.reshape(h // nrows, nrows, -1, ncols)
         .swapaxes(1, 2)
