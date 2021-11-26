@@ -50,6 +50,8 @@ class TEMSimulator:
         self.create_crd_file(pad=5)
         self.create_inp_file()
 
+        self.generate_metadata()
+
         micrograph_data = self.get_image_data(display_data=display_data)
         particle_data = self.extract_particles(
             micrograph_data,
@@ -190,13 +192,13 @@ class TEMSimulator:
         file_path_dict = {}
 
         output_file_path = (
-            path_dict["output_dir"]
-            + path_dict["pdb_keyword"]
-            + path_dict["micrograph_keyword"]
+                path_dict["output_dir"]
+                + path_dict["pdb_keyword"]
+                + path_dict["micrograph_keyword"]
         )
 
         file_path_dict["pdb_file"] = (
-            path_dict["pdb_dir"] + path_dict["pdb_keyword"] + ".pdb"
+                path_dict["pdb_dir"] + path_dict["pdb_keyword"] + ".pdb"
         )
         file_path_dict["crd_file"] = output_file_path + ".txt"
         file_path_dict["mrc_file"] = output_file_path + ".mrc"
@@ -385,7 +387,7 @@ class TEMSimulator:
 
     @staticmethod
     def view_particles(data, slicing=(1, 1, 1), figsize=1, ncol=5):
-        """Extract particle data from micrograph.
+        """Render picked particles in grid.
 
         Parameters
         ----------
@@ -414,6 +416,64 @@ class TEMSimulator:
 
         plt.tight_layout()
         plt.show()
+
+    def generate_metadata(self):
+        """Generate metadata associated with picked particles from simulator.
+
+        Notes
+        -----
+        Exports particle metadata in .star file to output directory specified in user config file.
+        """
+        particle_metadata = self.retrieve_rotation_metadata(self.output_path_dict['crd_file'])
+
+        file_name = self.path_dict['pdb_keyword'] + self.path_dict['micrograph_keyword'] + '.star'
+        f = open(self.path_dict['output_dir'] + file_name, "w")
+
+        for key, value in self.raw_sim_dict.items():
+            f.write(f'{key}\n')
+            for key0, value0 in value.items():
+                if type(value0) is list:
+                    f.write("_" + "{0:24}{1}\n".format(key0, value0))
+                else:
+                    f.write("_" + "{0:24}{1:>15}\n".format(key0, value0))
+            f.write('\n')
+
+        f.write("particle_rotation_angles\n")
+        f.write("loop_\n")
+        f.write("_phi\n")
+        f.write("_theta\n")
+        f.write("_psi\n")
+        for angle in particle_metadata:
+            f.write('{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}\n'.format(
+                angle))
+
+        f.close()
+
+    @staticmethod
+    def retrieve_rotation_metadata(path):
+        """Retrieve particle rotation data from pre-generated simulator crd file.
+
+        Parameters
+        ---------
+        path : str
+            String specifying path to crd file generated during simulation.
+
+        Returns
+        -------
+        rotation_metadata : array-like, shape=[..., 3]
+            N x 3 matrix representing the rotation angles , phi, theta, psi, of each particle in stack.
+        """
+        rotation_metadata = []
+        lines = []
+        with open(path) as f:
+            lines = f.readlines()
+
+        for i, line in enumerate(lines):
+            if 4 < i:
+                rotation_metadata.append([float(x) for x in line.split()[3:]])
+
+        f.close()
+        return rotation_metadata
 
 
 def main():
