@@ -1,8 +1,10 @@
+"""Test function for CTF module."""
 from ..linear_simulator.modules import CTF
 from ..linear_simulator.utils import init_data, normalized_mse, primal_to_fourier_2D
 
 
 def test_ctf():
+    """Test accuracy of the ctf."""
     path = "simSPI/tests_simple_simulator/tests_data.npy"
 
     saved_data, config = init_data(path)

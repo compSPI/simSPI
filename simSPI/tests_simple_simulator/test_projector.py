@@ -1,8 +1,10 @@
+"""Test function for projector module."""
 from ..linear_simulator.modules import Projector
 from ..linear_simulator.utils import init_data, normalized_mse
 
 
 def test_projector():
+    """Test accuracy of projector function."""
     path = "simSPI/tests_simple_simulator/tests_data.npy"
 
     saved_data, config = init_data(path)

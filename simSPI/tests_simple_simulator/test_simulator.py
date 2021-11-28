@@ -1,8 +1,10 @@
+"""Test function for simulator module."""
 from ..linear_simulator.modules import simulator
 from ..linear_simulator.utils import init_data, normalized_mse
 
 
 def test_simulator():
+    """Test accuracy of linear forward model."""
     path = "simSPI/tests_simple_simulator/tests_data.npy"
 
     saved_data, config = init_data(path)
