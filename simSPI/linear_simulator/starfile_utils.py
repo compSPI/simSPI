@@ -1,3 +1,4 @@
+"""contains the function to load parameters from the starfile."""
 import os
 
 import numpy as np
@@ -5,21 +6,24 @@ import starfile
 
 
 def check_star_file(path):
+    """Check if the starfile exists and is valid."""
     if not os.path.isfile(path):
         raise FileNotFoundError("Input star file doesn't exist!")
-    if not ".star" in path:
+    if ".star" not in path:
         raise FileExistsError("Input star file is not a valid star file!")
 
 
 def starfile_opticsparams(config):
-    """function to update attributes of config with metadata from input starfile.
+    """Update attributes of config with metadata from input starfile.
+
     Parameters
     ----------
-        config: class
-            Class containing parameters of the dataset generator.
+    config: class
+        Class containing parameters of the dataset generator.
+
     Returns
     -------
-        config: class
+    config: class
     """
     check_star_file(config.input_starfile_path)
     df = starfile.read(config.input_starfile_path)
@@ -35,15 +39,16 @@ def starfile_opticsparams(config):
 
 
 def return_names(config):
-    """returns relion-convention names of metadata for starfile
+    """Return relion-convention names of metadata for starfile.
+
     Parameters
     ----------
     config: class
         Class containing parameters of the dataset generator.
 
     Returns
-    ------
-        names: list of str
+    -------
+    names: list of str
     """
     names = [
         "__rlnImageName",
@@ -67,23 +72,27 @@ def return_names(config):
 
 
 def starfile_data(dataframe, rot_params, ctf_params, shift_params, iterations, config):
-    """appends the dataframe with the parameters of the simulator for the current projection chunk
+    """Append the dataframe with the parameters of the simulator.
+
     Parameters
     ----------
-        rot_params: dict of type str to {tensor}
-            Dictionary of rotation parameters for a projection chunk
-        ctf_params: dict of type str to {tensor}
-            Dictionary of Contrast Transfer Function (CTF) parameters for a projection chunk
-        shift_params: dict of type str to {tensor}
-            Dictionary of shift parameters for a projection chunk
-        iterations: int
-            iteration number of the loop. Used in naming the mrcs file.
-        config: class
-             class containing parameters of the dataset generator.
+    rot_params: dict of type str to {tensor}
+        Dictionary of rotation parameters for a projection chunk
+    ctf_params: dict of type str to {tensor}
+        Dictionary of Contrast Transfer Function (CTF) parameters
+         for a projection chunk
+    shift_params: dict of type str to {tensor}
+        Dictionary of shift parameters for a projection chunk
+    iterations: int
+        iteration number of the loop. Used in naming the mrcs file.
+    config: class
+         class containing parameters of the dataset generator.
+
     Returns
-    --------
-        dataframe: list
-        list containing the metadata of the projection chunks. This list is then used to save the starfile.
+    -------
+    dataframe: list
+        list containing the metadata of the projection chunks.
+        This list is then used to save the starfile.
     """
     ImageName = [
         str(idx).zfill(3) + "@" + str(iterations).zfill(4) + ".mrcs"
