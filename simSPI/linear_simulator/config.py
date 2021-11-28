@@ -1,13 +1,25 @@
-""" Loads program configuration into a config object."""
+"""Load program configuration into a config object."""
 
 from backports import configparser
 
+"""Module to convert args into class with attributes."""
+
 
 class Config(object):
+    """Class to convert args into class with attributes.
+
+    Parameters
+    ----------
+    filename: str
+        path of the config file from which the attributes are loaded.
+
+    """
+
     def __init__(self, filename):
         self.load_config(filename)
 
     def load_config(self, filename):
+        """Load and save the config file."""
         config = configparser.SafeConfigParser()
         config.read(filename)
         self.config = config
