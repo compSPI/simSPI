@@ -1,4 +1,4 @@
-"""contain functions and classed for parameter generation."""
+"""contains functions and classed for parameter generation."""
 from abc import ABCMeta, abstractstaticmethod
 
 import numpy as np
