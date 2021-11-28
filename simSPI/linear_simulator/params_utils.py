@@ -1,4 +1,4 @@
-import os
+"""contain functions and classed for parameter generation."""
 from abc import ABCMeta, abstractstaticmethod
 
 import numpy as np
@@ -16,14 +16,16 @@ from .utils import U2T
 
 
 def params_update(config):
-    """function to update attributes of config.
+    """Update attributes of config.
+
     Parameters
     ----------
-        config: class
-            Class containing parameters of the dataset generator.
+    config: class
+        Class containing parameters of the dataset generator.
+
     Returns
     -------
-        config: class
+    config: class
     """
     config.starfile_available = config.input_starfile_path != ""
     if config.starfile_available:
@@ -36,20 +38,25 @@ def params_update(config):
     return config
 
 
+"""Module to instantiate param generator from a factory of choices."""
+
+
 class ParamsFactory:
-    """
-    Module to instantiate param generator from a factory of choices
-    """
+    """Class to instantiate param generator from a factory of choices."""
 
     def get_params_generator(config):
-        """Returns the param generator. If the starfile is available then
-            chooses it otherwise chooses distributional param generator.
+        """Return the param generator.
+
+        If the starfile is available then chooses it otherwise
+        chooses distributional param generator.
+
         Parameters
         ----------
-            config: class
+        config: class
+
         Returns
-        ----------
-            params_generator: class
+        -------
+        params_generator: class
         """
         if config.starfile_available:
             return starfile_params(config)
@@ -58,21 +65,27 @@ class ParamsFactory:
 
 
 class Iparams(metaclass=ABCMeta):
-    """Abstract class for the params generator factory with get_params method"""
+    """Abstract class for the params generator factory with get_params method."""
 
     @abstractstaticmethod
     def get_params(self):
-        "method to get the parameters"
+        """Get the parameters."""
+
+
+"""Module to generate parameters using the input star file."""
 
 
 class starfile_params(Iparams):
+    """Class to generate parameters using the input star file.
+
+    Parameters
+    ----------
+    config: class
+        Class containing parameters of the dataset generator.
+
+    """
+
     def __init__(self, config):
-        """class to generate parameters using the input star file.
-        Parameters
-        ---------
-            config: class
-                Class containing parameters of the dataset generator.
-        """
 
         self.counter = 0
         self.invert_hand = False
@@ -82,15 +95,17 @@ class starfile_params(Iparams):
         print("Reading parameters from the input starfile.")
 
     def get_params(self):
-        """get the parameters from the starfile
+        """Get the parameters from the starfile.
+
         Returns
         -------
-            rot_params: dict of type str to {tensor}
-                Dictionary of rotation parameters for a projection chunk
-            ctf_params: dict of type str to {tensor}
-                Dictionary of Contrast Transfer Function (CTF) parameters for a projection chunk
-            shift_params: dict of type str to {tensor}
-                Dictionary of shift parameters for a projection chunk
+        rot_params: dict of type str to {tensor}
+            Dictionary of rotation parameters for a projection chunk
+        ctf_params: dict of type str to {tensor}
+            Dictionary of Contrast Transfer Function (CTF) parameters
+            for a projection chunk
+        shift_params: dict of type str to {tensor}
+            Dictionary of shift parameters for a projection chunk
         """
         self.particle = self.df["particles"].iloc[
             self.counter : self.counter + self.config.chunks
@@ -99,19 +114,24 @@ class starfile_params(Iparams):
         return self.get_rotmat(), self.get_ctf_params(), self.get_shift_params()
 
     def get_rotmat(self):
-        """get the parameters for the rotation of the particle in the projector from the starfile
+        """Get the parameters for the rotation of the projections from starfile.
+
         Returns
         -------
-            rotmat_params: dict of type str to {tensor}
-                dictionary containing:
-                "rotmat": torch.Tensor
-                    Tensor of size (chunks,3,3) that containing the rotation matrix for each projection
-                "relion_AnglePsi": torch.Tensor
-                    Tensor of size (chunks,) that contains the Psi angle (in degrees) for ZYZ rotation
-                "relion_AngleTilt": torch.Tensor
-                    Tensor of size (chunks,) that contains the Tilt angle (in degrees) for ZYZ rotation
-                "relion_AngleRot": torch.Tensor
-                    Tensor of size (chunks,) that contains the Rot angle (in degrees) for ZYZ rotation
+        rotmat_params: dict of type str to {tensor}
+            dictionary containing:
+            "rotmat": torch.Tensor
+                Tensor of size (chunks,3,3) that containing the rotation matrix for
+                each projection
+            "relion_AnglePsi": torch.Tensor
+                Tensor of size (chunks,) that contains the Psi angle (in degrees)
+                 for ZYZ rotation
+            "relion_AngleTilt": torch.Tensor
+                Tensor of size (chunks,) that contains the Tilt angle (in degrees)
+                 for ZYZ rotation
+            "relion_AngleRot": torch.Tensor
+                Tensor of size (chunks,) that contains the Rot angle (in degrees)
+                for ZYZ rotation
         """
         AnglePsi = np.array(self.particle["rlnAnglePsi"], ndmin=2).squeeze()
         AngleTilt = np.array(self.particle["rlnAngleTilt"], ndmin=2).squeeze()
@@ -137,19 +157,23 @@ class starfile_params(Iparams):
         }
 
     def get_ctf_params(self):
-        """gets the parameters for the CTF of the particle from the starfile
-        if config.ctf is True else returns {}
+        """Get the parameters for the CTF of the particle from the starfile.
+
+        If config.ctf is True else returns {}
 
         Returns
         -------
-            ctf_params: dict of type str to {tensor}
-                dictionary containing:
-                "defocusU": torch.Tensor
-                    Tensor of size (chunks,1,1,1) that contains the major defocus value in microns
-                "defocusV": torch.Tensor
-                    Tensor of size (chunks,1,1,1) that contains the minor defocus value in microns
-                "defocusAngle": torch.Tensor
-                    Tensor of size (chunks,1,1,1) that contains the major defocus value in microns
+        ctf_params: dict of type str to {tensor}
+            dictionary containing:
+            "defocusU": torch.Tensor
+                Tensor of size (chunks,1,1,1) that contains the major
+                defocus value in microns
+            "defocusV": torch.Tensor
+                Tensor of size (chunks,1,1,1) that contains the minor
+                defocus value in microns
+            "defocusAngle": torch.Tensor
+                Tensor of size (chunks,1,1,1) that contains the major
+                defocus value in microns
         """
         params = {}
         if self.config.ctf:
@@ -176,8 +200,9 @@ class starfile_params(Iparams):
         return params
 
     def get_shift_params(self):
-        """gets the parameters for the shift of the particle from the starfile
-        if config.shift is True else returns {}
+        """Get the parameters for the shift of the particle from the starfile.
+
+        If config.shift is True else returns {}
 
         Returns
         -------
@@ -196,34 +221,53 @@ class starfile_params(Iparams):
         return params
 
 
+"""Module to generate parameters using the specified distribution."""
+
+
 class distributional_params(Iparams):
+    """Class to generate parameters using the specified distribution.
+
+    Parameters
+    ----------
+    config: class
+        Class containing parameters of the dataset generator.
+
+    """
+
     def __init__(self, config):
         self.config = config
         print("Parameters getting generated from specified distributions.")
 
     def get_params(self):
+        """Get the rotation, ctf, and shift parameters."""
         return self.get_rotmat(), self.get_ctf_params(), self.get_shift_params()
 
     def get_rotmat(self):
-        """gets the parameters for the rotation of the particle in the projector from a specified distribution
+        """Get the parameters for the rotation of the projection from a specified distribution.
+
         Returns
         -------
         rotmat_params: dict of type str to {tensor}
             dictionary containing:
             "rotmat": torch.Tensor
-                Tensor of size (chunks,3,3) that containing the rotation matrix for each projection
+                Tensor of size (chunks,3,3) that containing the rotation matrix
+                for each projection
             "relion_AnglePsi": torch.Tensor
-                Tensor of size (chunks,) that contains the Psi angle (in degrees) for ZYZ rotation
+                Tensor of size (chunks,) that contains the Psi angle (in degrees)
+                for ZYZ rotation
             "relion_AngleTilt": torch.Tensor
-                Tensor of size (chunks,) that contains the Tilt angle (in degrees) for ZYZ rotation
+                Tensor of size (chunks,) that contains the Tilt angle (in degrees)
+                for ZYZ rotation
             "relion_AngleRot": torch.Tensor
-                Tensor of size (chunks,) that contains the Rot angle (in degrees) for ZYZ rotation
+                Tensor of size (chunks,) that contains the Rot angle (in degrees)
+                for ZYZ rotation
         """
         if self.config.angle_distribution == "uniform":
             rotmat = random_rotations(self.config.chunks)
             euler = np.degrees(matrix_to_euler_angles(rotmat, convention="ZYZ").numpy())
             # the rot and psi below have been swapped and their sign have been changed
-            # in order to follow the relion convention (see starfile_params.get_rotmat())
+            # in order to follow the relion convention
+            # (see starfile_params.get_rotmat())
             return {
                 "rotmat": rotmat,
                 "relion_AnglePsi": -euler[:, 0],
@@ -233,23 +277,28 @@ class distributional_params(Iparams):
             }
         else:
             raise NotImplementedError(
-                f"Angle distribution '{self.config.angle_distribution}' has not been implemented!"
+                f"Angle distribution '{self.config.angle_distribution}' "
+                f"has not been implemented!"
             )
 
     def get_ctf_params(self):
-        """gets the parameters for the CTF of the particle from a distribution,
-        if config.ctf is True else returns {}
+        """Get the parameters for the CTF of the particle from a distribution.
+
+        If config.ctf is True else returns {}
 
         Returns
         -------
         ctf_params: dict of type str to {tensor}
             dictionary containing:
             "defocusU": torch.Tensor
-                Tensor of size (chunks,1,1,1) that contains the major defocus value in microns
+                Tensor of size (chunks,1,1,1) that contains the major
+                defocus value in microns
             "defocusV": torch.Tensor
-                Tensor of size (chunks,1,1,1) that contains the minor defocus value in microns
+                Tensor of size (chunks,1,1,1) that contains the minor
+                defocus value in microns
             "defocusAngle": torch.Tensor
-                Tensor of size (chunks,1,1,1) that contains the major defocus value in microns
+                Tensor of size (chunks,1,1,1) that contains the major
+                defocus value in microns
         """
         if self.config.ctf:
             defocusU = (
@@ -268,19 +317,19 @@ class distributional_params(Iparams):
             return {}
 
     def get_shift_params(self):
-        """gets the parameters for the shift of the particle from a distribution,
-        if config.shift is True else returns {}
+        """Get the parameters for the shift of the particle from a distribution.
+
+        If config.shift is True else returns {}.
 
         Returns
         -------
-            shift_params: dict of type str to {torch.Tensor}
+        shift_params: dict of type str to {torch.Tensor}
             dictionary containing
-                'shiftX': torch.Tensor (B,)
-                    batch of shifts along horizontal axis
-                'shiftY': torch.Tensor (B,)
-                    batch of shifts along vertical axis
+            'shiftX': torch.Tensor (B,)
+                batch of shifts along horizontal axis
+            'shiftY': torch.Tensor (B,)
+                batch of shifts along vertical axis
         """
-
         if self.config.shift:
             if self.config.shift_distribution == "triangular":
                 shiftNormalized = torch.Tensor(self.config.chunks, 2).uniform_()
@@ -295,7 +344,8 @@ class distributional_params(Iparams):
             else:
                 print("here")
                 raise NotImplementedError(
-                    f"Shift distribution '{self.config.shift_distribution}' has not been implemented!"
+                    f"Shift distribution '{self.config.shift_distribution}' "
+                    f"has not been implemented!"
                 )
 
         else:
