@@ -1,4 +1,4 @@
-name: test2
+name: simSPI
 channels:
   - conda-forge
   - defaults
