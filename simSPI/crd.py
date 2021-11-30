@@ -1,6 +1,7 @@
 """Helper functions for tem.py to write particle data to .crd file."""
 import math
 import os
+import logging
 
 import numpy as np
 from scipy.stats import special_ortho_group
@@ -25,8 +26,10 @@ def write_crd_file(
     crd_file : str
         Relative path to output .crd file.
     """
+    log = logging.getLogger()
+
     if os.path.exists(crd_file):
-        print(crd_file + " already exists.")
+        log.info(crd_file + " already exists.")
     else:
         rotlist = get_rotlist(numpart)
         with open(crd_file, "w") as crd:
@@ -96,6 +99,7 @@ def rotation_matrix_to_euler_angles(mat):
 
     sy = math.sqrt(mat[0, 0] * mat[0, 0] + mat[1, 0] * mat[1, 0])
     singular = sy < 1e-6
+
     if not singular:
         x = math.atan2(mat[2, 1], mat[2, 2])
         y = math.atan2(-mat[2, 0], sy)
@@ -104,9 +108,11 @@ def rotation_matrix_to_euler_angles(mat):
         x = math.atan2(-mat[1, 2], mat[1, 1])
         y = math.atan2(-mat[2, 0], sy)
         z = 0
+
     x = np.rad2deg(x)
     y = np.rad2deg(y)
     z = np.rad2deg(z)
+
     return np.array([x, y, z])
 
 
@@ -118,6 +124,6 @@ def is_rotation_matrix(matrix):
     matrix : ndarray
         Matrix to check if it is a valid rotation matrix.
     """
-    is_symmetric = np.allclose(matrix, matrix.T)
+    is_orthogonal = np.allclose(np.dot(matrix, matrix.T), np.identity(3))
     is_det_one = np.isclose(np.linalg.det(matrix), 1)
-    return is_symmetric and is_det_one
+    return is_orthogonal and is_det_one
