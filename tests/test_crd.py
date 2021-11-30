@@ -49,7 +49,7 @@ def test_rotation_matrix_to_euler_angles():
 
 
 def test_is_rotation_matrix():
-    """Test whether method correctly classifies matrices as singular or non-singular."""
+    """Test whether is_rotation_matrix correctly determines if a matrix is a rotation matrix."""
     # sample rotation data
     angle = np.pi / 6
     c = np.cos(angle)
