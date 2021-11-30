@@ -6,6 +6,7 @@ from simSPI import crd
 
 
 def test_write_crd_file():
+    """Test whether function creates and writes to file on given path."""
     temp_dir = tempfile.TemporaryDirectory()
     temp_file = temp_dir.name + '/crd.txt'
 
@@ -15,11 +16,13 @@ def test_write_crd_file():
 
 
 def test_get_rotlist():
+    """Test whether randomly generated rotlist is of correct length."""
     numpart = 10
     assert len(crd.get_rotlist(numpart)) == len(range(0, numpart + 1))
 
 
 def test_rotation_matrix_to_euler_angles():
+    """Test correct generation of Euler angles for singular and non-singular rotation matrices."""
     # sample rotation data
     angle = np.pi / 6
     c = np.cos(angle)
@@ -46,6 +49,7 @@ def test_rotation_matrix_to_euler_angles():
 
 
 def test_is_rotation_matrix():
+    """Test whether method correctly classifies matrices as singular or non-singular."""
     # sample rotation data
     angle = np.pi / 6
     c = np.cos(angle)
