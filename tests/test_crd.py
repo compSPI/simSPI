@@ -1,6 +1,9 @@
-import numpy as np
+"""Unit tests for crd.py."""
+
 import os
 import tempfile
+
+import numpy as np
 
 from simSPI import crd
 
@@ -8,7 +11,7 @@ from simSPI import crd
 def test_write_crd_file():
     """Test whether function creates and writes to file on given path."""
     temp_dir = tempfile.TemporaryDirectory()
-    temp_file = temp_dir.name + '/crd.txt'
+    temp_file = temp_dir.name + "/crd.txt"
 
     assert not os.path.isfile(temp_file)
     crd.write_crd_file(numpart=20, crd_file=temp_file)
@@ -22,7 +25,7 @@ def test_get_rotlist():
 
 
 def test_rotation_matrix_to_euler_angles():
-    """Test correct generation of Euler angles for singular and non-singular rotation matrices."""
+    """Test correct generation of Euler angles for rotation matrices."""
     # sample rotation data
     angle = np.pi / 6
     c = np.cos(angle)
@@ -49,7 +52,7 @@ def test_rotation_matrix_to_euler_angles():
 
 
 def test_is_rotation_matrix():
-    """Test whether is_rotation_matrix correctly determines if a matrix is a rotation matrix."""
+    """Test whether is_rotation_matrix correctly identifies rotation matrices."""
     # sample rotation data
     angle = np.pi / 6
     c = np.cos(angle)

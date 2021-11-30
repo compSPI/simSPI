@@ -1,7 +1,7 @@
 """Helper functions for tem.py to write particle data to .crd file."""
+import logging
 import math
 import os
-import logging
 
 import numpy as np
 from scipy.stats import special_ortho_group
