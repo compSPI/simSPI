@@ -79,7 +79,3 @@ def test_is_rotation_matrix():
     assert crd.is_rotation_matrix(rot_in_y)
     assert crd.is_rotation_matrix(rot_in_z)
     assert not crd.is_rotation_matrix(not_rot)
-
-
-if __name__ == "__main__":
-    test_rotation_matrix_to_euler_angles_exception()
