@@ -19,7 +19,7 @@ def mrc2data(mrc_file):
     return micrograph
 
 
-def data_and_dic2hdf5(data, h5_file):
+def data_and_dic_2hdf5(data, h5_file, dic):
     """Convert dictionary data to hdf5 file format.
 
     Parameters
@@ -29,7 +29,6 @@ def data_and_dic2hdf5(data, h5_file):
     h5_file : str
         Relative path to h5 file.
     """
-    dic = {}
     dic["data"] = data
     with h5py.File(h5_file, "w") as file:
         recursively_save_dict_contents_to_group(file, "/", dic)
