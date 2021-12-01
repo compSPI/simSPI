@@ -53,6 +53,16 @@ def test_rotation_matrix_to_euler_angles():
     assert np.allclose(s_angles, crd.rotation_matrix_to_euler_angles(s_rot))
 
 
+def test_rotation_matrix_to_euler_angles_exception():
+    """Test correct raising of exception when passed a non-rotation matrix."""
+    non_rotation_matrix = np.ones((3, 3))
+
+    try:
+        crd.rotation_matrix_to_euler_angles(non_rotation_matrix)
+    except ValueError:
+        assert True
+
+
 def test_is_rotation_matrix():
     """Test whether is_rotation_matrix correctly identifies rotation matrices."""
     # sample rotation data
@@ -69,3 +79,7 @@ def test_is_rotation_matrix():
     assert crd.is_rotation_matrix(rot_in_y)
     assert crd.is_rotation_matrix(rot_in_z)
     assert not crd.is_rotation_matrix(not_rot)
+
+
+if __name__ == "__main__":
+    test_rotation_matrix_to_euler_angles_exception()
