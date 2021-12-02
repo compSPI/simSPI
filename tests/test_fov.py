@@ -4,6 +4,8 @@ import numpy as np
 
 from simSPI import fov
 
+pdb_path = "../tests/test_files/fov_test.pdb"
+
 
 def test_define_grid_in_fov():
     """Test calculation of grid for picking micrograph particles."""
@@ -14,7 +16,6 @@ def test_define_grid_in_fov():
 
     # optics params
     magnification = 81000
-    pdb_path = "./test_files/fov_test.pdb"
 
     x, y, n = fov.define_grid_in_fov(
         [magnification], [detector_nx, detector_ny, detector_pixel_size], pdb_path
@@ -35,7 +36,6 @@ def test_get_fov():
     # optics params
     magnification = 81000
 
-    pdb_path = "./test_files/fov_test.pdb"
     d_max = 40
 
     expected_fov_lx = 355.55555555555554
@@ -60,13 +60,11 @@ def test_get_fov():
 
 def test_get_dmax():
     """Test correct retrieval of maximum particle dimension from example .pdb file."""
-    pdb_path = "./test_files/fov_test.pdb"
     assert fov.get_dmax(pdb_path) == 19.367856950503086
 
 
 def test_get_xyz_from_pdb():
     """Test reading and retrieval of particle dimensions from example .pdb file."""
-    pdb_path = "./test_files/fov_test.pdb"
     assert fov.get_xyz_from_pdb(pdb_path).shape == (1, 3, 3)
 
 
