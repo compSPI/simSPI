@@ -8,6 +8,7 @@ dependencies:
   - flake8-black
   - flake8-docstrings
   - flake8-import-order
+  - mdtraj
   - numba
   - numpy
   - pip
