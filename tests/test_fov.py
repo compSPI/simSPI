@@ -14,15 +14,15 @@ def test_define_grid_in_fov():
 
     # optics params
     magnification = 81000
-    pdb_path = "test_files/4v6x.pdb"
+    pdb_path = "test_files/fov_test.pdb"
 
     x, y, n = fov.define_grid_in_fov(
         [magnification], [detector_nx, detector_ny, detector_pixel_size], pdb_path
     )
 
-    assert x.size == 8
-    assert y.size == 6
-    assert n == 48
+    assert x.size == 16
+    assert y.size == 11
+    assert n == 176
 
 
 def test_get_fov():
@@ -35,7 +35,7 @@ def test_get_fov():
     # optics params
     magnification = 81000
 
-    pdb_path = "test_files/4v6x.pdb"
+    pdb_path = "test_files/fov_test.pdb"
     d_max = 40
 
     expected_fov_lx = 355.55555555555554
@@ -46,7 +46,7 @@ def test_get_fov():
     ) == (expected_fov_lx, expected_fov_ly, 102.0)
     assert fov.get_fov(
         [magnification], [detector_nx, detector_ny, detector_pixel_size], pdb_path
-    ) == (expected_fov_lx, expected_fov_ly, 41.95543853302807)
+    ) == (expected_fov_lx, expected_fov_ly, 21.367856950503086)
     assert (
         fov.get_fov(
             [magnification],
@@ -60,14 +60,14 @@ def test_get_fov():
 
 def test_get_dmax():
     """Test correct retrieval of maximum particle dimension from example .pdb file."""
-    pdb_path = "test_files/4v6x.pdb"
-    assert 40 - fov.get_dmax(pdb_path) < 0.05
+    pdb_path = "test_files/fov_test.pdb"
+    assert fov.get_dmax(pdb_path) == 19.367856950503086
 
 
 def test_get_xyz_from_pdb():
     """Test reading and retrieval of particle dimensions from example .pdb file."""
-    pdb_path = "test_files/4v6x.pdb"
-    assert fov.get_xyz_from_pdb(pdb_path).shape == (1, 19845, 3)
+    pdb_path = "test_files/fov_test.pdb"
+    assert fov.get_xyz_from_pdb(pdb_path).shape == (1, 3, 3)
 
 
 def test_micrograph2particles():
