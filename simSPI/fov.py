@@ -115,7 +115,9 @@ def get_dmax(filename):
     """
     xyz = get_xyz_from_pdb(filename)
     distance = pdist(xyz[0, ...])
-    return np.amax(distance)
+    dmax = np.amax(distance)
+
+    return dmax
 
 
 def get_xyz_from_pdb(filename=None):
@@ -134,7 +136,9 @@ def get_xyz_from_pdb(filename=None):
     traj = md.load(filename)
     atom_indices = traj.topology.select("name CA or name P")
     traj_small = traj.atom_slice(atom_indices)
-    return traj_small.xyz
+    coordinates = traj_small.xyz
+
+    return coordinates
 
 
 def micrograph2particles(
@@ -173,6 +177,7 @@ def micrograph2particles(
     y_pixels = np.int(fov_Ny * n_boxsize)
     data = micrograph[0:y_pixels, 0:x_pixels]
     particles = slice_and_stack(data, n_boxsize=n_boxsize)
+
     return particles
 
 
