@@ -1,4 +1,5 @@
 """Helper functions for tem.py to define grid FOV for displaying particles."""
+import logging
 import math
 
 import mdtraj as md
@@ -9,13 +10,13 @@ from scipy.spatial.distance import pdist
 def define_grid_in_fov(
     optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
 ):
-    """Define field of view for graph.
+    """Define particle grid for picking particles from micrograph.
 
     Parameters
     ----------
-    optic_params : list
+    optics_params : list
         List of sim parameters pertaining to microscope settings.
-    detector_params : dict
+    detector_params : list
         List of sim parameters pertaining to detector settings.
     pdb_file : str
         Relative path to write .pdb file to.
@@ -23,6 +24,15 @@ def define_grid_in_fov(
         Maximum dimension of molecule.
     pad : int
         Amount of padding.
+
+    Return
+    ------
+    x_range : ndarray
+        Coordinate range of each picked particle in micrograph in x-dimension.
+    y_range : ndarray
+        Coordinate range of each picked particle in micrograph in y-dimension.
+    n_particles : int
+        Number of particles to be picked from micrograph.
     """
     fov_Lx, fov_Ly, boxsize = get_fov(
         optics_params,
@@ -51,16 +61,25 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0):
 
     Parameters
     ----------
-    optic_params : list
+    optics_params : list
         List of sim parameters pertaining to microscope settings.
-    detector_params : dict
+    detector_params : list
         List of sim parameters pertaining to detector settings.
     pdb_file : str
         Relative path to .pdb file output.
     dmax : int
-        Maximum dimension of molecule
+        Maximum dimension of molecule.
     pad : int
         Amount of padding.
+
+    Returns
+    -------
+    fov_Lx : float
+        Length of fov in x-dimension.
+    fov_Ly : float
+        Length of fov in y-dimension.
+    boxsize : float
+        Boxsize of particle, equal to max particle dimension with pad.
     """
     detector_Nx = detector_params[0]
     detector_Ny = detector_params[1]
@@ -88,6 +107,11 @@ def get_dmax(filename):
     ----------
     filename : str
         Relative path to file containing topological information of particle
+
+    Returns
+    -------
+    np.amax(distance) : float
+        Max dimension of given particle in .pdb source file.
     """
     xyz = get_xyz_from_pdb(filename)
     distance = pdist(xyz[0, ...])
@@ -101,6 +125,11 @@ def get_xyz_from_pdb(filename=None):
     ----------
     filename : str
         Relative path to file containing topological information of particle
+
+    Returns
+    -------
+    traj_small.xyz : ndarray
+        Particle coordinates from .pdb file.
     """
     traj = md.load(filename)
     atom_indices = traj.topology.select("name CA or name P")
@@ -117,16 +146,21 @@ def micrograph2particles(
     ----------
     micrograph : ndarray
         Particle micrograph to extract from.
-    optic_params : list
+    optics_params : list
         List of sim parameters pertaining to microscope settings.
-    detector_params : dict
+    detector_params : list
         List of sim parameters pertaining to detector settings.
     pdb_file : str
-        Relative path to write .pdb file to.
+        Relative path to .pdb file.
     dmax : int
-        Maximum dimension of molecule.
+        Predefined maximum dimension of molecule.
     pad : int
-        Amount of padding.
+        Amount of padding for each particle box.
+
+    Returns
+    -------
+    particles : ndarray
+        Picked and sliced particle data from micrograph.
     """
     fov_Lx, fov_Ly, boxsize = get_fov(
         optics_params, detector_params, pdb_file=pdb_file, dmax=dmax, pad=pad
@@ -153,14 +187,21 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
         Boxsize.
     n_ovl : int
         Overlap.
+
+    Returns
+    -------
+    data_stack : ndarray
+        Array containing sliced particle data.
     """
+    log = logging.getLogger()
+
     if n_ovl == 0:
         data_stack = blockshaped(data, n_boxsize, n_boxsize)
     else:
-        n_split = math.floor((data.shape[0] - 2 * n_ovl) / (n_boxsize))
+        n_split = math.floor((data.shape[0] - 2 * n_ovl) / n_boxsize)
         n_dilat = n_boxsize + 2 * n_ovl
         data_stack = np.zeros((n_split * n_split, n_dilat, n_dilat))
-        print("Array dimensions: ", data_stack.shape)
+        log.info("Array dimensions: {}".format(data_stack.shape))
         i_stack = 0
         for i in np.arange(n_split):
             for j in np.arange(n_split):
@@ -188,10 +229,16 @@ def blockshaped(arr, nrows, ncols):
         Number of rows.
     ncols : int
         Number of cols.
+
+    Returns
+    -------
+    reshaped_arr : ndarray
+        Reshaped input array with dimension (n, nrows, ncols)
     """
-    h, _, _ = arr.shape
-    return (
+    h, _ = arr.shape
+    reshaped_arr = (
         arr.reshape(h // nrows, nrows, -1, ncols)
         .swapaxes(1, 2)
         .reshape(-1, nrows, ncols)
     )
+    return reshaped_arr
