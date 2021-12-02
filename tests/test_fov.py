@@ -1,10 +1,22 @@
 """Unit tests for fov.py."""
 
+import tempfile
+
 import numpy as np
 
 from simSPI import fov
 
-pdb_path = "../tests/test_files/fov_test.pdb"
+pdb_test_string = (
+    "ATOM  46616  CA  LYS C  71      79.058 -46.138  59.506  1.00 30.00      IB   C\n"
+    "ATOM    150  CA  ASN A  21     -26.864  63.622 -59.845  1.00 30.00      A    C\n"
+    "ATOM    172  CA  VAL A  24     -20.237  55.210 -60.973  1.00 30.00      A    C"
+)
+
+pdb_dir = tempfile.TemporaryDirectory()
+pdb_path = pdb_dir.name + "/fov_test.pdb"
+
+with open(pdb_path, "w") as f:
+    f.write(pdb_test_string)
 
 
 def test_define_grid_in_fov():
