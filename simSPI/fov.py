@@ -24,7 +24,7 @@ def define_grid_in_fov(
     pad : int
         Amount of padding.
     """
-    fov_Lx, fov_Ly, boxsize = get_fov(
+    fov_lx, fov_ly, boxsize = get_fov(
         optics_params,
         detector_params,
         pdb_file=pdb_file,
@@ -32,17 +32,17 @@ def define_grid_in_fov(
         pad=pad,
     )
 
-    fov_Nx = np.floor(fov_Lx / boxsize)
-    fov_Ny = np.floor(fov_Ly / boxsize)
+    fov_nx = np.floor(fov_lx / boxsize)
+    fov_ny = np.floor(fov_ly / boxsize)
 
-    x_origin = -fov_Lx / 2.0 + boxsize / 2.0
-    x_frontier = x_origin + fov_Nx * boxsize
-    y_origin = -fov_Ly / 2.0 + boxsize / 2.0
-    y_frontier = y_origin + fov_Ny * boxsize
+    x_origin = -fov_lx / 2.0 + boxsize / 2.0
+    x_frontier = x_origin + fov_nx * boxsize
+    y_origin = -fov_ly / 2.0 + boxsize / 2.0
+    y_frontier = y_origin + fov_ny * boxsize
 
     x_range = np.arange(x_origin, x_frontier, boxsize)
     y_range = np.arange(y_origin, y_frontier, boxsize)
-    n_particles = np.int(fov_Nx * fov_Ny)
+    n_particles = np.int(fov_nx * fov_ny)
     return x_range, y_range, n_particles
 
 
