@@ -21,9 +21,9 @@ def define_grid_in_fov(
     pdb_file : str
         Relative path to write .pdb file to.
     dmax : int
-        Maximum dimension of molecule.
+        Maximum dimension of molecule in pixels.
     pad : int
-        Amount of padding.
+        Amount of padding in pixels.
 
     Return
     ------
