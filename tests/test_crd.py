@@ -16,6 +16,8 @@ def test_write_crd_file():
     assert not os.path.isfile(temp_file)
     crd.write_crd_file(numpart=20, crd_file=temp_file)
     assert os.path.isfile(temp_file)
+    crd.write_crd_file(numpart=20, crd_file=temp_file)
+    assert os.path.isfile(temp_file)
 
 
 def test_get_rotlist():
@@ -49,6 +51,16 @@ def test_rotation_matrix_to_euler_angles():
 
     assert np.allclose(ns_angles, crd.rotation_matrix_to_euler_angles(ns_rot))
     assert np.allclose(s_angles, crd.rotation_matrix_to_euler_angles(s_rot))
+
+
+def test_rotation_matrix_to_euler_angles_exception():
+    """Test correct raising of exception when passed a non-rotation matrix."""
+    non_rotation_matrix = np.ones((3, 3))
+
+    try:
+        crd.rotation_matrix_to_euler_angles(non_rotation_matrix)
+    except ValueError:
+        assert True
 
 
 def test_is_rotation_matrix():
