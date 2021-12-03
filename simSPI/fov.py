@@ -56,7 +56,7 @@ def define_grid_in_fov(
     return x_range, y_range, n_particles
 
 
-def get_fov(optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0):
+def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
     """Define field of view dimensions for displaying particle.
 
     Parameters
@@ -81,23 +81,21 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0):
     boxsize : float
         Boxsize of particle, equal to max particle dimension with pad.
     """
-    detector_Nx = detector_params[0]
-    detector_Ny = detector_params[1]
-    detector_pixel_size = detector_params[2] * 1e3
+    detector_nx_pix = detector_params[0]
+    detector_ny_pix = detector_params[1]
+    detector_pix_size = detector_params[2] * 1e3
     magnification = optics_params[0]
 
-    detector_Lx = detector_Nx * detector_pixel_size
-    detector_Ly = detector_Ny * detector_pixel_size
-    fov_Lx = detector_Lx / magnification
-    fov_Ly = detector_Ly / magnification
+    detector_lx = detector_nx_pix * detector_pix_size
+    detector_ly = detector_ny_pix * detector_pix_size
+    fov_lx = detector_lx / magnification
+    fov_ly = detector_ly / magnification
 
-    if dmax is None:
-        if pdb_file is not None:
-            dmax = get_dmax(pdb_file)
-        else:
-            dmax = 100
+    if pdb_file is not None:
+        dmax = get_dmax(pdb_file)
+
     boxsize = dmax + 2 * pad
-    return fov_Lx, fov_Ly, boxsize
+    return fov_lx, fov_ly, boxsize
 
 
 def get_dmax(filename):
