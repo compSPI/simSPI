@@ -170,9 +170,7 @@ def fill_parameters_dictionary(
     dic["beam"]["voltage"] = beam_params[0]  # voltage in kV
     dic["beam"]["spread"] = beam_params[1]  # energy spread in V
     if dose is None:
-        dic["beam"][
-            "dose_per_im"
-        ] = beam_params[2]  # dose per image in e/nm**2
+        dic["beam"]["dose_per_im"] = beam_params[2]  # dose per image in e/nm**2
     else:
         dic["beam"]["dose_per_im"] = dose
     dic["beam"]["dose_sd"] = beam_params[3]  # standard deviation of dose per image
@@ -192,9 +190,9 @@ def fill_parameters_dictionary(
     if defocus is not None:
         dic["optics"]["defocus_nominal"] = defocus
     else:
-        dic["optics"][
-            "defocus_nominal"
-        ] = optics_params[6]  # nominal defocus value in um
+        dic["optics"]["defocus_nominal"] = optics_params[
+            6
+        ]  # nominal defocus value in um
     dic["optics"]["defocus_syst_error"] = optics_params[7]
     dic["optics"]["defocus_nonsyst_error"] = optics_params[8]
     if optics_defocout is None:
