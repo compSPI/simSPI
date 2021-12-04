@@ -169,7 +169,12 @@ def fill_parameters_dictionary(
     dic["beam"] = {}
     dic["beam"]["voltage"] = beam_params[0]  # voltage in kV
     dic["beam"]["spread"] = beam_params[1]  # energy spread in V
-    dic["beam"]["dose_per_im"] = beam_params[2]  # dose per image in e/nm**2
+    if dose is None:
+        dic["beam"][
+            "dose_per_im"
+        ] = beam_params[2]  # dose per image in e/nm**2
+    else:
+        dic["beam"]["dose_per_im"] = dose
     dic["beam"]["dose_sd"] = beam_params[3]  # standard deviation of dose per image
     dic["optics"] = {}
     dic["optics"]["magnification"] = optics_params[0]  # magnification
@@ -184,7 +189,12 @@ def fill_parameters_dictionary(
     dic["optics"]["cond_ap_angle"] = optics_params[
         5
     ]  # aperture angle in mrad of the beam furnished by the condenser lens
-    dic["optics"]["defocus_nominal"] = optics_params[6]  # nominal defocus value in um
+    if defocus is not None:
+        dic["optics"]["defocus_nominal"] = defocus
+    else:
+        dic["optics"][
+            "defocus_nominal"
+        ] = optics_params[6]  # nominal defocus value in um
     dic["optics"]["defocus_syst_error"] = optics_params[7]
     dic["optics"]["defocus_nonsyst_error"] = optics_params[8]
     if optics_defocout is None:
@@ -204,9 +214,12 @@ def fill_parameters_dictionary(
     dic["detector"]["gain"] = detector_params[
         3
     ]  # detector gain: average number of counts per electron
-    dic["detector"]["use_quantization"] = detector_params[
-        4
-    ]  # quantized electron waves result in noise
+    if noise is None:
+        dic["detector"]["use_quantization"] = detector_params[
+            4
+        ]  # quantized electron waves result in noise
+    else:
+        dic["detector"]["use_quantization"] = noise
     dic["detector"]["dqe"] = detector_params[5]  # detector quantum efficiency
     dic["detector"]["mtf_a"] = detector_params[6]  # parameter of MTF
     dic["detector"]["mtf_b"] = detector_params[7]  # parameter of MTF
