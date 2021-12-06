@@ -21,9 +21,7 @@ class Projector(torch.nn.Module):
 
         self.config = config
         self.vol = torch.rand([self.config.side_len] * 3, dtype=torch.float32)
-        lincoords = torch.linspace(
-            -1.0, 1.0, self.config.side_len
-        )  # assume square volume
+        lincoords = torch.linspace(-1.0, 1.0, self.config.side_len)
         [X, Y, Z] = torch.meshgrid([lincoords, lincoords, lincoords])
         coords = torch.stack([Y, X, Z], dim=-1)
         self.register_buffer("vol_coords", coords.reshape(-1, 3))
