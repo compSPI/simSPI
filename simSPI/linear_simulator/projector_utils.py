@@ -29,7 +29,9 @@ class Projector(torch.nn.Module):
     def forward(self, rot_params, proj_axis=-1):
         """Output the tomographic projection of the volume.
 
-        First rotate the volume and then sum it along an axis.
+        First rotate the volume and then sum it along an axis. 
+        The volume is assumed to be square. The output image 
+        follows (batch x channel x height x width) convention of pytorch.
 
         Parameters
         ----------
