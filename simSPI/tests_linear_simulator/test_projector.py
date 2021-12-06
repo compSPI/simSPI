@@ -1,6 +1,9 @@
 """Test function for projector module."""
-from ..linear_simulator.projector_utils import Projector
+
 import numpy as np
+
+from ..linear_simulator.projector_utils import Projector
+
 
 class AttrDict(dict):
     """Class to convert a dictionary to a class.
