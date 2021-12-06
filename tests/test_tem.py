@@ -165,7 +165,7 @@ def test_classify_sim_params(sample_class):
     }
 
     for key, value in sample_class.classify_sim_params(raw_params).items():
-        assert key in sim_dict_keys_template.keys()
+        assert key in sim_dict_keys_template
         assert len(value) is sim_dict_keys_template[key]
 
 
@@ -189,8 +189,8 @@ def test_generate_path_dict(sample_class):
     }
 
     for key, value in sample_class.generate_path_dict(raw_path_params).items():
-        assert key in output_path_dict_template.keys()
-        directory, file = os.path.split(value)
+        assert key in output_path_dict_template
+        directory, _ = os.path.split(value)
         assert os.path.isdir(directory)
         assert output_path_dict_template[key] in value
 
