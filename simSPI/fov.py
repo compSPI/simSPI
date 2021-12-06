@@ -118,13 +118,15 @@ def get_dmax(filename):
     return dmax
 
 
-def get_xyz_from_pdb(filename=None):
+def get_xyz_from_pdb(filename=None, atom_selection="name CA or name P"):
     """Get particle coordinates from .pdb file.
 
     Parameters
     ----------
     filename : str
         Relative path to file containing topological information of particle
+    atom_selection: str
+        Atoms to be selected by MDTraj for returning their cartesian coordinates
 
     Returns
     -------
@@ -132,7 +134,7 @@ def get_xyz_from_pdb(filename=None):
         Particle coordinates from .pdb file.
     """
     traj = md.load(filename)
-    atom_indices = traj.topology.select("name CA or name P")
+    atom_indices = traj.topology.select(atom_selection)
     traj_small = traj.atom_slice(atom_indices)
     coordinates = traj_small.xyz
 
