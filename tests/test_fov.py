@@ -66,7 +66,7 @@ def test_get_fov():
             pdb_path,
             d_max,
         )
-        == (expected_fov_lx, expected_fov_ly, 42.0)
+        == (expected_fov_lx, expected_fov_ly, 21.367856950503086)
     )
 
 
