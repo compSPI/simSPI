@@ -63,14 +63,12 @@ def write_crd_file(
                         "psi": rotlist[i][2],
                     }
                     crd.write(
-                        "{0[x]:14.4f} \
-                        {0[y]:14.4f} \
-                        {0[z]:14.4f} \
-                        {0[phi]:14.4f} \
-                        {0[theta]:14.4f} \
-                        {0[psi]:14.4f}\n".format(
-                            crd_table
-                        )
+                        f"{crd_table['x']:14.4f} \
+                        {crd_table['y']:14.4f} \
+                        {crd_table['z']:14.4f} \
+                        {crd_table['phi']:14.4f} \
+                        {crd_table['theta']:14.4f} \
+                        {crd_table['psi']:14.4f}\n",
                     )
                     i += 1
 
