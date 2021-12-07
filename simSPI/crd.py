@@ -1,4 +1,5 @@
-"""Helper functions for tem.py to write particle data to .crd file."""
+"""Helper functions for tem.py to write particle stack data (slice of protein)
+to .txt file containing coordinate (crd) information on particle"""
 import logging
 import math
 import os
