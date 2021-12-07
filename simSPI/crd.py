@@ -18,7 +18,9 @@ def write_crd_file(
     yrange=np.arange(-100, 110, 10),
     crd_file="crd.txt",
 ):
-    """Write particle data to .crd file.
+    """Write particle data to .txt file containing particle stack data.
+
+    Particle center coordinates as well as its Euler angles is written to file.
 
     Parameters
     ----------
@@ -29,7 +31,7 @@ def write_crd_file(
     yrange : ndarray
         Range of particle center y-coordinates to write.
     crd_file : str
-        Relative path to output .crd file.
+        Relative path to output .txt file.
     """
     log = logging.getLogger()
 
