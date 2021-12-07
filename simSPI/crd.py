@@ -39,7 +39,7 @@ def write_crd_file(
         rotlist = get_rotlist(n_particles)
         with open(crd_file, "w") as crd:
             crd.write("# File created by TEM-simulator, version 1.3.\n")
-            crd.write("{n_particles}  6\n".format(n_particles=n_particles))
+            crd.write(f"{n_particles} 6\n")
             crd.write(
                 "#            \
                 x             \
