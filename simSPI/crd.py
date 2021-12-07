@@ -8,7 +8,7 @@ from scipy.stats import special_ortho_group
 
 
 def write_crd_file(
-    numpart,
+    n_particles,
     xrange=np.arange(-100, 110, 10),
     yrange=np.arange(-100, 110, 10),
     crd_file="crd.txt",
@@ -17,7 +17,7 @@ def write_crd_file(
 
     Parameters
     ----------
-    numpart : int
+    n_particles : int
         Number of particles.
     xrange : ndarray
         Range of particle center x-coordinates to write.
@@ -31,10 +31,10 @@ def write_crd_file(
     if os.path.exists(crd_file):
         log.info(crd_file + " already exists.")
     else:
-        rotlist = get_rotlist(numpart)
+        rotlist = get_rotlist(n_particles)
         with open(crd_file, "w") as crd:
             crd.write("# File created by TEM-simulator, version 1.3.\n")
-            crd.write("{numpart}  6\n".format(numpart=numpart))
+            crd.write("{n_particles}  6\n".format(n_particles=n_particles))
             crd.write(
                 "#            \
                 x             \
@@ -47,7 +47,7 @@ def write_crd_file(
             i = 0
             for y in yrange:
                 for x in xrange:
-                    if i == int(numpart):
+                    if i == int(n_particles):
                         break
                     crd_table = {
                         "x": x,
@@ -70,16 +70,16 @@ def write_crd_file(
                     i += 1
 
 
-def get_rotlist(numpart):
+def get_rotlist(n_particles):
     """Return a rotation list containing Euler angles.
 
     Parameters
     ----------
-    numpart : int
+    n_particles : int
         Number of particles.
     """
     rotlist = []
-    for x in range(0, numpart + 1):
+    for x in range(0, n_particles + 1):
         x = special_ortho_group.rvs(3)
         y = rotation_matrix_to_euler_angles(x)
         rotlist.append(y)
