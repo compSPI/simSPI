@@ -1,7 +1,7 @@
 """Test function for noise module."""
 import numpy as np
 
-from ..linear_simulator.noise_utils import Noise
+from simSPI.linear_simulator.noise_utils import Noise
 
 
 class AttrDict(dict):
@@ -64,7 +64,7 @@ def normalized_mse(a, b):
 
 def test_shift():
     """Test accuracy of noise operation."""
-    path = "simSPI/tests_linear_simulator/data/noise_data.npy"
+    path = "tests/data/noise_data.npy"
 
     saved_data, config = init_data(path)
     im_input = saved_data["noise_input"]
