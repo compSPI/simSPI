@@ -4,8 +4,9 @@ import string
 
 import yaml
 from ioSPI import cryoemio as io
-from simSPI import fov,crd
+from simSPI import fov, crd
 from pathlib import Path
+
 
 class TEMSimulator:
     """Wrapper for the TEM Simulator.
@@ -23,7 +24,7 @@ class TEMSimulator:
         self.output_path_dict = self.generate_path_dict(path_config)
         self.sim_dict = self.get_config_from_yaml(sim_config)
 
-        #TODO : figure out how parameter ict works
+        # TODO : figure out how parameter ict works
         self.parameter_dict = self.generate_parameter_dict(
             self.output_path_dict, self.sim_dict, self.raw_sim_dict, seed = 1234
         )
@@ -166,14 +167,14 @@ class TEMSimulator:
 
         path_dict = {}
 
-
         if output_dir is None:
             output_dir = Path(pdb_file).parent
+
         if mrc_keyword is None:
-            mrc_keyword = Path(pdb_file).stem + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            mrc_keyword = Path(pdb_file).stem + ''.join(random.choices(string.ascii_uppercase + string.digits, k = 5))
         output_file_path = (
-            output_dir
-            + mrc_keyword
+                output_dir
+                + mrc_keyword
         )
 
         path_dict["pdb_file"] = (
@@ -241,7 +242,7 @@ class TEMSimulator:
         ----------
         micrograph : arr
             Array containing TEM-simulator micrograph output
-        pad : double
+        pad : double #TODO: add dimensions?
             Pad to be added to maximal dimension of the object read from pdb_file
 
         Returns
@@ -249,7 +250,7 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        #TODO: where is microgaph2particles?
+        # TODO: where is microgaph2particles?
         particles = simutils.microgaph2particles(
             micrograph,
             self.sim_dict["molecular_model"],
@@ -257,7 +258,7 @@ class TEMSimulator:
             self.sim_dict["detector_parameters"],
             pdb_file = self.output_path_dict["pdb_file"],
             Dmax = 30,
-            pad = 5.0,
+            pad = pad,
         )
 
         return particles
@@ -274,6 +275,3 @@ class TEMSimulator:
         io.data_and_dic_2hdf5(
             particles, self.output_path_dict["h5_file"], dic = self.parameter_dict
         )
-
-
-
