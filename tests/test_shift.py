@@ -64,7 +64,7 @@ def normalized_mse(a, b):
 
 def test_shift():
     """Test accuracy of the shift operation."""
-    path = "simSPI/tests_linear_simulator/data/shift_data.npy"
+    path = "tests/data/shift_data.npy"
 
     saved_data, config = init_data(path)
     shift_params = saved_data["shift_params"]
