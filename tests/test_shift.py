@@ -1,7 +1,7 @@
 """Test function for simulator module."""
 import numpy as np
 
-from ..linear_simulator.shift_utils import Shift
+from simSPI.linear_simulator.shift_utils import Shift
 
 
 class AttrDict(dict):
