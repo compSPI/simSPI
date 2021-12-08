@@ -5,7 +5,6 @@ import torch
 from simSPI.linear_simulator.ctf_utils import CTF
 
 
-
 class AttrDict(dict):
     """Class to convert a dictionary to a class.
 
