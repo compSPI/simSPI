@@ -2,7 +2,9 @@
 import numpy as np
 import torch
 
-from ..linear_simulator.ctf_utils import CTF
+from simSPI.linear_simulator.ctf_utils import CTF
+
+"""Module to convert a dictionary to a class."""
 
 
 class AttrDict(dict):
@@ -84,7 +86,7 @@ def primal_to_fourier_2D(r):
 
 def test_ctf():
     """Test accuracy of the ctf."""
-    path = "simSPI/tests_linear_simulator/data/ctf_data.npy"
+    path = "tests/data/ctf_data.npy"
 
     saved_data, config = init_data(path)
     ctf_params = saved_data["ctf_params"]
