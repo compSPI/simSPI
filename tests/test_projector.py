@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ..linear_simulator.projector_utils import Projector
+from simSPI.linear_simulator.projector_utils import Projector
 
 
 class AttrDict(dict):
@@ -65,7 +65,7 @@ def normalized_mse(a, b):
 
 def test_projector():
     """Test accuracy of projector function."""
-    path = "simSPI/tests_linear_simulator/data/projector_data.npy"
+    path = "tests/data/projector_data.npy"
 
     saved_data, config = init_data(path)
     rot_params = saved_data["rot_params"]
