@@ -1,11 +1,12 @@
 """Wrapper for the TEM Simulator."""
 import random
 import string
-
-import yaml
-from ioSPI import cryoemio as io
-from simSPI import fov, crd
 from pathlib import Path
+
+import crd
+import fov
+import yaml
+from ioSPI.ioSPI import cryoemio as io
 
 
 class TEMSimulator:
@@ -24,9 +25,12 @@ class TEMSimulator:
         self.output_path_dict = self.generate_path_dict(path_config)
         self.sim_dict = self.get_config_from_yaml(sim_config)
 
-        # TODO : figure out how parameter ict works
-        self.parameter_dict = self.generate_parameter_dict(
-            self.output_path_dict, self.sim_dict, self.raw_sim_dict, seed = 1234
+        self.parameter_dict = io.fill_parameters_dictionary(
+            sim_config,
+            self.output_path_dict["mrc_file"],
+            self.output_path_dict["pdb_file"],
+            self.output_path_dict["crd_file"],
+            self.output_path_dict["log_file"],
         )
 
     def get_config_from_yaml(self, config_yaml):
@@ -128,9 +132,7 @@ class TEMSimulator:
                     raw_params[param_type].get(key) for key in param_order
                 ]
             elif param_type == "detector_parameters":
-                ordered_list = [
-                    raw_params[param_type].get(key) for key in param_order
-                ]
+                ordered_list = [raw_params[param_type].get(key) for key in param_order]
                 classified_sim_params[param_type] = flatten_detector_array(ordered_list)
 
         return classified_sim_params
@@ -164,22 +166,18 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-
         path_dict = {}
 
         if output_dir is None:
-            output_dir = Path(pdb_file).parent
+            output_dir = str(Path(pdb_file).parent)
 
         if mrc_keyword is None:
-            mrc_keyword = Path(pdb_file).stem + ''.join(random.choices(string.ascii_uppercase + string.digits, k = 5))
-        output_file_path = (
-                output_dir
-                + mrc_keyword
-        )
+            mrc_keyword = str(Path(pdb_file).stem) + "".join(
+                random.choices(string.ascii_uppercase + string.digits, k=5)
+            )
+        output_file_path = output_dir + mrc_keyword
 
-        path_dict["pdb_file"] = (
-            pdb_file
-        )
+        path_dict["pdb_file"] = pdb_file
         path_dict["crd_file"] = output_file_path + ".txt"
         path_dict["mrc_file"] = output_file_path + ".mrc"
         path_dict["log_file"] = output_file_path + ".log"
@@ -197,32 +195,18 @@ class TEMSimulator:
             Pad to be added to maximal dimension of the object read from pdb_file
         """
         x_range, y_range, num_part = fov.define_grid_in_fov(
-            self.sim_dict["specimen_grid_params"],
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
-            self.output_path_dict["pdb_file"],
-            Dmax = 30,
-            pad = pad,
+            self.output_path_dict["pdb_file"],  # TODO: investigate dmax.
+            pad=pad,
         )
 
         crd.write_crd_file(
             num_part,
-            xrange = x_range,
-            yrange = y_range,
-            crd_file = self.output_path_dict["crd_file"],
+            xrange=x_range,
+            yrange=y_range,
+            crd_file=self.output_path_dict["crd_file"],
         )
-
-    def generate_parameters_dictionary(self):
-        """Compile experiment data into .inp friendly file for use in TEM-simulator.
-
-        Returns
-        -------
-        param_dictionary : dict
-            .inp friendly dictionary containing simulation input parameters.
-        """
-        self.placeholder = 0
-        param_dictionary = {}
-        return param_dictionary
 
     def write_inp_file(self):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
@@ -233,7 +217,9 @@ class TEMSimulator:
         different particles) and parameter assignments of the form
         "<parameter> = <value>".
         """
-        io.write_inp_file(inp_file = self.output_path_dict["inp_file"], dict_params = self.parameter_dict)
+        io.write_inp_file(
+            inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
+        )
 
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.
@@ -250,15 +236,13 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        # TODO: where is microgaph2particles?
-        particles = simutils.microgaph2particles(
+        particles = fov.micrograph2particles(
             micrograph,
-            self.sim_dict["molecular_model"],
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
-            pdb_file = self.output_path_dict["pdb_file"],
-            Dmax = 30,
-            pad = pad,
+            pdb_file=self.output_path_dict["pdb_file"],  # TODO: dmax?
+            pad=pad,
+            dmax=30,
         )
 
         return particles
@@ -272,6 +256,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        io.data_and_dic_2hdf5(
-            particles, self.output_path_dict["h5_file"], dic = self.parameter_dict
+        io.data_and_dic2hdf5(
+            particles,
+            self.output_path_dict["h5_file"],
         )
