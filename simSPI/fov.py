@@ -180,7 +180,7 @@ def micrograph2particles(
     n_boxsize = np.int(boxsize / pixel_size)
     x_pixels = np.int(fov_nx * n_boxsize)
     y_pixels = np.int(fov_ny * n_boxsize)
-    data = micrograph[0:y_pixels, 0:x_pixels]
+    data = micrograph[:y_pixels, :x_pixels]
     particles = slice_and_stack(data, n_boxsize=n_boxsize)
 
     return particles
