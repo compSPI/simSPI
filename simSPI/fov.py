@@ -206,12 +206,12 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
     log = logging.getLogger()
 
     if n_ovl == 0:
-        data_stack = blockshaped(data, n_boxsize, n_boxsize)
+        return blockshaped(data, n_boxsize, n_boxsize)
     else:
         n_split = math.floor((data.shape[0] - 2 * n_ovl) / n_boxsize)
         n_dilat = n_boxsize + 2 * n_ovl
         data_stack = np.zeros((n_split * n_split, n_dilat, n_dilat))
-        log.info("Array dimensions: {}".format(data_stack.shape))
+        log.info(f"Array dimensions: {data_stack.shape}")
         i_stack = 0
         for i in np.arange(n_split):
             for j in np.arange(n_split):
