@@ -12,11 +12,11 @@ def test_write_crd_file():
     temp_file = temp_dir.name + "/crd.txt"
 
     assert not os.path.isfile(temp_file)
-    crd.write_crd_file(numpart=20, crd_file=temp_file)
+    crd.write_crd_file(n_particles=20, crd_file=temp_file)
     assert os.path.isfile(temp_file)
 
     file_already_exists = temp_file
-    crd.write_crd_file(numpart=20, crd_file=file_already_exists)
+    crd.write_crd_file(n_particles=20, crd_file=file_already_exists)
     assert os.path.isfile(file_already_exists)
 
 
