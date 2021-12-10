@@ -129,7 +129,9 @@ def get_xyz_from_pdb(pdb_file=None, atom_selection="name CA or name P"):
     pdb_file : str
         Relative path to .pdb file containing topological information of particle.
     atom_selection: str
-        Atoms to be selected by MDTraj for returning their cartesian coordinates
+        Atoms to be selected by MDTraj for returning their cartesian coordinates.
+        https://mdtraj.org/1.9.4/examples/atom-selection.html#Atom-Selection-Language
+        for more information on selection syntax.
 
     Returns
     -------
