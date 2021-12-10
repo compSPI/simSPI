@@ -9,7 +9,7 @@ import math
 import os
 
 import numpy as np
-from scipy.stats import special_ortho_group
+from scipy.spatial.transform import Rotation as R
 
 
 def write_crd_file(
@@ -81,10 +81,9 @@ def get_rotlist(n_particles):
         Number of particles.
     """
     rotlist = []
-    for x in range(0, n_particles + 1):
-        x = special_ortho_group.rvs(3)
-        y = rotation_matrix_to_euler_angles(x)
-        rotlist.append(y)
+    for _ in range(n_particles + 1):
+        x = R.random(5).as_euler("xyz", degrees=True)
+        rotlist.append(x)
     return rotlist
 
 
