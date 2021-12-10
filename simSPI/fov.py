@@ -122,7 +122,7 @@ def get_dmax(filename):
 
 
 def get_xyz_from_pdb(pdb_file=None, atom_selection="name CA or name P"):
-    """Get particle coordinates from .pdb file.
+    """Get a particle's coordinates from .pdb file.
 
     Parameters
     ----------
@@ -135,8 +135,8 @@ def get_xyz_from_pdb(pdb_file=None, atom_selection="name CA or name P"):
 
     Returns
     -------
-    traj_small.xyz : ndarray
-        Particle coordinates from .pdb file.
+    coordinates : ndarray
+        Particle atom coordinates from .pdb file.
     """
     traj = md.load(pdb_file)
     atom_indices = traj.topology.select(atom_selection)
