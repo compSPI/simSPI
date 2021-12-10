@@ -1,4 +1,7 @@
-"""Helper functions for tem.py to define grid FOV for displaying particles."""
+"""Helper functions for tem.py.
+
+Define grid FOV (field-of-view) for displaying particles.
+"""
 import logging
 import math
 
