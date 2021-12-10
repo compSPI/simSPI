@@ -197,7 +197,7 @@ class TEMSimulator:
         x_range, y_range, num_part = fov.define_grid_in_fov(
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
-            self.output_path_dict["pdb_file"],  # TODO: investigate dmax.
+            self.output_path_dict["pdb_file"],
             pad=pad,
         )
 
@@ -228,7 +228,7 @@ class TEMSimulator:
         ----------
         micrograph : arr
             Array containing TEM-simulator micrograph output
-        pad : double #TODO: add dimensions?
+        pad : double
             Pad to be added to maximal dimension of the object read from pdb_file
 
         Returns
@@ -240,9 +240,8 @@ class TEMSimulator:
             micrograph,
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
-            pdb_file=self.output_path_dict["pdb_file"],  # TODO: dmax?
+            pdb_file=self.output_path_dict["pdb_file"],
             pad=pad,
-            dmax=30,
         )
 
         return particles

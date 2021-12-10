@@ -184,11 +184,12 @@ def test_extract_particles(sample_class, sample_resources):
     particles = sample_class.extract_particles(
         sample_resources["data"]["micrograph"], 5.0
     )
+
     assert particles.shape == (
-        48,
-        648,
-        648,
-    )  # value in notebook is this, test fails.why?
+        35,
+        809,
+        809,
+    )
 
 
 def test_export_particle_stack(sample_class, sample_resources):
@@ -220,12 +221,11 @@ def test_export_particle_stack(sample_class, sample_resources):
         0,
     ]
 
-    particles = fov.micrograph2particles(  # TODO: find where this function is now
+    particles = fov.micrograph2particles(
         sample_resources["data"]["micrograph"],
         sample_class.sim_dict["optics_parameters"],
         sample_class.sim_dict["detector_parameters"],
         pdb_file=sample_resources["files"]["pdb_file"],
-        dmax=30,
         pad=5.0,
     )
 
