@@ -228,12 +228,12 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
     return data_stack
 
 
-def blockshaped(arr, nrows, ncols):
+def blockshaped(data, nrows, ncols):
     """Return an array of shape (n, nrows, ncols) where n * nrows * ncols = arr.size.
 
     Parameters
     ----------
-    arr : ndarray
+    data : ndarray
         Array to reshape.
     nrows : int
         Number of rows.
@@ -245,9 +245,9 @@ def blockshaped(arr, nrows, ncols):
     reshaped_arr : ndarray
         Reshaped input array with dimension (n, nrows, ncols)
     """
-    h, _ = arr.shape
+    h, _ = data.shape
     reshaped_arr = (
-        arr.reshape(h // nrows, nrows, -1, ncols)
+        data.reshape(h // nrows, nrows, -1, ncols)
         .swapaxes(1, 2)
         .reshape(-1, nrows, ncols)
     )
