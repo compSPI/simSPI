@@ -206,7 +206,7 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
     log = logging.getLogger()
 
     if n_ovl == 0:
-        return blockshaped(data, n_boxsize, n_boxsize)
+        data_stack = blockshaped(data, n_boxsize, n_boxsize)
     else:
         n_split = math.floor((data.shape[0] - 2 * n_ovl) / n_boxsize)
         n_dilat = n_boxsize + 2 * n_ovl
