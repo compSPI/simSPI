@@ -60,7 +60,7 @@ class Shift(torch.nn.Module):
 
         return x_fourier * modulation
 
-    def forward(self, x_fourier, shift_params={}):
+    def forward(self, x_fourier, shift_params=None):
         """Output modulated input images.
 
         Fourier equivalent of shifting in primal domain. The modulation
@@ -83,7 +83,7 @@ class Shift(torch.nn.Module):
                 batch of modulated fourier images (batch_sizex1xSizexSize)
                 if shift_params is not empty else input is outputted
         """
-        if shift_params:
+        if shift_params is not None:
             x_fourier = self.phase_shift(
                 x_fourier, shift_params["shift_x"], shift_params["shift_y"]
             )
