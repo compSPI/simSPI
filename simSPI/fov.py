@@ -77,9 +77,9 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
 
     Returns
     -------
-    fov_Lx : float
+    fov_lx : float
         Length of fov in x-dimension.
-    fov_Ly : float
+    fov_ly : float
         Length of fov in y-dimension.
     boxsize : float
         Boxsize of particle, equal to max particle dimension with pad.
