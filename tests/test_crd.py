@@ -16,8 +16,10 @@ def test_write_crd_file():
     assert not os.path.isfile(temp_file)
     crd.write_crd_file(numpart=20, crd_file=temp_file)
     assert os.path.isfile(temp_file)
-    crd.write_crd_file(numpart=20, crd_file=temp_file)
-    assert os.path.isfile(temp_file)
+
+    file_already_exists = temp_file
+    crd.write_crd_file(numpart=20, crd_file=file_already_exists)
+    assert os.path.isfile(file_already_exists)
 
 
 def test_get_rotlist():
