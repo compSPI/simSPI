@@ -1,10 +1,10 @@
-"""Module containing method to shift an image in Fourier domain."""
+"""Module containing a method to apply a spatial shift to an image in Fourier domain."""
 import numpy as np
 import torch
 
 
 class Shift(torch.nn.Module):
-    """class containing method to shift an image in Fourier domain.
+    """class containing method to apply a spatial shift to an image in Fourier domain.
 
     Written by H. Gupta and Y.S.G. Nashed.
 
@@ -17,12 +17,13 @@ class Shift(torch.nn.Module):
 
     def __init__(self, config):
         super(Shift, self).__init__()
+        """Initialize image grid and frequency value."""
 
         self.config = config
         self.frequency = 1.0 / (self.config.side_len * self.config.pixel_size)
 
-        n2 = float(self.config.side_len // 2)
-        ax = torch.arange(-n2, n2 + self.config.side_len % 2)
+        n_half_len = float(self.config.side_len // 2)
+        ax = torch.arange(-n_half_len, n_half_len + self.config.side_len % 2)
         ax = torch.flip(ax, dims=[0])
         mx, my = torch.meshgrid(ax, ax)
 
