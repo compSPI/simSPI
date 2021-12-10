@@ -69,7 +69,7 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
     detector_params : list
         List of sim parameters pertaining to detector settings.
     pdb_file : str
-        Relative path to .pdb file output.
+        Relative path to .pdb file containing topological information of particle.
     dmax : int
         Maximum dimension of molecule.
     pad : int
@@ -102,17 +102,17 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
 
 
 def get_dmax(filename):
-    """Get maximmum dimension of particle.
+    """Get maximum diameter of a particle in pixels.
 
     Parameters
     ----------
-    filename : str
-        Relative path to file containing topological information of particle
+    pdb_file : str
+        Relative path to .pdb file containing topological information of particle.
 
     Returns
     -------
-    np.amax(distance) : float
-        Max dimension of given particle in .pdb source file.
+    dmax : float
+        Max diameter of given particle in .pdb source file.
     """
     xyz = get_xyz_from_pdb(filename)
     distance = pdist(xyz[0, ...])
@@ -121,13 +121,13 @@ def get_dmax(filename):
     return dmax
 
 
-def get_xyz_from_pdb(filename=None, atom_selection="name CA or name P"):
+def get_xyz_from_pdb(pdb_file=None, atom_selection="name CA or name P"):
     """Get particle coordinates from .pdb file.
 
     Parameters
     ----------
-    filename : str
-        Relative path to file containing topological information of particle
+    pdb_file : str
+        Relative path to .pdb file containing topological information of particle.
     atom_selection: str
         Atoms to be selected by MDTraj for returning their cartesian coordinates
 
@@ -136,7 +136,7 @@ def get_xyz_from_pdb(filename=None, atom_selection="name CA or name P"):
     traj_small.xyz : ndarray
         Particle coordinates from .pdb file.
     """
-    traj = md.load(filename)
+    traj = md.load(pdb_file)
     atom_indices = traj.topology.select(atom_selection)
     traj_small = traj.atom_slice(atom_indices)
     coordinates = traj_small.xyz
