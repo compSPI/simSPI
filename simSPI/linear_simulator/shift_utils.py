@@ -16,8 +16,8 @@ class Shift(torch.nn.Module):
     """
 
     def __init__(self, config):
-        super(Shift, self).__init__()
         """Initialize image grid and frequency value."""
+        super(Shift, self).__init__()
 
         self.config = config
         self.frequency = 1.0 / (self.config.side_len * self.config.pixel_size)
