@@ -28,8 +28,8 @@ def define_grid_in_fov(
     pad : int
         Amount of padding in pixels.
 
-    Return
-    ------
+    Returns
+    -------
     x_range : ndarray
         Coordinate range of each picked particle in micrograph in x-dimension.
     y_range : ndarray
