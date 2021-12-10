@@ -160,7 +160,7 @@ def micrograph2particles(
     detector_params : list
         Simulation parameters related to detector settings.
     pdb_file : str
-        Relative path to .pdb file.
+        Relative path to .pdb file containing topological information of particle.
     dmax : int
         Predefined maximum dimension of molecule.
     pad : int
@@ -171,15 +171,15 @@ def micrograph2particles(
     particles : ndarray
         Picked and sliced particle data from micrograph.
     """
-    fov_Lx, fov_Ly, boxsize = get_fov(
+    fov_lx, fov_ly, boxsize = get_fov(
         optics_params, detector_params, pdb_file=pdb_file, dmax=dmax, pad=pad
     )
-    fov_Nx = np.floor(fov_Lx / boxsize)
-    fov_Ny = np.floor(fov_Ly / boxsize)
-    pixel_size = (fov_Lx / micrograph.shape[1] + fov_Ly / micrograph.shape[0]) / 2.0
+    fov_nx = np.floor(fov_lx / boxsize)
+    fov_ny = np.floor(fov_ly / boxsize)
+    pixel_size = (fov_lx / micrograph.shape[1] + fov_ly / micrograph.shape[0]) / 2.0
     n_boxsize = np.int(boxsize / pixel_size)
-    x_pixels = np.int(fov_Nx * n_boxsize)
-    y_pixels = np.int(fov_Ny * n_boxsize)
+    x_pixels = np.int(fov_nx * n_boxsize)
+    y_pixels = np.int(fov_ny * n_boxsize)
     data = micrograph[0:y_pixels, 0:x_pixels]
     particles = slice_and_stack(data, n_boxsize=n_boxsize)
 
