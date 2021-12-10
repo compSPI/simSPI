@@ -84,9 +84,9 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
     boxsize : float
         Boxsize of particle, equal to max particle dimension with pad.
     """
-    detector_nx_pix = detector_params[0]
-    detector_ny_pix = detector_params[1]
+    detector_nx_pix, detector_ny_pix = detector_params[:2]
     detector_pix_size = detector_params[2] * 1e3
+
     magnification = optics_params[0]
 
     detector_lx = detector_nx_pix * detector_pix_size
