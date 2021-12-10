@@ -156,9 +156,9 @@ def micrograph2particles(
     micrograph : ndarray
         Particle micrograph to extract from.
     optics_params : list
-        List of sim parameters pertaining to microscope settings.
+        Simulation parameters related to microscope settings.
     detector_params : list
-        List of sim parameters pertaining to detector settings.
+        Simulation parameters related to detector settings.
     pdb_file : str
         Relative path to .pdb file.
     dmax : int
