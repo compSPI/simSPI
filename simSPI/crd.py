@@ -81,6 +81,6 @@ def get_rotlist(n_particles):
     """
     rotlist = []
     for _ in range(n_particles + 1):
-        x = R.random(5).as_euler("xyz", degrees=True)
+        x = R.random(5).as_euler("zyz", degrees=True)
         rotlist.append(x)
     return rotlist
