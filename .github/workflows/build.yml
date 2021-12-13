@@ -49,6 +49,7 @@ jobs:
       - name: install dependencies
         run:  |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
+          $CONDA/bin/conda update -n base -c defaults conda
           $CONDA/bin/conda env update --file environment.yml --name base
           $CONDA/bin/pip install -e .
       - name: linting [flake8]
