@@ -17,28 +17,35 @@ class Projector(torch.nn.Module):
     """
 
     def __init__(self, config):
+        """Initialize volume grid."""
         super(Projector, self).__init__()
 
         self.config = config
         self.vol = torch.rand([self.config.side_len] * 3, dtype=torch.float32)
-        lincoords = torch.linspace(-1.0, 1.0, self.config.side_len)
-        [X, Y, Z] = torch.meshgrid([lincoords, lincoords, lincoords])
-        coords = torch.stack([Y, X, Z], dim=-1)
+        lin_coords = torch.linspace(-1.0, 1.0, self.config.side_len)
+        [x, y, z] = torch.meshgrid(
+            [
+                lin_coords,
+            ]
+            * 3
+        )
+        coords = torch.stack([y, x, z], dim=-1)
         self.register_buffer("vol_coords", coords.reshape(-1, 3))
 
     def forward(self, rot_params, proj_axis=-1):
         """Output the tomographic projection of the volume.
 
         First rotate the volume and then sum it along an axis.
-        The volume is assumed to be square. The output image
+        The volume is assumed to be cube. The output image
         follows (batch x channel x height x width) convention of pytorch.
         Therefore, a dummy channel dimension is added at the end to projection.
 
         Parameters
         ----------
         rot_params: dict of type str to {tensor}
-            contains rotation matrix "rotmat" (batch_size x 3 x 3) that is
-            used to rotate the volume
+            Dictionary containing parameters for rotation, with keys
+                rotmat: str map to tensor
+                    rotation matrix (batch_size x 3 x 3) to rotate the volume
         proj_axis: int
             index along which summation is done of the rotated volume
 
