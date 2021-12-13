@@ -5,11 +5,10 @@ to .txt file containing coordinate (crd) information on particle.
 """
 
 import logging
-import math
 import os
 
 import numpy as np
-from scipy.stats import special_ortho_group
+from scipy.spatial.transform import Rotation as R
 
 
 def write_crd_file(
@@ -81,51 +80,7 @@ def get_rotlist(n_particles):
         Number of particles.
     """
     rotlist = []
-    for x in range(0, n_particles + 1):
-        x = special_ortho_group.rvs(3)
-        y = rotation_matrix_to_euler_angles(x)
-        rotlist.append(y)
+    for _ in range(n_particles + 1):
+        x = R.random(5).as_euler("zyz", degrees=True)
+        rotlist.append(x)
     return rotlist
-
-
-def rotation_matrix_to_euler_angles(mat):
-    """Compute Euler angles given a rotation matrix.
-
-    Parameters
-    ----------
-    mat : ndarray
-        Matrix to compute Euler angles from.
-    """
-    if not is_rotation_matrix(mat):
-        raise ValueError()
-
-    sy = math.sqrt(mat[0, 0] * mat[0, 0] + mat[1, 0] * mat[1, 0])
-    singular = sy < 1e-6
-
-    if not singular:
-        x = math.atan2(mat[2, 1], mat[2, 2])
-        y = math.atan2(-mat[2, 0], sy)
-        z = math.atan2(mat[1, 0], mat[0, 0])
-    else:
-        x = math.atan2(-mat[1, 2], mat[1, 1])
-        y = math.atan2(-mat[2, 0], sy)
-        z = 0
-
-    x = np.rad2deg(x)
-    y = np.rad2deg(y)
-    z = np.rad2deg(z)
-
-    return np.array([x, y, z])
-
-
-def is_rotation_matrix(matrix):
-    """Determine whether a given matrix is a valid rotation matrix.
-
-    Parameters
-    ----------
-    matrix : ndarray
-        Matrix to check if it is a valid rotation matrix.
-    """
-    is_orthogonal = np.allclose(np.dot(matrix, matrix.T), np.identity(3))
-    is_det_one = np.isclose(np.linalg.det(matrix), 1)
-    return is_orthogonal and is_det_one
