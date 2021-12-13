@@ -15,7 +15,7 @@ def sample_class(tmp_path):
     test_files_path = "./test_files"
     cwd = os.getcwd()
 
-    t = tem.TEMSimulator(
+    tem_simulator = tem.TEMSimulator(
         str(Path(cwd, test_files_path, "path_config.yaml")),
         str(Path(cwd, test_files_path, "sim_config.yaml")),
     )
@@ -23,14 +23,14 @@ def sample_class(tmp_path):
     # from test_files/path_config
     out_file_name = "_randomrot"
 
-    t.output_path_dict["crd_file"] = str(Path(cwd, tmp_path, out_file_name + ".txt"))
-    t.output_path_dict["mrc_file"] = str(Path(cwd, tmp_path, out_file_name + ".mrc"))
-    t.output_path_dict["log_file"] = str(Path(cwd, tmp_path, out_file_name + ".log"))
-    t.output_path_dict["inp_file"] = str(Path(cwd, tmp_path, out_file_name + ".inp"))
-    t.output_path_dict["h5_file"] = str(Path(cwd, tmp_path, out_file_name + ".h5"))
-    t.output_path_dict["pdb_file"] = str(Path(cwd, test_files_path, "4v6x.pdb"))
+    tem_simulator.output_path_dict["crd_file"] = str(Path(cwd, tmp_path, out_file_name + ".txt"))
+    tem_simulator.output_path_dict["mrc_file"] = str(Path(cwd, tmp_path, out_file_name + ".mrc"))
+    tem_simulator.output_path_dict["log_file"] = str(Path(cwd, tmp_path, out_file_name + ".log"))
+    tem_simulator.output_path_dict["inp_file"] = str(Path(cwd, tmp_path, out_file_name + ".inp"))
+    tem_simulator.output_path_dict["h5_file"] = str(Path(cwd, tmp_path, out_file_name + ".h5"))
+    tem_simulator.output_path_dict["pdb_file"] = str(Path(cwd, test_files_path, "4v6x.pdb"))
 
-    return t
+    return tem_simulator
 
 
 @pytest.fixture
@@ -94,37 +94,37 @@ def test_classify_input_config(sample_class):
     """Test classification of simulation parameters."""
     raw_params = {
         "molecular_model": {
-            "voxel_size": 0.1,
+            "voxel_size_nm": 0.1,
             "particle_name": "toto",
             "particle_mrcout": "None",
         },
         "specimen_grid_params": {
-            "hole_diameter": 1200,
-            "hole_thickness_center": 100,
-            "hole_thickness_edge": 100,
+            "hole_diameter_nm": 1200,
+            "hole_thickness_center_nm": 100,
+            "hole_thickness_edge_nm": 100,
         },
         "beam_parameters": {
-            "voltage": 300,
-            "energy_spread": 1.3,
-            "electron_dose": 100,
+            "voltage_kV": 300,
+            "energy_spread_V": 1.3,
+            "electron_dose_e_nm2": 100,
             "electron_dose_std": 0,
         },
         "optics_parameters": {
             "magnification": 81000,
-            "spherical_aberration": 2.7,
-            "chromatic_aberration": 2.7,
-            "aperture_diameter": 50,
-            "focal_length": 3.5,
-            "aperture_angle": 0.1,
-            "defocus": 1.0,
+            "spherical_aberration_mm": 2.7,
+            "chromatic_aberration_mm": 2.7,
+            "aperture_diameter_um": 50,
+            "focal_length_mm": 3.5,
+            "aperture_angle_mrad": 0.1,
+            "defocus_um": 1.0,
             "defocus_syst_error": 0.0,
             "defocus_nonsyst_error": 0.0,
             "optics_defocusout": "None",
         },
         "detector_parameters": {
-            "detector_Nx": 5760,
-            "detector_Ny": 4092,
-            "detector_pixel_size": 5,
+            "detector_pixels_x": 5760,
+            "detector_pixels_y": 4092,
+            "detector_pixel_size_um": 5,
             "detector_gain": 2,
             "noise": "no",
             "detector_Q_efficiency": 0.5,
@@ -142,9 +142,9 @@ def test_classify_input_config(sample_class):
         for param_value in raw_params[param_group_name].values():
             if type(param_value) is list:
                 for items in param_value:
-                    assert items in returned_params[param_group_name]
+                    assert items in param_list
             else:
-                assert param_value in returned_params[param_group_name]
+                assert param_value in param_list
 
 
 def test_generate_path_dict(sample_class, sample_resources):
@@ -161,7 +161,7 @@ def test_generate_path_dict(sample_class, sample_resources):
         sample_resources["files"]["pdb_file"]
     )
     for file_type, file_path in returned_paths.items():
-        assert file_type in expected_path_template.keys()
+        assert file_type in expected_path_template
         directory, file = os.path.split(file_path)
         assert os.path.isdir(directory)
         assert expected_path_template[file_type] in file

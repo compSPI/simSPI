@@ -77,52 +77,40 @@ class TEMSimulator:
             Dictionary of grouped parameters
         """
         sim_params_structure = {
-            "molecular_model": ["voxel_size", "particle_name", "particle_mrcout"],
+            "molecular_model": ["voxel_size_nm", "particle_name", "particle_mrcout"],
             "specimen_grid_params": [
-                "hole_diameter",
-                "hole_thickness_center",
-                "hole_thickness_edge",
+                "hole_diameter_nm",
+                "hole_thickness_center_nm",
+                "hole_thickness_edge_nm",
             ],
             "beam_parameters": [
-                "voltage",
-                "energy_spread",
-                "electron_dose",
+                "voltage_kV",
+                "energy_spread_V",
+                "electron_dose_e_nm2",
                 "electron_dose_std",
             ],
             "optics_parameters": [
                 "magnification",
-                "spherical_aberration",
-                "chromatic_aberration",
-                "aperture_diameter",
-                "focal_length",
-                "aperture_angle",
-                "defocus",
+                "spherical_aberration_mm",
+                "chromatic_aberration_mm",
+                "aperture_diameter_um",
+                "focal_length_mm",
+                "aperture_angle_mrad",
+                "defocus_um",
                 "defocus_syst_error",
                 "defocus_nonsyst_error",
                 "optics_defocusout",
             ],
             "detector_parameters": [
-                "detector_Nx",
-                "detector_Ny",
-                "detector_pixel_size",
+                "detector_pixels_x",
+                "detector_pixels_y",
+                "detector_pixel_size_um",
                 "detector_gain",
                 "noise",
                 "detector_Q_efficiency",
                 "MTF_params",
             ],
         }
-
-        def flatten_detector_array(arr):
-
-            flattened_params = []
-
-            for i in range(6):
-                flattened_params.append(arr[i])
-
-            for i in range(5):
-                flattened_params.append(arr[6][i])
-
-            return flattened_params
 
         classified_sim_params = {}
 
@@ -132,8 +120,17 @@ class TEMSimulator:
                     raw_params[param_type].get(key) for key in param_order
                 ]
             elif param_type == "detector_parameters":
-                ordered_list = [raw_params[param_type].get(key) for key in param_order]
-                classified_sim_params[param_type] = flatten_detector_array(ordered_list)
+                ordered_params = [
+                    raw_params[param_type].get(key) for key in param_order
+                ]
+                flattened_params = []
+
+                for i in range(6):
+                    flattened_params.append(ordered_params[i])
+                for i in range(5):
+                    flattened_params.append(ordered_params[6][i])
+
+                classified_sim_params[param_type] = flattened_params
 
         return classified_sim_params
 
