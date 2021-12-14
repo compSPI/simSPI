@@ -17,11 +17,12 @@ class CTF(torch.nn.Module):
     """
 
     def __init__(self, config):
+        """Initialize image grid, wavelength, and frequency step per pixel."""
         super(CTF, self).__init__()
 
         self.config = config
         self.wavelength = self._get_ewavelength()
-        self.frequency = 1.0 / (self.config.ctf_size * self.config.pixel_size)
+        self.frequency_step = 1.0 / (self.config.ctf_size * self.config.pixel_size)
         n2 = float(self.config.ctf_size // 2)
         ax = torch.arange(-n2, n2 + self.config.ctf_size % 2)
         mx, my = torch.meshgrid(ax, ax)
@@ -45,11 +46,83 @@ class CTF(torch.nn.Module):
     def get_ctf(self, ctf_params):
         """Output the CTF for a given params.
 
+        Continuous-domain CTF
+        ---------------------
+            Creates CTF using the formula (obtained from [1, Section 2.II.B]),
+
+                CTF(f)= E(f).((1-ac^2)^0.5 sin(R(f))+ ac. cos(R(f))), where,
+                R(f)= pi * wavelength*(D(f)* 1e4 *||f||^2 -
+                      0.25 * cs * 1e7 * wavelength^3 * ||f||^4),
+                D(f)=0.5*(defocus_u+ defocus_v) +
+                     0.5*(defocus_u-defocus_v)*cos(2*(alpha_f-defocus_angle)), and,
+                E(f)= exp^*(-0.25* b_factor*||f||^2).
+
+            Expression D(f) can actually be simplified as
+                D(f)=defocus_v+(defocus_u-defocus_v)*cos(alpha_f-defocus_angle)^2.
+
+            Note that the above formulation has been slightly modified from [1] in
+            order to make the CTF follow the sign and astigmatism convention of
+            Relion [2]. The CTF from Relion is accessible via relion_project function.
+
+        Constants and variables
+        -----------------------
+            Here,
+                f:  frequency vector;
+                alpha_f: phase of the vector f in polar coordinates;
+
+                ac:  amplitude contrast (comes from self.config);
+                wavelength: electron beam wavelength in A (comes from self.config);
+                cs: spherical aberration constant in mm (comes from self.config);
+                b_factor: decay for the envelope (comes from self.config)
+
+                defocus_u: horizontal defocus in um (comes from ctf_params);
+                defocus_v: vertical defocus in um (comes from ctf_params);
+                defocus_angle: astigmatism angle in radians (comes from ctf_params).
+
+            For a given dataset alpha_f, ac, wavelength, and cs are constants,
+            whereas, other variables can vary per projection.
+
+        Discretization
+        --------------
+            The code below simplifies and discretizes the above continuous-domain
+            expression by sampling CTF value at config.ctf_size//2 number of
+            equidistant frequency samples between 0 to Nyquist frequency.
+
+            Specifically, in a grid of pixel location going from (0,0) to (N-1, N-1)
+            for any pixel location (m,n):
+
+            |f|= ((m-c)^2+(n-c)^2)**0.5 *frequency_step,and
+            alpha_f=arctan(n-c,m-c)
+            where frequency_step= Nyquist_frequency/(N/2)=1/(pixel_size*N)
+
+        References
+        ----------
+            [1]: Frank, Joachim. Three-dimensional electron microscopy of
+                macromolecular assemblies: visualization of biological molecules
+                in their native state. Oxford university press, 2006.
+            [2]: Scheres, Sjors HW. "RELION: implementation of a Bayesian approach to
+                cryo-EM structure determination." Journal of structural biology,
+                180, no. 3 (2012): 519-530.
+
+        Remarks
+        -------
+            In the code below, the envelope function E(f), when b_factor is unknown
+            (assumed to be 0 in that case) uses value_nyquist given by the user. This
+            corresponds to the value of envelope function at nyquist frequency and
+            hence, is directly related to CTF b_factor. Because of this simple
+            definition of value_nyquist it is a more intuitive and easier input
+            for the user to provide than b_factor.
+
         Parameters
         ----------
-        ctf_params: dict of type str to {tensor}
-            contains "defocus_u", "defocus_v", "defocus_angle",
-            all of shape (batch_size,1,1,1)
+        ctf_params: dict of type str to torch.Tensor
+            contains defocus parameters with keys
+                defocus_u: str to torch.Tensor
+                    horizontal defocus in um with shape: (batch_size,1,1,1)
+                defocus_v: str to torch.Tensor
+                    vertical defocus in um with shape: (batch_size,1,1,1)
+                defocus_angle: str to torch.Tensor
+                    astigmatism angle in radians with shape: (batch_size,1,1,1)
 
         Returns
         -------
@@ -66,7 +139,7 @@ class CTF(torch.nn.Module):
             * torch.cos(self.angleFrequency - angle_astigmatism) ** 2
         )
         defocusContribution = (
-            np.pi * self.wavelength * 1e4 * elliptical * self.frequency ** 2
+            np.pi * self.wavelength * 1e4 * elliptical * self.frequency_step ** 2
         )
         abberationContribution = (
             -np.pi
@@ -74,7 +147,7 @@ class CTF(torch.nn.Module):
             * self.config.cs
             * (self.wavelength ** 3)
             * 1e7
-            * self.frequency ** 4
+            * self.frequency_step ** 4
             * self.r2 ** 2
         )
 
@@ -90,10 +163,10 @@ class CTF(torch.nn.Module):
                 * 2.0
                 * self.config.pixel_size
             )
-            envelope = torch.exp(-self.frequency ** 2 * decay ** 2 * self.r2)
+            envelope = torch.exp(-self.frequency_step ** 2 * decay ** 2 * self.r2)
         else:
             envelope = torch.exp(
-                -self.frequency ** 2 * self.config.b_factor / 4.0 * self.r2
+                -self.frequency_step ** 2 * self.config.b_factor / 4.0 * self.r2
             )
 
         hFourier *= envelope
