@@ -27,7 +27,7 @@ class CTF(torch.nn.Module):
         ax = torch.arange(-n2, n2 + self.config.ctf_size % 2)
         mx, my = torch.meshgrid(ax, ax)
         self.register_buffer("r2", mx ** 2 + my ** 2)
-        self.register_buffer("r", torch.sqrt(self.r2))
+        self.register_buffer("frequency", torch.sqrt(self.r2) * self.frequency_step)
         self.register_buffer("angleFrequency", torch.atan2(my, mx))
 
     def _get_ewavelength(self):
@@ -133,13 +133,12 @@ class CTF(torch.nn.Module):
         defocus_v = ctf_params["defocus_v"]
         angle_astigmatism = ctf_params["defocus_angle"]
         elliptical = (
-            defocus_v * self.r2
+            defocus_v
             + (defocus_u - defocus_v)
-            * self.r2
             * torch.cos(self.angleFrequency - angle_astigmatism) ** 2
         )
         defocusContribution = (
-            np.pi * self.wavelength * 1e4 * elliptical * self.frequency_step ** 2
+            np.pi * self.wavelength * 1e4 * elliptical * self.frequency ** 2
         )
         abberationContribution = (
             -np.pi
@@ -148,7 +147,6 @@ class CTF(torch.nn.Module):
             * (self.wavelength ** 3)
             * 1e7
             * self.frequency_step ** 4
-            * self.r2 ** 2
         )
 
         argument = abberationContribution + defocusContribution
@@ -163,11 +161,9 @@ class CTF(torch.nn.Module):
                 * 2.0
                 * self.config.pixel_size
             )
-            envelope = torch.exp(-self.frequency_step ** 2 * decay ** 2 * self.r2)
+            envelope = torch.exp(-self.frequency ** 2 * decay ** 2)
         else:
-            envelope = torch.exp(
-                -self.frequency_step ** 2 * self.config.b_factor / 4.0 * self.r2
-            )
+            envelope = torch.exp(-self.frequency ** 2 * self.config.b_factor / 4.0)
 
         hFourier *= envelope
         return hFourier
