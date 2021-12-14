@@ -23,8 +23,8 @@ class CTF(torch.nn.Module):
         self.config = config
         self.wavelength = self._get_ewavelength()
         self.frequency_step = 1.0 / (self.config.ctf_size * self.config.pixel_size)
-        n2 = float(self.config.ctf_size // 2)
-        ax = torch.arange(-n2, n2 + self.config.ctf_size % 2)
+        n_half_len = float(self.config.ctf_size // 2)
+        ax = torch.arange(-n_half_len, n_half_len + self.config.ctf_size % 2)
         mx, my = torch.meshgrid(ax, ax)
         self.register_buffer("r2", mx ** 2 + my ** 2)
         self.register_buffer("frequency", torch.sqrt(self.r2) * self.frequency_step)
@@ -36,7 +36,7 @@ class CTF(torch.nn.Module):
         Returns
         -------
         wavelength: float
-            wavelength of the electron beam
+            wavelength of the electron beam in A.
         """
         wavelength = 12.2639 / np.sqrt(
             self.config.kv * 1e3 + 0.97845 * self.config.kv ** 2
