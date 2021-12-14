@@ -168,7 +168,7 @@ class CTF(torch.nn.Module):
         hFourier *= envelope
         return hFourier
 
-    def forward(self, x_fourier, ctf_params={}):
+    def forward(self, x_fourier, ctf_params=None):
         """Multiply the CTF and projection in fourier domain.
 
         If ctf_params is empty then skip multiplication.
@@ -185,7 +185,7 @@ class CTF(torch.nn.Module):
         x_fourier: torch.Tensor
             modulated fourier transform of the projection (chunks,1,sidelen,sidelen)
         """
-        if ctf_params:
+        if ctf_params is not None:
             hFourier = self.get_ctf(ctf_params)
 
             x_fourier = x_fourier * hFourier
