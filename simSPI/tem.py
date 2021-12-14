@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI.ioSPI import cryoemio as io
+from ioSPI import cryoemio as io
 
 from simSPI import crd, fov
 
