@@ -23,15 +23,27 @@ def sample_class(tmp_path):
     # from test_files/path_config
     out_file_name = "_randomrot"
 
-    tem_simulator.output_path_dict["crd_file"] = str(Path(cwd, tmp_path, out_file_name + ".txt"))
-    tem_simulator.output_path_dict["mrc_file"] = str(Path(cwd, tmp_path, out_file_name + ".mrc"))
-    tem_simulator.output_path_dict["log_file"] = str(Path(cwd, tmp_path, out_file_name + ".log"))
-    tem_simulator.output_path_dict["inp_file"] = str(Path(cwd, tmp_path, out_file_name + ".inp"))
-    tem_simulator.output_path_dict["h5_file"] = str(Path(cwd, tmp_path, out_file_name + ".h5"))
+    tem_simulator.output_path_dict["crd_file"] = str(
+        Path(cwd, tmp_path, out_file_name + ".txt")
+    )
+    tem_simulator.output_path_dict["mrc_file"] = str(
+        Path(cwd, tmp_path, out_file_name + ".mrc")
+    )
+    tem_simulator.output_path_dict["log_file"] = str(
+        Path(cwd, tmp_path, out_file_name + ".log")
+    )
+    tem_simulator.output_path_dict["inp_file"] = str(
+        Path(cwd, tmp_path, out_file_name + ".inp")
+    )
+    tem_simulator.output_path_dict["h5_file"] = str(
+        Path(cwd, tmp_path, out_file_name + ".h5")
+    )
     tem_simulator.output_path_dict["h5_file_noisy"] = str(
         Path(cwd, tmp_path, out_file_name + "-noisy.h5")
     )
-    tem_simulator.output_path_dict["pdb_file"] = str(Path(cwd, test_files_path, "4v6x.pdb"))
+    tem_simulator.output_path_dict["pdb_file"] = str(
+        Path(cwd, test_files_path, "4v6x.pdb")
+    )
 
     return tem_simulator
 
@@ -136,7 +148,6 @@ def test_classify_input_config(sample_class):
     }
 
     returned_params = sample_class.classify_input_config(raw_params)
-
 
     for param_group_name, param_list in returned_params.items():
         assert param_group_name in raw_params
