@@ -1,4 +1,7 @@
-"""Helper functions for tem.py to define grid FOV for displaying particles."""
+"""Helper functions for tem.py.
+
+Define grid FOV (field-of-view) for displaying particles.
+"""
 import logging
 import math
 
@@ -25,8 +28,8 @@ def define_grid_in_fov(
     pad : int
         Amount of padding in pixels.
 
-    Return
-    ------
+    Returns
+    -------
     x_range : ndarray
         Coordinate range of each picked particle in micrograph in x-dimension.
     y_range : ndarray
@@ -66,7 +69,7 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
     detector_params : list
         List of sim parameters pertaining to detector settings.
     pdb_file : str
-        Relative path to .pdb file output.
+        Relative path to .pdb file containing topological information of particle.
     dmax : int
         Maximum dimension of molecule.
     pad : int
@@ -74,16 +77,16 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
 
     Returns
     -------
-    fov_Lx : float
+    fov_lx : float
         Length of fov in x-dimension.
-    fov_Ly : float
+    fov_ly : float
         Length of fov in y-dimension.
     boxsize : float
         Boxsize of particle, equal to max particle dimension with pad.
     """
-    detector_nx_pix = detector_params[0]
-    detector_ny_pix = detector_params[1]
+    detector_nx_pix, detector_ny_pix = detector_params[:2]
     detector_pix_size = detector_params[2] * 1e3
+
     magnification = optics_params[0]
 
     detector_lx = detector_nx_pix * detector_pix_size
@@ -99,17 +102,17 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
 
 
 def get_dmax(filename):
-    """Get maximmum dimension of particle.
+    """Get maximum diameter of a particle in pixels.
 
     Parameters
     ----------
-    filename : str
-        Relative path to file containing topological information of particle
+    pdb_file : str
+        Relative path to .pdb file containing topological information of particle.
 
     Returns
     -------
-    np.amax(distance) : float
-        Max dimension of given particle in .pdb source file.
+    dmax : float
+        Max diameter of given particle in .pdb source file.
     """
     xyz = get_xyz_from_pdb(filename)
     distance = pdist(xyz[0, ...])
@@ -118,22 +121,24 @@ def get_dmax(filename):
     return dmax
 
 
-def get_xyz_from_pdb(filename=None, atom_selection="name CA or name P"):
-    """Get particle coordinates from .pdb file.
+def get_xyz_from_pdb(pdb_file=None, atom_selection="name CA or name P"):
+    """Get a particle's coordinates from .pdb file.
 
     Parameters
     ----------
-    filename : str
-        Relative path to file containing topological information of particle
+    pdb_file : str
+        Relative path to .pdb file containing topological information of particle.
     atom_selection: str
-        Atoms to be selected by MDTraj for returning their cartesian coordinates
+        Atoms to be selected by MDTraj for returning their cartesian coordinates.
+        https://mdtraj.org/1.9.4/examples/atom-selection.html#Atom-Selection-Language
+        for more information on selection syntax.
 
     Returns
     -------
-    traj_small.xyz : ndarray
-        Particle coordinates from .pdb file.
+    coordinates : ndarray
+        Particle atom coordinates from .pdb file.
     """
-    traj = md.load(filename)
+    traj = md.load(pdb_file)
     atom_indices = traj.topology.select(atom_selection)
     traj_small = traj.atom_slice(atom_indices)
     coordinates = traj_small.xyz
@@ -151,11 +156,11 @@ def micrograph2particles(
     micrograph : ndarray
         Particle micrograph to extract from.
     optics_params : list
-        List of sim parameters pertaining to microscope settings.
+        Simulation parameters related to microscope settings.
     detector_params : list
-        List of sim parameters pertaining to detector settings.
+        Simulation parameters related to detector settings.
     pdb_file : str
-        Relative path to .pdb file.
+        Relative path to .pdb file containing topological information of particle.
     dmax : int
         Predefined maximum dimension of molecule.
     pad : int
@@ -166,16 +171,16 @@ def micrograph2particles(
     particles : ndarray
         Picked and sliced particle data from micrograph.
     """
-    fov_Lx, fov_Ly, boxsize = get_fov(
+    fov_lx, fov_ly, boxsize = get_fov(
         optics_params, detector_params, pdb_file=pdb_file, dmax=dmax, pad=pad
     )
-    fov_Nx = np.floor(fov_Lx / boxsize)
-    fov_Ny = np.floor(fov_Ly / boxsize)
-    pixel_size = (fov_Lx / micrograph.shape[1] + fov_Ly / micrograph.shape[0]) / 2.0
+    fov_nx = np.floor(fov_lx / boxsize)
+    fov_ny = np.floor(fov_ly / boxsize)
+    pixel_size = (fov_lx / micrograph.shape[1] + fov_ly / micrograph.shape[0]) / 2.0
     n_boxsize = np.int(boxsize / pixel_size)
-    x_pixels = np.int(fov_Nx * n_boxsize)
-    y_pixels = np.int(fov_Ny * n_boxsize)
-    data = micrograph[0:y_pixels, 0:x_pixels]
+    x_pixels = np.int(fov_nx * n_boxsize)
+    y_pixels = np.int(fov_ny * n_boxsize)
+    data = micrograph[:y_pixels, :x_pixels]
     particles = slice_and_stack(data, n_boxsize=n_boxsize)
 
     return particles
@@ -206,7 +211,7 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
         n_split = math.floor((data.shape[0] - 2 * n_ovl) / n_boxsize)
         n_dilat = n_boxsize + 2 * n_ovl
         data_stack = np.zeros((n_split * n_split, n_dilat, n_dilat))
-        log.info("Array dimensions: {}".format(data_stack.shape))
+        log.info(f"Array dimensions: {data_stack.shape}")
         i_stack = 0
         for i in np.arange(n_split):
             for j in np.arange(n_split):
@@ -223,12 +228,12 @@ def slice_and_stack(data, n_boxsize=256, n_ovl=0):
     return data_stack
 
 
-def blockshaped(arr, nrows, ncols):
+def blockshaped(data, nrows, ncols):
     """Return an array of shape (n, nrows, ncols) where n * nrows * ncols = arr.size.
 
     Parameters
     ----------
-    arr : ndarray
+    data : ndarray
         Array to reshape.
     nrows : int
         Number of rows.
@@ -240,9 +245,9 @@ def blockshaped(arr, nrows, ncols):
     reshaped_arr : ndarray
         Reshaped input array with dimension (n, nrows, ncols)
     """
-    h, _ = arr.shape
+    h, _ = data.shape
     reshaped_arr = (
-        arr.reshape(h // nrows, nrows, -1, ncols)
+        data.reshape(h // nrows, nrows, -1, ncols)
         .swapaxes(1, 2)
         .reshape(-1, nrows, ncols)
     )
