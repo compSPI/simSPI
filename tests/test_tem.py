@@ -23,15 +23,15 @@ def sample_class(tmp_path):
     # from test_files/path_config
     out_file_name = "_randomrot"
 
-    t.output_path_dict["crd_file"] = str(Path(cwd, tmp_path, out_file_name + ".txt"))
-    t.output_path_dict["mrc_file"] = str(Path(cwd, tmp_path, out_file_name + ".mrc"))
-    t.output_path_dict["log_file"] = str(Path(cwd, tmp_path, out_file_name + ".log"))
-    t.output_path_dict["inp_file"] = str(Path(cwd, tmp_path, out_file_name + ".inp"))
-    t.output_path_dict["h5_file"] = str(Path(cwd, tmp_path, out_file_name + ".h5"))
-    t.output_path_dict["h5_file_noisy"] = str(
+    tem_simulator.output_path_dict["crd_file"] = str(Path(cwd, tmp_path, out_file_name + ".txt"))
+    tem_simulator.output_path_dict["mrc_file"] = str(Path(cwd, tmp_path, out_file_name + ".mrc"))
+    tem_simulator.output_path_dict["log_file"] = str(Path(cwd, tmp_path, out_file_name + ".log"))
+    tem_simulator.output_path_dict["inp_file"] = str(Path(cwd, tmp_path, out_file_name + ".inp"))
+    tem_simulator.output_path_dict["h5_file"] = str(Path(cwd, tmp_path, out_file_name + ".h5"))
+    tem_simulator.output_path_dict["h5_file_noisy"] = str(
         Path(cwd, tmp_path, out_file_name + "-noisy.h5")
     )
-    t.output_path_dict["pdb_file"] = str(Path(cwd, test_files_path, "4v6x.pdb"))
+    tem_simulator.output_path_dict["pdb_file"] = str(Path(cwd, test_files_path, "4v6x.pdb"))
 
     return tem_simulator
 
@@ -110,7 +110,7 @@ def test_classify_input_config(sample_class):
             "voltage_kV": 300,
             "energy_spread_V": 1.3,
             "electron_dose_e_nm2": 100,
-            "electron_dose_std": 0,
+            "electron_dose_std_e_per_nm2": 0,
         },
         "optics_parameters": {
             "magnification": 81000,
@@ -120,15 +120,15 @@ def test_classify_input_config(sample_class):
             "focal_length_mm": 3.5,
             "aperture_angle_mrad": 0.1,
             "defocus_um": 1.0,
-            "defocus_syst_error": 0.0,
-            "defocus_nonsyst_error": 0.0,
+            "defocus_syst_error_um": 0.0,
+            "defocus_nonsyst_error_um": 0.0,
             "optics_defocusout": "None",
         },
         "detector_parameters": {
-            "detector_pixels_x": 5760,
-            "detector_pixels_y": 4092,
+            "detector_Nx_px": 5760,
+            "detector_Ny_px": 4092,
             "detector_pixel_size_um": 5,
-            "detector_gain": 2,
+            "average_gain_count_per_electron": 2,
             "noise": "no",
             "detector_Q_efficiency": 0.5,
             "MTF_params": [0, 0, 1, 0, 0],
@@ -137,7 +137,6 @@ def test_classify_input_config(sample_class):
 
     returned_params = sample_class.classify_input_config(raw_params)
 
-    print(returned_params)
 
     for param_group_name, param_list in returned_params.items():
         assert param_group_name in raw_params
