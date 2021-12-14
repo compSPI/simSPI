@@ -1,10 +1,10 @@
 """Unit test for TEM Simulator wrapper."""
-from simSPI import tem
-
-import tempfile
 import os
+import tempfile
 
 import yaml
+
+from simSPI import tem
 
 
 def test_tem_main():
