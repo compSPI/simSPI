@@ -3,10 +3,9 @@
 import os
 from pathlib import Path
 
-import fov
+from simSPI import fov,tem
 import numpy as np
 import pytest
-import tem
 
 
 @pytest.fixture
