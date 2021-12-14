@@ -8,7 +8,7 @@ import logging
 import os
 
 import numpy as np
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation
 
 
 def write_crd_file(
@@ -73,6 +73,6 @@ def get_rotlist(n_particles):
     """
     rotlist = []
     for _ in range(n_particles + 1):
-        x = R.random().as_euler("zyz", degrees=True)
+        x = Rotation.random().as_euler("zyz", degrees=True)
         rotlist.append(x)
     return rotlist
