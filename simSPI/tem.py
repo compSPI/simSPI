@@ -3,11 +3,11 @@ import random
 import string
 from pathlib import Path
 
-import crd
-import fov
 import numpy as np
 import yaml
 from ioSPI.ioSPI import cryoemio as io
+
+from simSPI import crd, fov
 
 
 class TEMSimulator:
