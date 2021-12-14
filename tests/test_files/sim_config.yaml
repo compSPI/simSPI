@@ -1,37 +1,39 @@
   molecular_model:
-    voxel_size_nm: 0.1 # The size of voxels in the volume map
-    particle_name: 'toto'   # Name of the particle. Not very important.
-    particle_mrcout: None   # volume map of sample is written.
+    voxel_size_nm: 0.1         # [nm]
+    particle_name: 'toto'      # Name of the particle. Not very important.
+    particle_mrcout: None      # volume map of sample is written.
 
   specimen_grid_params:
-    hole_diameter_nm: 1200
-    hole_thickness_center_nm: 100
-    hole_thickness_edge_nm: 100
+    hole_diameter_nm: 1200         # [nm]
+    hole_thickness_center_nm: 100  # [nm]
+    hole_thickness_edge_nm: 100    # [nm]
 
   beam_parameters:
-    voltage_kV: 300 # The acceleration voltage of the microscope in kV b/w 1 to 10**4
-    energy_spread_V: 1.3 # The energy spread of the electron beam in V
-    electron_dose_e_nm2: 100     # [e/nm**2] dose per image
-    electron_dose_std: 0   # standard deviation of dose per image b/w [0,1]
+    voltage_kv: 300                  # [kV]
+    energy_spread_v: 1.3             # [V]
+    electron_dose_e_per_nm2: 100     # [e/nm**2] dose per image
+    electron_dose_std_e_per_nm2: 0   # standard deviation of dose per image
 
   optics_parameters:
-    magnification: 81000 # The magnification of the simulated microscope.
-    spherical_aberration_mm: 2.7   # The spherical aberration of the optical system
-    chromatic_aberration_mm: 2.7   # The chromatic aberration of the optical system
-    aperture_diameter_um: 50 # The diameter of the aperture in the back focal plane
-    focal_length_mm: 3.5           # The focal length of the primary lens
-    aperture_angle_mrad: 0.1         # The aperture angle of the beam furnished by the condenser lens
-    defocus_um: 1.0                # The nominal defocus value
-    defocus_syst_error: 0.0     # The standard deviation of a systematic error added to the nominal defocus
-    defocus_nonsyst_error: 0.0  # The standard deviation of a non-systematic error added to the nominal defocus and the systematic error
+    magnification: 81000        #
+    spherical_aberration_mm: 2.7     # [mm]
+    chromatic_aberration_mm: 2.7     # [mm]
+    aperture_diameter_um: 50         # [um] in back focal plane
+    focal_length_mm: 3.5             # [mm]
+    aperture_angle_mrad: 0.1         # [mrad] of the condenser lens
+    defocus_um: 1.0                  # [um]
+    defocus_syst_error_um: 0.0       # [um]
+    defocus_nonsyst_error_um: 0.0    # [um]
     optics_defocusout: None     # file to write defocus values
 
   detector_parameters:
-    detector_pixels_x: 5760           # number of pixels along X axis
-    detector_pixels_y: 4092           # number of pixels along Y axis
-    detector_pixel_size_um: 5
-    detector_gain: 2            # average number of counts per electron
+    detector_Nx_px: 5760               # [px] number of pixels along X axis
+    detector_Ny_px: 4092               # [px] number of pixels along Y axis
+    detector_pixel_size_um: 5          # [um]
+    average_gain_count_per_electron: 2 # average number of counts per electron
     noise: 'no'                 # whether quantized electron waves result in noise
     detector_Q_efficiency: 0.5  # detector quantum efficiency
     MTF_params: [0,0,1,0,0]     # to be described. [0,0,1,0,0] is perfect detector.
 
+  miscellaneous:
+    signal_to_noise: 0.67       # signal-to-noise-ratio for added white noise.

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import crd
 import fov
+import numpy as np
 import yaml
 from ioSPI.ioSPI import cryoemio as io
 
@@ -156,6 +157,8 @@ class TEMSimulator:
                 relative path to desired output crd file
             h5_file
                 relative path to desired output h5 file
+            h5_file_noisy
+                relative path to desired output h5 file with noise
             inp_file
                 relative path to desired output inp file
             mrc_file
@@ -180,6 +183,7 @@ class TEMSimulator:
         path_dict["log_file"] = output_file_path + ".log"
         path_dict["inp_file"] = output_file_path + ".inp"
         path_dict["h5_file"] = output_file_path + ".h5"
+        path_dict["h5_file_noisy"] = output_file_path + "-noisy.h5"
 
         return path_dict
 
@@ -243,6 +247,36 @@ class TEMSimulator:
 
         return particles
 
+    def apply_gaussian_noise(self, particles):
+        """Apply gaussian noise to particle data.
+
+        Parameters
+        ----------
+        particles : arr
+            Individual particle data extracted from micrograph
+
+        Returns
+        -------
+        noisy_particles : arr
+            Individual particle data with gaussian noise applied
+        """
+        variance = np.var(particles)
+        if "other" not in self.parameter_dict:
+            return particles.copy()
+        snr = 1.0
+        try:
+            snr = self.parameter_dict["other"]["signal_to_noise"]
+        except KeyError:
+            pass
+        try:
+            snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
+            snr = 10 ** (snr_db / 10)
+        except KeyError:
+            pass
+        scale = np.sqrt(variance / snr)
+        noisy_particles = np.random.normal(particles, scale)
+        return noisy_particles
+
     def export_particle_stack(self, particles):
         """Export extracted particle data to h5 file.
 
@@ -256,3 +290,18 @@ class TEMSimulator:
             particles,
             self.output_path_dict["h5_file"],
         )
+
+        if "other" in self.parameter_dict:
+            noisy_particles = self.apply_gaussian_noise(particles)
+            if "h5_file_noisy" in self.output_path_dict:
+                io.data_and_dic2hdf5(
+                    noisy_particles,
+                    self.output_path_dict["h5_file_noisy"],
+                )
+            else:
+                io.data_and_dic2hdf5(
+                    noisy_particles,
+                    self.output_path_dict["h5_file"][:-3]
+                    + "-noisy"
+                    + self.output_path_dict["h5_file"][-3:],
+                )
