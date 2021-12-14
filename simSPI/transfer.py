@@ -9,7 +9,12 @@ import numpy as np
 def ctf_freqs(n_pixels, psize=1.0, dim=2):
     """Make CTF Frequencies.
 
-    Makes 1 or 2 D array of fourier space frequenceis
+    Makes 1 or 2 D array of fourier space frequencies.
+    Note that freq_pix_1d_safe ensures that we have
+        [0,1/(2*n_pixels), 2/(2*n_pixels), ..., (n_pixels - 1) / (2*n_pixels)]
+        otherwise np.arange gives an extra point at +0.5 for n_pixels=98
+        instead of finishing at
+        (n_pixels - 1) / (2*n_pixels) = (49-1)/(2*49) = 48/98 = 0.48979... < 0.5
 
     Parameters
     ----------
@@ -36,12 +41,14 @@ def ctf_freqs(n_pixels, psize=1.0, dim=2):
     """
     if dim == 1:
         freq_pix_1d = np.arange(0, 0.5, 1 / n_pixels)
-        freq_1d = freq_pix_1d * psize
+        freq_pix_1d_safe = freq_pix_1d[: n_pixels // 2]
+        freq_1d = freq_pix_1d_safe * psize
         return freq_1d
 
     # assert d == 2
     freq_pix_1d = np.arange(-0.5, 0.5, 1 / n_pixels)
-    x, y = np.meshgrid(freq_pix_1d, freq_pix_1d)
+    freq_pix_1d_safe = freq_pix_1d[:n_pixels]
+    x, y = np.meshgrid(freq_pix_1d_safe, freq_pix_1d_safe)
     rho = np.sqrt(x ** 2 + y ** 2)
     angles_rad = np.arctan2(y, x)
     freq_mag_2d = rho * psize
