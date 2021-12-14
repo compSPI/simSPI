@@ -23,4 +23,4 @@ def test_write_crd_file():
 def test_get_rotlist():
     """Test whether randomly generated rotlist is of correct length."""
     n_particles = 10
-    assert len(crd.get_rotlist(n_particles)) == n_particles
+    assert len(crd.get_rotlist(n_particles)) == n_particles + 1

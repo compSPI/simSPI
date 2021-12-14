@@ -42,13 +42,8 @@ def write_crd_file(
             crd.write("# File created by TEM-simulator, version 1.3.\n")
             crd.write(f"{n_particles} 6\n")
             crd.write(
-                "#            \
-                x             \
-                y             \
-                z             \
-                phi           \
-                theta         \
-                psi  \n"
+                "#            x             y             z       "
+                "    phi         theta           psi  \n"
             )
             for y in yrange:
                 for x in xrange:
@@ -62,12 +57,9 @@ def write_crd_file(
                             "psi": rotlist[i][2],
                         }
                         crd.write(
-                            f"{crd_table['x']:14.4f} \
-                            {crd_table['y']:14.4f} \
-                            {crd_table['z']:14.4f} \
-                            {crd_table['phi']:14.4f} \
-                            {crd_table['theta']:14.4f} \
-                            {crd_table['psi']:14.4f}\n",
+                            f"{crd_table['x']:14.4f}{crd_table['y']:14.4f}"
+                            f"{crd_table['z']:14.4f}{crd_table['phi']:14.4f}"
+                            f"{crd_table['theta']:14.4f}{crd_table['psi']:14.4f}\n"
                         )
 
 
@@ -81,6 +73,6 @@ def get_rotlist(n_particles):
     """
     rotlist = []
     for _ in range(n_particles + 1):
-        x = R.random(5).as_euler("zyz", degrees=True)
+        x = R.random().as_euler("zyz", degrees=True)
         rotlist.append(x)
     return rotlist
