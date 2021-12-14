@@ -273,3 +273,4 @@ def test_export_particle_stack(sample_class,sample_resources):
 
     sample_class.export_particle_stack(particles)
     assert os.path.isfile(sample_class.output_path_dict["h5_file"])
+
