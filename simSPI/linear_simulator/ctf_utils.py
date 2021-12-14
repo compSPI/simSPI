@@ -146,7 +146,7 @@ class CTF(torch.nn.Module):
             * self.config.cs
             * (self.wavelength ** 3)
             * 1e7
-            * self.frequency_step ** 4
+            * self.frequency ** 4
         )
 
         argument = abberationContribution + defocusContribution
