@@ -1,11 +1,12 @@
 """Wrapper for the TEM Simulator."""
+import os
 import random
 import string
 from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import cryoemio as io
+from ioSPI.ioSPI import cryoemio as io
 
 from simSPI import crd, fov
 
@@ -26,7 +27,6 @@ class TEMSimulator:
 
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
-
 
         self.output_path_dict = self.generate_path_dict(**parsed_path_config)
         self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
@@ -156,6 +156,7 @@ class TEMSimulator:
             user-specified keyword appended to output files
         kwargs
             Arbitrary keyword arguments.
+
         Returns
         -------
         path_dict : dict of type str to str
@@ -185,23 +186,26 @@ class TEMSimulator:
                 random.choices(string.ascii_uppercase + string.digits, k=5)
             )
 
-
         path_dict["pdb_file"] = str(Path(pdb_file))
-        path_dict["crd_file"] = str(Path(output_dir,mrc_keyword+ ".txt"))
-        path_dict["mrc_file"] = str(Path(output_dir,mrc_keyword+ ".mrc"))
-        path_dict["log_file"] = str(Path(output_dir,mrc_keyword+ ".log"))
-        path_dict["inp_file"] = str(Path(output_dir,mrc_keyword+ ".inp"))
-        path_dict["h5_file"] = str(Path(output_dir,mrc_keyword+ ".h5"))
-        path_dict["h5_file_noisy"] = str(Path(output_dir,mrc_keyword+ "-noisy.h5"))
+        path_dict["crd_file"] = str(Path(output_dir, mrc_keyword + ".txt"))
+        path_dict["mrc_file"] = str(Path(output_dir, mrc_keyword + ".mrc"))
+        path_dict["log_file"] = str(Path(output_dir, mrc_keyword + ".log"))
+        path_dict["inp_file"] = str(Path(output_dir, mrc_keyword + ".inp"))
+        path_dict["h5_file"] = str(Path(output_dir, mrc_keyword + ".h5"))
+        path_dict["h5_file_noisy"] = str(Path(output_dir, mrc_keyword + "-noisy.h5"))
 
         return path_dict
 
-    def run(self, pad=5, export_particles = False):
+    def run(self, pad=5, export_particles=False):
         """Run TEM simulator on input file and produce particle stacks with metadata.
+
         Parameters
         ----------
-        pdb_file : str
-            Relative file path to input .pdb file for sim
+        pad : double, (default = 5)
+            Pad to be added to maximal dimension of the object read from pdb_file
+        export_particles : boolean, (default = False)
+            Particle data exported to .h5 if True.
+
         Returns
         -------
         particles : arr
@@ -211,14 +215,13 @@ class TEMSimulator:
         self.create_inp_file()
 
         micrograph_data = self.get_image_data()
-        particle_data = self.extract_particles(
-            micrograph_data,
-            pad = pad
-        )
+        particle_data = self.extract_particles(micrograph_data, pad=pad)
 
         if "other" in self.parameter_dict:
-            if (self.parameter_dict["other"].get("signal_to_noise") is not None or
-                    self.parameter_dict["other"].get("signal_to_noise_db") is not None):
+            if (
+                self.parameter_dict["other"].get("signal_to_noise") is not None
+                or self.parameter_dict["other"].get("signal_to_noise_db") is not None
+            ):
                 particle_data = self.apply_gaussian_noise(particle_data)
 
         if export_particles:
@@ -263,24 +266,24 @@ class TEMSimulator:
 
     def get_image_data(self):
         """Run simulator and return data.
+
         Returns
         -------
         List containing parsed .mrc data from Simulator
+
+        Notes
+        -----
+        This method requires a local tem_sim installation to run.
         """
         os.system(
             "{} {}".format(
-                self.path_dict["simulator_dir"], self.output_path_dict["inp_file"]
+                self.output_path_dict["local_sim_dir"],
+                self.output_path_dict["inp_file"],
             )
         )
 
-        data = cryoemio.mrc2data(self.output_path_dict["mrc_file"])
+        data = io.mrc2data(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
-
-        if display_data:
-            # fig = plt.figure(figsize=(18, 12))
-            plt.imshow(micrograph, origin = "lower", cmap = "Greys")
-            plt.colorbar()
-            plt.show()
 
         return micrograph
 
