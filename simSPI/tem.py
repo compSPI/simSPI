@@ -85,8 +85,8 @@ class TEMSimulator:
                 "hole_thickness_edge_nm",
             ],
             "beam_parameters": [
-                "voltage_kV",
-                "energy_spread_V",
+                "voltage_kv",
+                "energy_spread_v",
                 "electron_dose_e_nm2",
                 "electron_dose_std_e_per_nm2",
             ],
@@ -103,13 +103,13 @@ class TEMSimulator:
                 "optics_defocusout",
             ],
             "detector_parameters": [
-                "detector_Nx_px",
-                "detector_Ny_px",
+                "detector_nx_px",
+                "detector_ny_px",
                 "detector_pixel_size_um",
                 "average_gain_count_per_electron",
                 "noise",
-                "detector_Q_efficiency",
-                "MTF_params",
+                "detector_q_efficiency",
+                "mtf_params",
             ],
         }
 

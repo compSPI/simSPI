@@ -119,8 +119,8 @@ def test_classify_input_config(sample_class):
             "hole_thickness_edge_nm": 100,
         },
         "beam_parameters": {
-            "voltage_kV": 300,
-            "energy_spread_V": 1.3,
+            "voltage_kv": 300,
+            "energy_spread_v": 1.3,
             "electron_dose_e_nm2": 100,
             "electron_dose_std_e_per_nm2": 0,
         },
@@ -137,13 +137,13 @@ def test_classify_input_config(sample_class):
             "optics_defocusout": "None",
         },
         "detector_parameters": {
-            "detector_Nx_px": 5760,
-            "detector_Ny_px": 4092,
+            "detector_nx_px": 5760,
+            "detector_ny_px": 4092,
             "detector_pixel_size_um": 5,
             "average_gain_count_per_electron": 2,
             "noise": "no",
-            "detector_Q_efficiency": 0.5,
-            "MTF_params": [0, 0, 1, 0, 0],
+            "detector_q_efficiency": 0.5,
+            "mtf_params": [0, 0, 1, 0, 0],
         },
     }
 

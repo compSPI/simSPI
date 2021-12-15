@@ -27,13 +27,13 @@
     optics_defocusout: None     # file to write defocus values
 
   detector_parameters:
-    detector_Nx_px: 5760               # [px] number of pixels along X axis
-    detector_Ny_px: 4092               # [px] number of pixels along Y axis
+    detector_nx_px: 5760               # [px] number of pixels along X axis
+    detector_ny_px: 4092               # [px] number of pixels along Y axis
     detector_pixel_size_um: 5          # [um]
     average_gain_count_per_electron: 2 # average number of counts per electron
     noise: 'no'                 # whether quantized electron waves result in noise
-    detector_Q_efficiency: 0.5  # detector quantum efficiency
-    MTF_params: [0,0,1,0,0]     # to be described. [0,0,1,0,0] is perfect detector.
+    detector_q_efficiency: 0.5  # detector quantum efficiency
+    mtf_params: [0,0,1,0,0]     # to be described. [0,0,1,0,0] is perfect detector.
 
   miscellaneous:
     signal_to_noise: 0.67       # signal-to-noise-ratio for added white noise.
