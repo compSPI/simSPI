@@ -1,6 +1,6 @@
   molecular_model:
     voxel_size_nm: 0.1         # [nm]
-    particle_name: 'toto'      # Name of the particle. Not very important.
+    particle_name: 'toto'      # Name of the particle.
     particle_mrcout: None      # volume map of sample is written.
 
   specimen_grid_params:
