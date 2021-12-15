@@ -1,6 +1,5 @@
 """Unit test for TEM Simulator wrapper."""
 
-import logging
 import os
 from pathlib import Path
 
@@ -12,7 +11,7 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class(tmp_path):
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "./test_files"
+    test_files_path = "./tests/test_files"
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
@@ -51,7 +50,7 @@ def sample_class(tmp_path):
 @pytest.fixture
 def sample_resources():
     """Return sample resources for testing."""
-    test_files_path = "./test_files"
+    test_files_path = "./tests/test_files"
     cwd = os.getcwd()
     resources = {}
 
@@ -61,9 +60,6 @@ def sample_resources():
         "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
     }
 
-    log = logging.getLogger()
-    log.info(cwd)
-    log.info(os.listdir())
     micrograph = str(Path(cwd, test_files_path, "micrograph.npz"))
 
     resources["data"] = {"micrograph": micrograph.f.arr_0}
