@@ -2,6 +2,7 @@ name: simSPI
 channels:
   - conda-forge
   - defaults
+  - pytorch3d
 dependencies:
   - codecov
   - configparser
@@ -19,6 +20,7 @@ dependencies:
   - pytest
   - pytest-cov
   - pytorch=1.9.0
+  - pytorch3d
   - pip:
     - black==20.8b0
     - geomstats
