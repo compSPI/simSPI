@@ -32,7 +32,7 @@ We start the Dockerfile by stating that we will build our image on top of a pre-
 FROM ubuntu:18.04
 ```
 
-We then define the "working directory" of the container, where all Docker commands will be executed. 
+We then define the "working directory" of the container, where all Docker commands will be executed.
 
 ```dockerfile
 WORKDIR /work
@@ -63,7 +63,7 @@ ENV PATH=/work/TEM-simulator/src:$PATH
 
 ### Build, push and pull the image
 
-Now that we have our recipe, we are ready to build our image from it. 
+Now that we have our recipe, we are ready to build our image from it.
 
 Assuming you have `docker` installed on your machine, and you have created a [DockerHub](https://hub.docker.com/) account, the basic commands for this would be:
 ```bash
@@ -80,7 +80,7 @@ At this point, we have "built" and "pushed" an "image" to the "cloud". For you t
 singularity pull docker://<your-user-name>/<the-image-name>:latest
 ```
 
-This would "pull" the Docker image from the cloud and convert it to a Singularity image: a `<the-image-name>_latest.sif` file. 
+This would "pull" the Docker image from the cloud and convert it to a Singularity image: a `<the-image-name>_latest.sif` file.
 
 ### Run the container
 
@@ -95,5 +95,5 @@ This will just appear as a regular Terminal bash line (starting with Singularity
 
 ## Additional resources about containers
 
-- 
+-
 - Yee-Ting Li (SLAC) [seminar](https://confluence.slac.stanford.edu/display/AI/AI+Seminar#AISeminar-Containers!Containers!Containers!)

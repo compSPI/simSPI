@@ -5,7 +5,14 @@ import cryoemio
 import matplotlib.pyplot as plt
 import numpy as np
 import simutils
+import random
+import string
+from pathlib import Path
+
 import yaml
+from ioSPI import cryoemio as io
+
+from simSPI import crd, fov
 
 
 class TEMSimulator:
@@ -20,18 +27,19 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
-        self.path_dict = self.get_raw_config_from_yaml(path_config)
-        self.raw_sim_dict = self.get_raw_config_from_yaml(sim_config)
+        self.output_path_dict = self.generate_path_dict(path_config)
+        self.sim_dict = self.get_config_from_yaml(sim_config)
 
-        self.output_path_dict = self.generate_path_dict(self.path_dict)
-        self.sim_dict = self.classify_sim_params(self.raw_sim_dict)
-
-        self.parameter_dict = self.generate_parameter_dict(
-            self.output_path_dict, self.sim_dict, self.raw_sim_dict, seed=1234
+        self.parameter_dict = io.fill_parameters_dictionary(
+            sim_config,
+            self.output_path_dict["mrc_file"],
+            self.output_path_dict["pdb_file"],
+            self.output_path_dict["crd_file"],
+            self.output_path_dict["log_file"],
         )
 
-        self.placeholder = 0
-
+    //TODO: run DOES NOT EXIST in master, and is not up to date. 
+    //      requires deprecation (by more careful hands than my own).
     def run(self, display_data=False, export_particles=True):
         """Run TEM simulator on input file and produce particle stacks with metadata.
 
@@ -51,15 +59,15 @@ class TEMSimulator:
         self.create_inp_file()
 
         self.generate_metadata()
-
+        
         micrograph_data = self.get_image_data(display_data=display_data)
         particle_data = self.extract_particles(
             micrograph_data,
             export_particles=export_particles,
             display_data=display_data,
         )
-
         return particle_data
+
 
     @staticmethod
     def get_raw_config_from_yaml(config_yaml):
@@ -81,8 +89,8 @@ class TEMSimulator:
         return raw_params
 
     @staticmethod
-    def classify_sim_params(raw_sim_params):
-        """Take dictionary of individual simulation parameters and groups them into lists.
+    def classify_input_config(raw_params):
+        """Take dictionary of unordered parameters and groups them into lists.
 
         Parameters
         ----------
@@ -95,65 +103,60 @@ class TEMSimulator:
             Dictionary of grouped simulator parameters
         """
         sim_params_structure = {
-            "molecular_model": ["voxel_size", "particle_name", "particle_mrcout"],
+            "molecular_model": ["voxel_size_nm", "particle_name", "particle_mrcout"],
             "specimen_grid_params": [
-                "hole_diameter",
-                "hole_thickness_center",
-                "hole_thickness_edge",
+                "hole_diameter_nm",
+                "hole_thickness_center_nm",
+                "hole_thickness_edge_nm",
             ],
             "beam_parameters": [
-                "voltage",
-                "energy_spread",
-                "electron_dose",
-                "electron_dose_std",
+                "voltage_kv",
+                "energy_spread_v",
+                "electron_dose_e_nm2",
+                "electron_dose_std_e_per_nm2",
             ],
             "optics_parameters": [
                 "magnification",
-                "spherical_aberration",
-                "chromatic_aberration",
-                "aperture_diameter",
-                "focal_length",
-                "aperture_angle",
-                "defocus",
-                "defocus_syst_error",
-                "defocus_nonsyst_error",
+                "spherical_aberration_mm",
+                "chromatic_aberration_mm",
+                "aperture_diameter_um",
+                "focal_length_mm",
+                "aperture_angle_mrad",
+                "defocus_um",
+                "defocus_syst_error_um",
+                "defocus_nonsyst_error_um",
                 "optics_defocusout",
             ],
             "detector_parameters": [
-                "detector_Nx",
-                "detector_Ny",
-                "detector_pixel_size",
-                "detector_gain",
+                "detector_nx_px",
+                "detector_ny_px",
+                "detector_pixel_size_um",
+                "average_gain_count_per_electron",
                 "noise",
-                "detector_Q_efficiency",
-                "MTF_params",
+                "detector_q_efficiency",
+                "mtf_params",
             ],
         }
-
-        def flatten_detector_array(arr):
-
-            flattened_params = []
-
-            for i in range(6):
-                flattened_params.append(arr[i])
-
-            for i in range(5):
-                flattened_params.append(arr[6][i])
-
-            return flattened_params
 
         classified_sim_params = {}
 
         for param_type, param_order in sim_params_structure.items():
             if param_type != "detector_parameters":
                 classified_sim_params[param_type] = [
-                    raw_sim_params[param_type].get(key) for key in param_order
+                    raw_params[param_type].get(key) for key in param_order
                 ]
             elif param_type == "detector_parameters":
-                ordered_list = [
-                    raw_sim_params[param_type].get(key) for key in param_order
+                ordered_params = [
+                    raw_params[param_type].get(key) for key in param_order
                 ]
-                classified_sim_params[param_type] = flatten_detector_array(ordered_list)
+                flattened_params = []
+
+                for i in range(6):
+                    flattened_params.append(ordered_params[i])
+                for i in range(5):
+                    flattened_params.append(ordered_params[6][i])
+
+                classified_sim_params[param_type] = flattened_params
 
         return classified_sim_params
 
@@ -182,6 +185,8 @@ class TEMSimulator:
                 relative path to desired output crd file
             h5_file
                 relative path to desired output h5 file
+            h5_file_noisy
+                relative path to desired output h5 file with noise
             inp_file
                 relative path to desired output inp file
             mrc_file
@@ -189,24 +194,26 @@ class TEMSimulator:
             log_file
                 relative path to desired output log file
         """
-        file_path_dict = {}
+        path_dict = {}
 
-        output_file_path = (
-                path_dict["output_dir"]
-                + path_dict["pdb_keyword"]
-                + path_dict["micrograph_keyword"]
-        )
+        if output_dir is None:
+            output_dir = str(Path(pdb_file).parent)
 
-        file_path_dict["pdb_file"] = (
-                path_dict["pdb_dir"] + path_dict["pdb_keyword"] + ".pdb"
-        )
-        file_path_dict["crd_file"] = output_file_path + ".txt"
-        file_path_dict["mrc_file"] = output_file_path + ".mrc"
-        file_path_dict["log_file"] = output_file_path + ".log"
-        file_path_dict["inp_file"] = output_file_path + ".inp"
-        file_path_dict["h5_file"] = output_file_path + ".h5"
+        if mrc_keyword is None:
+            mrc_keyword = str(Path(pdb_file).stem) + "".join(
+                random.choices(string.ascii_uppercase + string.digits, k=5)
+            )
+        output_file_path = output_dir + mrc_keyword
 
-        return file_path_dict
+        path_dict["pdb_file"] = pdb_file
+        path_dict["crd_file"] = output_file_path + ".txt"
+        path_dict["mrc_file"] = output_file_path + ".mrc"
+        path_dict["log_file"] = output_file_path + ".log"
+        path_dict["inp_file"] = output_file_path + ".inp"
+        path_dict["h5_file"] = output_file_path + ".h5"
+        path_dict["h5_file_noisy"] = output_file_path + "-noisy.h5"
+
+        return path_dict
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
@@ -221,16 +228,14 @@ class TEMSimulator:
         Leverages methods developed in:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
-        x_range, y_range, num_part = simutils.define_grid_in_fov(
-            self.sim_dict["specimen_grid_params"],
+        x_range, y_range, num_part = fov.define_grid_in_fov(
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
             self.output_path_dict["pdb_file"],
-            Dmax=30,
             pad=pad,
         )
 
-        simutils.write_crd_file(
+        crd.write_crd_file(
             num_part,
             xrange=x_range,
             yrange=y_range,
@@ -339,8 +344,9 @@ class TEMSimulator:
         Leverages methods developed in:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
         """
-        inp_file = self.output_path_dict["inp_file"]
-        simutils.write_inp_file(inp_file=inp_file, dict_params=self.parameter_dict)
+        io.write_inp_file(
+            inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
+        )
 
     def extract_particles(self, micrograph, export_particles=True, display_data=False):
         """Extract particle data from micrograph.
@@ -365,57 +371,40 @@ class TEMSimulator:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/cryoemio.py
         """
-        particles = simutils.microgaph2particles(
+
+        particles = fov.micrograph2particles(
             micrograph,
-            self.sim_dict["molecular_model"],
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
             pdb_file=self.output_path_dict["pdb_file"],
-            Dmax=30,
-            pad=5.0,
+            pad=pad,
         )
-
-        if display_data:
-            self.view_particles(particles, ncol=5)
-
-        if export_particles:
-            cryoemio.data_and_dic_2hdf5(
-                particles, self.output_path_dict["h5_file"], dic=self.parameter_dict
-            )
 
         return particles
 
-    @staticmethod
-    def view_particles(data, slicing=(1, 1, 1), figsize=1, ncol=5):
-        """Render picked particles in grid.
-
-        Parameters
-        ----------
-        data : arr
-            Array containing TEM-simulator micrograph output
-        slicing : tuple
-
-        figsize : int
-            Integer scaling factor for rendered particle figures
-        ncol : int
-            Integer number of columns in particle view
-
+    def apply_gaussian_noise(self, particles):
+        """Apply gaussian noise to particle data.
         Returns
         -------
-        particles : arr
-            Individual particle data extracted from micrograph
+        noisy_particles : arr
+            Individual particle data with gaussian noise applied
         """
-        view = data[:: slicing[0], :: slicing[1], :: slicing[2]]
-        figsize = int(figsize * ncol)
-        nrow = np.ceil(view.shape[0] / ncol)
-        fig = plt.figure(figsize=(ncol * figsize, nrow * figsize))
-
-        for i in np.arange(view.shape[0]):
-            fig.add_subplot(int(nrow), int(ncol), int(i + 1))
-            plt.imshow(view[i], cmap="Greys")
-
-        plt.tight_layout()
-        plt.show()
+        variance = np.var(particles)
+        if "other" not in self.parameter_dict:
+            return particles.copy()
+        snr = 1.0
+        try:
+            snr = self.parameter_dict["other"]["signal_to_noise"]
+        except KeyError:
+            pass
+        try:
+            snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
+            snr = 10 ** (snr_db / 10)
+        except KeyError:
+            pass
+        scale = np.sqrt(variance / snr)
+        noisy_particles = np.random.normal(particles, scale)
+        return noisy_particles
 
     def generate_metadata(self):
         """Generate metadata associated with picked particles from simulator.
@@ -475,16 +464,60 @@ class TEMSimulator:
         f.close()
         return rotation_metadata
 
+    def export_particle_stack(self, particles):
+        """Export extracted particle data to h5 file.
 
-def main():
-    """Return 1 as a placeholder."""
-    t = TEMSimulator(
-        "../path_config.yaml",
-        "../sim_config.yaml",
-    )
-    t.run(display_data=True, export_particles=True)
-    return 1
+        Parameters
+        ----------
+        particles : arr
+            Individual particle data extracted from micrograph
 
+        """
+        io.data_and_dic2hdf5(
+            particles,
+            self.output_path_dict["h5_file"],
+        )
 
-if __name__ == "__main__":
-    main()
+        if "other" in self.parameter_dict:
+            noisy_particles = self.apply_gaussian_noise(particles)
+            if "h5_file_noisy" in self.output_path_dict:
+                io.data_and_dic2hdf5(
+                    noisy_particles,
+                    self.output_path_dict["h5_file_noisy"],
+                )
+            else:
+                io.data_and_dic2hdf5(
+                    noisy_particles,
+                    self.output_path_dict["h5_file"][:-3]
+                    + "-noisy"
+                    + self.output_path_dict["h5_file"][-3:],
+                )
+
+    @staticmethod
+    def view_particles(data, slicing=(1, 1, 1), figsize=1, ncol=5):
+        """Render picked particles in grid.
+        Parameters
+        ----------
+        data : arr
+            Array containing TEM-simulator micrograph output
+        slicing : tuple
+        figsize : int
+            Integer scaling factor for rendered particle figures
+        ncol : int
+            Integer number of columns in particle view
+        Returns
+        -------
+        particles : arr
+            Individual particle data extracted from micrograph
+        """
+        view = data[:: slicing[0], :: slicing[1], :: slicing[2]]
+        figsize = int(figsize * ncol)
+        nrow = np.ceil(view.shape[0] / ncol)
+        fig = plt.figure(figsize=(ncol * figsize, nrow * figsize))
+
+        for i in np.arange(view.shape[0]):
+            fig.add_subplot(int(nrow), int(ncol), int(i + 1))
+            plt.imshow(view[i], cmap="Greys")
+
+        plt.tight_layout()
+        plt.show()

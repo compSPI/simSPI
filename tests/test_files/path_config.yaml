@@ -1,0 +1,5 @@
+  pdb_dir: './test_files'
+  micrograph_keyword: '_randomrot'
+  pdb_keyword: '4v6x'
+  output_dir: './test_files'
+  simulator_dir: '../../../../TEM-simulator/src/TEM-simulator'
