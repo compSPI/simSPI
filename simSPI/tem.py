@@ -1,14 +1,13 @@
 """Wrapper for the TEM Simulator."""
 import os
+import random
+import string
+from pathlib import Path
 
 import cryoemio
 import matplotlib.pyplot as plt
 import numpy as np
 import simutils
-import random
-import string
-from pathlib import Path
-
 import yaml
 from ioSPI import cryoemio as io
 
@@ -38,8 +37,8 @@ class TEMSimulator:
             self.output_path_dict["log_file"],
         )
 
-    //TODO: run DOES NOT EXIST in master, and is not up to date. 
-    //      requires deprecation (by more careful hands than my own).
+    # TODO: run DOES NOT EXIST in master, and is not up to date.
+    #       requires deprecation (by more careful hands than my own).
     def run(self, display_data=False, export_particles=True):
         """Run TEM simulator on input file and produce particle stacks with metadata.
 
@@ -59,7 +58,7 @@ class TEMSimulator:
         self.create_inp_file()
 
         self.generate_metadata()
-        
+
         micrograph_data = self.get_image_data(display_data=display_data)
         particle_data = self.extract_particles(
             micrograph_data,
@@ -67,7 +66,6 @@ class TEMSimulator:
             display_data=display_data,
         )
         return particle_data
-
 
     @staticmethod
     def get_raw_config_from_yaml(config_yaml):
@@ -161,20 +159,17 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(path_dict):
+    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
         ----------
-        path_dict : dict of type str to str
-            Dict of user inputted path config parameters containing keys:
-            pdb_file : str
-                Relative path to the pdb file
-            output_dir : str, (default = None)
-                Relative path to output directory
-            mrc_keyword : str, (default = None)
-                user-specified keyword appended to output files
-
+        pdb_file : str
+            Relative path to pdb file
+        output_dir : str, (default = None)
+            Relative path to output directory
+        mrc_keyword : str, (default = None)
+            user-specified keyword appended to output files
         Returns
         -------
         path_dict : dict of type str to str
@@ -348,13 +343,17 @@ class TEMSimulator:
             inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
         )
 
-    def extract_particles(self, micrograph, export_particles=True, display_data=False):
+    def extract_particles(
+        self, micrograph, pad, export_particles=True, display_data=False
+    ):
         """Extract particle data from micrograph.
 
         Parameters
         ----------
         micrograph : arr
             Array containing TEM-simulator micrograph output
+        pad : double
+            Pad to be added to maximal dimension of the object read from pdb_file
         export_particles : bool
             Boolean flag to determine whether to export particle data to h5 file
         display_data : bool
@@ -371,7 +370,6 @@ class TEMSimulator:
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/simutils.py
             https://github.com/slaclab/cryoEM-notebooks/blob/master/src/cryoemio.py
         """
-
         particles = fov.micrograph2particles(
             micrograph,
             self.sim_dict["optics_parameters"],
@@ -380,10 +378,17 @@ class TEMSimulator:
             pad=pad,
         )
 
+        if display_data:
+            self.view_particles(particles, ncol=5)
+
+        if export_particles:
+            cryoemio.data_and_dic2hdf5(particles, self.output_path_dict["h5_file"])
+
         return particles
 
     def apply_gaussian_noise(self, particles):
         """Apply gaussian noise to particle data.
+
         Returns
         -------
         noisy_particles : arr
@@ -411,21 +416,28 @@ class TEMSimulator:
 
         Notes
         -----
-        Exports particle metadata in .star file to output directory specified in user config file.
+        Exports particle metadata in .star file to output directory specified
+        in user config file.
         """
-        particle_metadata = self.retrieve_rotation_metadata(self.output_path_dict['crd_file'])
+        particle_metadata = self.retrieve_rotation_metadata(
+            self.output_path_dict["crd_file"]
+        )
 
-        file_name = self.path_dict['pdb_keyword'] + self.path_dict['micrograph_keyword'] + '.star'
-        f = open(self.path_dict['output_dir'] + file_name, "w")
+        file_name = (
+            self.path_dict["pdb_keyword"]
+            + self.path_dict["micrograph_keyword"]
+            + ".star"
+        )
+        f = open(self.path_dict["output_dir"] + file_name, "w")
 
         for key, value in self.raw_sim_dict.items():
-            f.write(f'{key}\n')
+            f.write(f"{key}\n")
             for key0, value0 in value.items():
                 if type(value0) is list:
                     f.write("_" + "{0:24}{1}\n".format(key0, value0))
                 else:
                     f.write("_" + "{0:24}{1:>15}\n".format(key0, value0))
-            f.write('\n')
+            f.write("\n")
 
         f.write("particle_rotation_angles\n")
         f.write("loop_\n")
@@ -433,8 +445,7 @@ class TEMSimulator:
         f.write("_theta\n")
         f.write("_psi\n")
         for angle in particle_metadata:
-            f.write('{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}\n'.format(
-                angle))
+            f.write("{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}\n".format(angle))
 
         f.close()
 
@@ -443,14 +454,15 @@ class TEMSimulator:
         """Retrieve particle rotation data from pre-generated simulator crd file.
 
         Parameters
-        ---------
+        ----------
         path : str
             String specifying path to crd file generated during simulation.
 
         Returns
         -------
         rotation_metadata : array-like, shape=[..., 3]
-            N x 3 matrix representing the rotation angles , phi, theta, psi, of each particle in stack.
+            N x 3 matrix representing the rotation angles , phi, theta, psi, of
+            each particle in stack.
         """
         rotation_metadata = []
         lines = []
@@ -496,6 +508,7 @@ class TEMSimulator:
     @staticmethod
     def view_particles(data, slicing=(1, 1, 1), figsize=1, ncol=5):
         """Render picked particles in grid.
+
         Parameters
         ----------
         data : arr
@@ -505,6 +518,7 @@ class TEMSimulator:
             Integer scaling factor for rendered particle figures
         ncol : int
             Integer number of columns in particle view
+
         Returns
         -------
         particles : arr
