@@ -62,6 +62,7 @@ class TEMSimulator:
         micrograph_data = self.get_image_data(display_data=display_data)
         particle_data = self.extract_particles(
             micrograph_data,
+            0.0,
             export_particles=export_particles,
             display_data=display_data,
         )
@@ -428,26 +429,24 @@ class TEMSimulator:
             + self.path_dict["micrograph_keyword"]
             + ".star"
         )
-        f = open(self.path_dict["output_dir"] + file_name, "w")
 
-        for key, value in self.raw_sim_dict.items():
-            f.write(f"{key}\n")
-            for key0, value0 in value.items():
-                if type(value0) is list:
-                    f.write("_" + "{0:24}{1}\n".format(key0, value0))
-                else:
-                    f.write("_" + "{0:24}{1:>15}\n".format(key0, value0))
-            f.write("\n")
+        with open(self.path_dict["output_dir"] + file_name, "w") as f:
+            for key, value in self.raw_sim_dict.items():
+                f.write(f"{key}\n")
+                for key0, value0 in value.items():
+                    if type(value0) is list:
+                        f.write("_" + "{0:24}{1}\n".format(key0, value0))
+                    else:
+                        f.write("_" + "{0:24}{1:>15}\n".format(key0, value0))
+                f.write("\n")
 
-        f.write("particle_rotation_angles\n")
-        f.write("loop_\n")
-        f.write("_phi\n")
-        f.write("_theta\n")
-        f.write("_psi\n")
-        for angle in particle_metadata:
-            f.write("{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}\n".format(angle))
-
-        f.close()
+            f.write("particle_rotation_angles\n")
+            f.write("loop_\n")
+            f.write("_phi\n")
+            f.write("_theta\n")
+            f.write("_psi\n")
+            for angle in particle_metadata:
+                f.write("{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}\n".format(angle))
 
     @staticmethod
     def retrieve_rotation_metadata(path):
