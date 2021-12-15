@@ -1,9 +1,9 @@
 """Unit test for TEM Simulator wrapper."""
 
+import logging
 import os
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from simSPI import fov, tem
@@ -61,7 +61,10 @@ def sample_resources():
         "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
     }
 
-    micrograph = np.load("./test_files/micrograph.npz")
+    log = logging.getLogger()
+    log.info(cwd)
+    log.info(os.listdir())
+    micrograph = str(Path(cwd, test_files_path, "micrograph.npz"))
 
     resources["data"] = {"micrograph": micrograph.f.arr_0}
 
