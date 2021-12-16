@@ -1,8 +1,7 @@
 """Wrapper for the TEM Simulator."""
-import os
 import random
-import shlex
 import string
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -271,16 +270,18 @@ class TEMSimulator:
         -------
         List containing parsed .mrc data from Simulator
 
+        Raises
+        ------
+        subprocess.CalledProcessError
+            Raised if shell commmand exits with non zero code.
+
         Notes
         -----
         This method requires a local tem_sim installation to run.
         """
-        os.system(
-            shlex.quote(
-                f"{self.output_path_dict['local_sim_dir']} "
-                f"{self.output_path_dict['inp_file']}"
-            )
-        )
+        sim_executable = f"{self.output_path_dict['local_sim_dir']}"
+        input_file_arg = f"{self.output_path_dict['inp_file']}"
+        subprocess.run([sim_executable, input_file_arg], check=True)
 
         data = io.mrc2data(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
