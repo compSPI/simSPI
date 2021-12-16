@@ -1,9 +1,9 @@
 """Wrapper for the TEM Simulator."""
 import os
 import random
+import shlex
 import string
 from pathlib import Path
-from shlex import quote
 
 import numpy as np
 import yaml
@@ -213,7 +213,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
         """
         self.create_crd_file(pad)
-        self.create_inp_file()
+        self.write_inp_file()
 
         micrograph_data = self.get_image_data()
         particle_data = self.extract_particles(micrograph_data, pad=pad)
@@ -276,7 +276,7 @@ class TEMSimulator:
         This method requires a local tem_sim installation to run.
         """
         os.system(
-            quote(
+            shlex.quote(
                 f"{self.output_path_dict['local_sim_dir']} "
                 f"{self.output_path_dict['inp_file']}"
             )
