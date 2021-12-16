@@ -3,6 +3,7 @@ import os
 import random
 import string
 from pathlib import Path
+from shlex import quote
 
 import numpy as np
 import yaml
@@ -217,12 +218,11 @@ class TEMSimulator:
         micrograph_data = self.get_image_data()
         particle_data = self.extract_particles(micrograph_data, pad=pad)
 
-        if "other" in self.parameter_dict:
-            if (
-                self.parameter_dict["other"].get("signal_to_noise") is not None
-                or self.parameter_dict["other"].get("signal_to_noise_db") is not None
-            ):
-                particle_data = self.apply_gaussian_noise(particle_data)
+        if "other" in self.parameter_dict and (
+            self.parameter_dict["other"].get("signal_to_noise") is not None
+            or self.parameter_dict["other"].get("signal_to_noise_db") is not None
+        ):
+            particle_data = self.apply_gaussian_noise(particle_data)
 
         if export_particles:
             self.export_particle_stack(particle_data)
@@ -276,9 +276,9 @@ class TEMSimulator:
         This method requires a local tem_sim installation to run.
         """
         os.system(
-            "{} {}".format(
-                self.output_path_dict["local_sim_dir"],
-                self.output_path_dict["inp_file"],
+            quote(
+                f"{self.output_path_dict['local_sim_dir']} "
+                f"{self.output_path_dict['inp_file']}"
             )
         )
 
