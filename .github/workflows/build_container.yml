@@ -2,14 +2,17 @@ name: "Building TEM simulator container"
 
 on:
   push:
-    branches: [master,temsim-container]
+    branches: [master, temsim-test-in-container]
     paths:
-      - 'docker/TEM-simulator/Dockerfile'
+      - 'docker/Dockerfile'
+      - 'docker/entrypoint.sh'
+      - 'environment.yml'
+      - 'setup.py'
 
   pull_request:
     branch: [master]
     paths:
-      - 'docker/TEM-simulator/Dockerfile'
+      - 'docker/Dockerfile'
 
 jobs:
   build:
@@ -42,12 +45,28 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./
-          file: ./docker/TEM-simulator/Dockerfile
+          file: ./docker/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi-temsimulator:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Install Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.3
+
+      - name: Run linting in container
+        run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest flake8 simSPI tests
+
+      - name: Run tests in container
+        run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
+
+      - name: uploading code coverage [codecov]
+          if: ${{matrix.python-version == 3.7}}
+          run: |
+            bash <(curl -s https://codecov.io/bash) -c
