@@ -59,18 +59,18 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-      - name: Install Singularity
-        uses: eWaterCycle/setup-singularity@v7
-        with:
-          singularity-version: 3.8.3
-
-      - name: Run linting in container
-        run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest flake8 simSPI tests
-
-      - name: Run tests in container
-        run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
-
-      - name: uploading code coverage [codecov]
-        if: ${{matrix.python-version == 3.7}}
-        run: |
-          bash <(curl -s https://codecov.io/bash) -c
+#      - name: Install Singularity
+#        uses: eWaterCycle/setup-singularity@v7
+#        with:
+#          singularity-version: 3.8.3
+#
+#      - name: Run linting in container
+#        run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest flake8 simSPI tests
+#
+#      - name: Run tests in container
+#        run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
+#
+#      - name: uploading code coverage [codecov]
+#        if: ${{matrix.python-version == 3.7}}
+#        run: |
+#          bash <(curl -s https://codecov.io/bash) -c
