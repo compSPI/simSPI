@@ -19,7 +19,7 @@ RUN wget 'http://www.fftw.org/fftw-3.3.10.tar.gz' && \
 RUN wget 'https://iweb.dl.sourceforge.net/project/tem-simulator/TEM-simulator_1.3.zip' && \
     unzip TEM-simulator_1.3.zip && \
     cd TEM-simulator_1.3/src && make && \
-    cd /work && rm -f TEM-simulator_1.3.zip
+    cd /root && rm -f TEM-simulator_1.3.zip
 
 # Download miniconda installer, perform the installation and remove it
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
