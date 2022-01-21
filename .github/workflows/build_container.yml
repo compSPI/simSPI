@@ -8,11 +8,15 @@ on:
       - 'docker/entrypoint.sh'
       - 'environment.yml'
       - 'setup.py'
+      - '.github/workflows/build_container.yml'
 
   pull_request:
     branch: [master]
     paths:
       - 'docker/Dockerfile'
+      - 'docker/entrypoint.sh'
+      - 'environment.yml'
+      - 'setup.py'
 
 jobs:
   build:
