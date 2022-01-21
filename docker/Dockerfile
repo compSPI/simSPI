@@ -24,7 +24,8 @@ RUN wget 'https://iweb.dl.sourceforge.net/project/tem-simulator/TEM-simulator_1.
 # Download miniconda installer, perform the installation and remove it
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     chmod +x /root/Miniconda3-latest-Linux-x86_64.sh && \
-    /root/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/anaconda &&
+    /root/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/anaconda && \
+    rm /root/Miniconda3-latest-Linux-x86_64.sh
 
 # Copy the code and generate the environment
 COPY environment.yml /root/environment.yml
