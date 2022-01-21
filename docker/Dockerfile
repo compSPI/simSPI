@@ -35,6 +35,7 @@ COPY tests /root/tests
 RUN . /opt/anaconda/etc/profile.d/conda.sh && conda update -c conda-forge conda
 RUN . /opt/anaconda/etc/profile.d/conda.sh && \
     conda env update --name base --file environment.yml && \
+    conda activate base && \
     pip install -e . && \
     conda clean -afy
 
