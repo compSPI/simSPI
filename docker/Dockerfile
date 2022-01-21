@@ -29,6 +29,7 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
 
 # Copy the code and generate the environment
 COPY environment.yml /root/environment.yml
+COPY README.md /root/README.md
 COPY setup.py /root/setup.py
 COPY simSPI /root/simSPI
 COPY tests /root/tests
