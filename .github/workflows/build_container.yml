@@ -1,4 +1,4 @@
-name: "Building TEM simulator container"
+name: "Building container and testing simSPI"
 
 on:
   push:
@@ -67,6 +67,6 @@ jobs:
         run: singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
 
       - name: uploading code coverage [codecov]
-          if: ${{matrix.python-version == 3.7}}
-          run: |
-            bash <(curl -s https://codecov.io/bash) -c
+        if: ${{matrix.python-version == 3.7}}
+        run: |
+          bash <(curl -s https://codecov.io/bash) -c
