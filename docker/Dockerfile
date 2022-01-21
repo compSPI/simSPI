@@ -42,4 +42,5 @@ RUN . /opt/anaconda/etc/profile.d/conda.sh && \
 
 # Copy and add the entrypoint script
 ADD docker/entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
 ENTRYPOINT ["/opt/entrypoint.sh"]
