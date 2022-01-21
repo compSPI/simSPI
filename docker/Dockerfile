@@ -38,5 +38,5 @@ RUN . /opt/anaconda/etc/profile.d/conda.sh && \
     conda clean -afy
 
 # Copy and add the entrypoint script
-ADD entrypoint.sh /opt/entrypoint.sh
+ADD docker/entrypoint.sh /opt/entrypoint.sh
 ENTRYPOINT ["/opt/entrypoint.sh"]
