@@ -2,7 +2,7 @@ FROM docker.io/ubuntu:18.04
 
 MAINTAINER Frederic Poitevin "fpoitevi@stanford.edu"
 
-WORKDIR /root
+WORKDIR /work
 
 # Install useful packages
 RUN apt-get -y update && \
@@ -13,26 +13,26 @@ RUN apt-get -y update && \
 RUN wget 'http://www.fftw.org/fftw-3.3.10.tar.gz' && \
     tar -xzvf fftw-3.3.10.tar.gz  && \
     cd fftw-3.3.10 && ./configure && make && make install && \
-    cd /root && rm -rf fftw-3.3.10*
+    cd /work && rm -rf fftw-3.3.10*
 
 # Download and install TEM-simulator
 RUN wget 'https://iweb.dl.sourceforge.net/project/tem-simulator/TEM-simulator_1.3.zip' && \
     unzip TEM-simulator_1.3.zip && \
     cd TEM-simulator_1.3/src && make && \
-    cd /root && rm -f TEM-simulator_1.3.zip
+    cd /work && rm -f TEM-simulator_1.3.zip
 
 # Download miniconda installer, perform the installation and remove it
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-    chmod +x /root/Miniconda3-latest-Linux-x86_64.sh && \
-    /root/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/anaconda && \
-    rm /root/Miniconda3-latest-Linux-x86_64.sh
+    chmod +x /work/Miniconda3-latest-Linux-x86_64.sh && \
+    /work/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/anaconda && \
+    rm /work/Miniconda3-latest-Linux-x86_64.sh
 
 # Copy the code and generate the environment
-COPY environment.yml /root/environment.yml
-COPY README.md /root/README.md
-COPY setup.py /root/setup.py
-COPY simSPI /root/simSPI
-COPY tests /root/tests
+COPY environment.yml /work/environment.yml
+COPY README.md /work/README.md
+COPY setup.py /work/setup.py
+COPY simSPI /work/simSPI
+COPY tests /work/tests
 RUN . /opt/anaconda/etc/profile.d/conda.sh && conda update -c conda-forge conda
 RUN . /opt/anaconda/etc/profile.d/conda.sh && \
     conda env update --name base --file environment.yml && \
