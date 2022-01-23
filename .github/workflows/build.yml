@@ -1,8 +1,8 @@
-name: "Linting and Testing"
+name: "Linting and Testing (Singularity)"
 
 on:
   push:
-    branches: [master,github-actions-test]
+    branches: [master,temsim-test-in-container]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
@@ -22,42 +22,35 @@ on:
 jobs:
   build:
 
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-18.04]
-        python-version: [3.7,3.8,3.9]
-        test-folder : ['tests']
-      fail-fast: false
-
+    runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Build using Python ${{matrix.python-version}}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{matrix.python-version}}
 
-      - name: cache conda
-        uses: actions/cache@v1
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Install Singularity
+        uses: eWaterCycle/setup-singularity@v7
         with:
-          path: $CONDA
-          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-conda-
-      - name: install dependencies
-        run:  |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          $CONDA/bin/conda env update --file environment.yml --name base
-          $CONDA/bin/pip install -e .
+           singularity-version: 3.8.3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
       - name: linting [flake8]
-        run: |
-          $CONDA/bin/flake8 simSPI tests
+        run: >
+          singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
+          /bin/bash /opt/entrypoint.sh
+          flake8 /work/simSPI /work/tests
+
       - name: unit testing [pytest]
-        run: |
-          $CONDA/bin/pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI ${{matrix.test-folder}}
+        run: >
+          singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
+          /bin/bash /opt/entrypoint.sh
+          pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
+
       - name: uploading code coverage [codecov]
-        if: ${{matrix.python-version == 3.7}}
-        run: |
+        run: >
           bash <(curl -s https://codecov.io/bash) -c
