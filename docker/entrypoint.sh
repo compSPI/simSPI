@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh -l
 
 export PATH="/work/TEM-simulator/src":$PATH
 echo $PATH
