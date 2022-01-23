@@ -31,13 +31,13 @@ jobs:
         uses: ./docker/
         id: dryrun
         with:
-          command: /bin/ls
+          command: /bin/ls *
 
       - name: linting [flake8]
         uses: ./docker/
         id: linting
         with:
-          command: flake8 /work/simSPI /work/tests
+          command: /opt/anaconda/bin/flake8 /work/simSPI /work/tests
 
       - name: unit testing [pytest]
         uses: ./docker/
