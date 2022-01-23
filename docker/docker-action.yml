@@ -1,0 +1,12 @@
+name: 'Execute in Docker container'
+description: 'Execute command in Docker container'
+inputs:
+  command: # id of input
+    description: 'Command to be execute in Docker container'
+    required: true
+    default: 'ls /work/*'
+runs:
+  using: 'docker'
+  image: 'docker/Dockerfile'
+  args:
+    - ${{ inputs.command }}
