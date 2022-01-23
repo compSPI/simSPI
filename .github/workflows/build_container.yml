@@ -1,4 +1,4 @@
-name: "Building container and testing simSPI"
+name: "Building simSPI Container"
 
 on:
   push:
