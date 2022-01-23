@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
 
 export PATH="/work/TEM-simulator/src":$PATH
 
@@ -7,4 +10,4 @@ conda activate base
 
 echo "PATH: $PATH"
 
-exec "$@"
+bash -c "set -e; set -o pipefail; $1"
