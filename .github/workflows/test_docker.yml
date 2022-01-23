@@ -28,16 +28,18 @@ jobs:
         uses: actions/checkout@v2
 
       - name: linting [flake8]
-        using: 'docker'
-        image: 'docker/Dockerfile'
-        args:
-          - flake8 /work/simSPI /work/tests
+        runs:
+          using: 'docker'
+          image: 'docker/Dockerfile'
+          args:
+            - flake8 /work/simSPI /work/tests
 
       - name: unit testing [pytest]
-        using: 'docker'
-        image: 'docker/Dockerfile'
-        args:
-          - pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
+        runs:
+          using: 'docker'
+          image: 'docker/Dockerfile'
+          args:
+            - pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
 
       #- name: uploading code coverage [codecov]
       #  if: ${{matrix.python-version == 3.7}}
