@@ -30,8 +30,6 @@ jobs:
       - name: dryrun
         uses: ./docker/
         id: dryrun
-        with:
-          command: /bin/ls
 
       - name: linting [flake8]
         uses: ./docker/
