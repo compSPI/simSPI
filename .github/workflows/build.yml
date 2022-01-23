@@ -2,7 +2,7 @@ name: "Linting and Testing (Singularity)"
 
 on:
   push:
-    branches: [master,temsim-test-in-container]
+    branches: [master]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'

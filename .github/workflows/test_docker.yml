@@ -1,0 +1,45 @@
+name: "Linting and Testing (Docker)"
+# https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action
+on:
+  push:
+    branches: [master,temsim-test-in-container]
+    paths-ignore:
+    - 'README.md'
+    - '.deepsource.toml'
+    - '.gitignore'
+    - 'setup.py'
+
+
+  pull_request:
+    branches: [master]
+    paths-ignore:
+    - 'README.md'
+    - '.deepsource.toml'
+    - '.gitignore'
+    - 'setup.py'
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: linting [flake8]
+        using: 'docker'
+        image: 'docker/Dockerfile'
+        args:
+          - flake8 /work/simSPI /work/tests
+
+      - name: unit testing [pytest]
+        using: 'docker'
+        image: 'docker/Dockerfile'
+        args:
+          - pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
+
+      #- name: uploading code coverage [codecov]
+      #  if: ${{matrix.python-version == 3.7}}
+      #  run: |
+      #    bash <(curl -s https://codecov.io/bash) -c
