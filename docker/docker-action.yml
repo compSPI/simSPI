@@ -7,6 +7,6 @@ inputs:
     default: 'ls /work/*'
 runs:
   using: 'docker'
-  image: 'docker/Dockerfile'
+  image: 'docker://fpoitevi/simspi:latest'
   args:
     - ${{ inputs.command }}
