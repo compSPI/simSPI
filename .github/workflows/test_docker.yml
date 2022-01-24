@@ -41,7 +41,8 @@ jobs:
         uses: ./docker/
         id: testing
         with:
-          command: pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
+          command: |
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
 
       - name: uploading code coverage [codecov]
         run: |

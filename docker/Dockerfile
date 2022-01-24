@@ -28,6 +28,7 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
     rm /work/Miniconda3-latest-Linux-x86_64.sh
 
 # Copy the code and generate the environment
+# Remains to be done: COPY all and remove the fat later, instead-of multiplying layers:
 COPY environment.yml /work/environment.yml
 COPY README.md /work/README.md
 COPY setup.py /work/setup.py
