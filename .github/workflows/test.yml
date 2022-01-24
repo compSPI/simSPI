@@ -26,6 +26,10 @@ jobs:
       - name: Check Out Repo
         uses: actions/checkout@v2
 
+      - name: dryrun
+        uses: ./docker/
+        id: dryrun
+
       - name: unit testing [pytest]
         uses: ./docker/
         id: testing
