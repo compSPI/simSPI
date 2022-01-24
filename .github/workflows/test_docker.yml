@@ -35,7 +35,7 @@ jobs:
         uses: ./docker/
         id: linting
         with:
-          command: /opt/anaconda/bin/flake8 /work/simSPI /work/tests
+          command: flake8 /work/simSPI /work/tests
 
       - name: unit testing [pytest]
         uses: ./docker/
