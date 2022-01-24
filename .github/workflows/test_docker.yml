@@ -9,7 +9,6 @@ on:
     - '.gitignore'
     - 'setup.py'
 
-
   pull_request:
     branches: [master]
     paths-ignore:
@@ -43,7 +42,6 @@ jobs:
         with:
           command: pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
 
-      #- name: uploading code coverage [codecov]
-      #  if: ${{matrix.python-version == 3.7}}
-      #  run: |
-      #    bash <(curl -s https://codecov.io/bash) -c
+      - name: uploading code coverage [codecov]
+        run: |
+          bash <(curl -s https://codecov.io/bash) -c
