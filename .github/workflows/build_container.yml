@@ -1,15 +1,22 @@
-name: "Building TEM simulator container"
+name: "Building simSPI Container"
 
 on:
   push:
-    branches: [master,temsim-container]
+    branches: [master, temsim-test-in-container]
     paths:
-      - 'docker/TEM-simulator/Dockerfile'
+      - 'docker/Dockerfile'
+      - 'docker/entrypoint.sh'
+      - 'environment.yml'
+      - 'setup.py'
+      - '.github/workflows/build_container.yml'
 
   pull_request:
     branch: [master]
     paths:
-      - 'docker/TEM-simulator/Dockerfile'
+      - 'docker/Dockerfile'
+      - 'docker/entrypoint.sh'
+      - 'environment.yml'
+      - 'setup.py'
 
 jobs:
   build:
@@ -42,10 +49,10 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./
-          file: ./docker/TEM-simulator/Dockerfile
+          file: ./docker/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi-temsimulator:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
