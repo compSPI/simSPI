@@ -1,3 +1,4 @@
 .idea
 simSPI/__pycache__
+simSPI/linear_simulator/__pycache__
 temp_workspace/*
