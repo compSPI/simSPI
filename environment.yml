@@ -2,6 +2,7 @@ name: simSPI
 channels:
   - conda-forge
   - defaults
+  - pytorch
   - pytorch3d
 dependencies:
   - codecov
