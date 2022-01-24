@@ -53,12 +53,12 @@ def sample_resources():
     """Return sample resources for testing."""
     test_files_path = "./tests/test_files"
     cwd = os.getcwd()
-    resources = {}
-
-    resources["files"] = {
-        "path_yaml": str(Path(cwd, test_files_path, "path_config.yaml")),
-        "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
-        "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+    resources = {
+        "files": {
+            "path_yaml": str(Path(cwd, test_files_path, "path_config.yaml")),
+            "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
+            "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+        }
     }
 
     micrograph = np.load(str(Path(cwd, test_files_path, "micrograph.npz")))
