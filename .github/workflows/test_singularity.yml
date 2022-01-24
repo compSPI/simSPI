@@ -2,16 +2,15 @@ name: "Linting and Testing (Singularity)"
 
 on:
   push:
-    branches: [simspi-test-singularity]
+    branches: [test-singularity]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
     - '.gitignore'
     - 'setup.py'
 
-
   pull_request:
-    branches: [simspi-test-singularity]
+    branches: [test-singularity]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
@@ -32,12 +31,6 @@ jobs:
         uses: eWaterCycle/setup-singularity@v7
         with:
            singularity-version: 3.8.3
-
-      - name: linting [flake8]
-        run: >
-          singularity exec docker://${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
-          /bin/bash /opt/entrypoint.sh
-          flake8 --config=/work/.flake8 /work/simSPI /work/tests
 
       - name: unit testing [pytest]
         run: >
