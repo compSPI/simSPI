@@ -5,7 +5,7 @@ inputs:
   command: # id of input
     description: 'Command to be execute in Docker container'
     required: true
-    default: 'ls . /opt /work'
+    default: 'ls -a . /opt /work'
 runs:
   using: 'docker'
   image: 'docker://fpoitevi/simspi:latest'
