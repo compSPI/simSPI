@@ -2,7 +2,7 @@ name: "Linting and Testing (Singularity)"
 
 on:
   push:
-    branches: [temsim-test-in-container]
+    branches: [simspi-test-singularity]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
@@ -11,7 +11,7 @@ on:
 
 
   pull_request:
-    branches: [master]
+    branches: [simspi-test-singularity]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
