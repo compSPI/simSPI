@@ -204,7 +204,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
         """
         self.create_crd_file(pad)
-        self.write_inp_file()
+        self.create_inp_file()
 
         self.generate_metadata()
 
