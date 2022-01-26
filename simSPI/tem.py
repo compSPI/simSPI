@@ -275,7 +275,6 @@ class TEMSimulator:
         micrograph = data[0, ...]
 
         if display_data:
-            # fig = plt.figure(figsize=(18, 12))
             plt.imshow(micrograph, origin="lower", cmap="Greys")
             plt.colorbar()
             plt.show()
@@ -480,7 +479,7 @@ class TEMSimulator:
             lines = f.readlines()
 
         for i, line in enumerate(lines):
-            if 4 < i:
+            if i < 4:
                 rotation_metadata.append([float(x) for x in line.split()[3:]])
 
         f.close()
