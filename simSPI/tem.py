@@ -1,7 +1,7 @@
 """Wrapper for the TEM Simulator."""
-import os
 import random
 import string
+import subprocess
 from pathlib import Path
 
 import cryoemio
@@ -249,13 +249,8 @@ class TEMSimulator:
             crd_file=self.output_path_dict["crd_file"],
         )
 
-    def get_image_data(self, display_data=False):
+    def get_image_data(self):
         """Run simulator and return data.
-
-        Parameters
-        ----------
-        display_data : bool
-            Flag to determine whether to display particle data
 
         Returns
         -------
@@ -265,19 +260,12 @@ class TEMSimulator:
         ---------
         Leverages methods developed in https://github.com/slaclab/cryoEM-notebooks
         """
-        os.system(
-            "{} {}".format(
-                self.path_dict["simulator_dir"], self.output_path_dict["inp_file"]
-            )
-        )
+        sim_executable = f"{self.output_path_dict['local_sim_dir']}"
+        input_file_arg = f"{self.output_path_dict['inp_file']}"
+        subprocess.run([sim_executable, input_file_arg], check=True)
 
         data = cryoemio.mrc2data(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
-
-        if display_data:
-            plt.imshow(micrograph, origin="lower", cmap="Greys")
-            plt.colorbar()
-            plt.show()
 
         return micrograph
 
