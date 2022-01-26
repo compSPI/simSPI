@@ -2,7 +2,6 @@
 import os
 import random
 import string
-import subprocess
 from pathlib import Path
 
 import cryoemio
@@ -43,37 +42,6 @@ class TEMSimulator:
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
         )
-
-    # TODO: run DOES NOT EXIST in master, and is not up to date.
-    #       requires deprecation (by more careful hands than my own).
-    def run(self, display_data=False, export_particles=True):
-        """Run TEM simulator on input file and produce particle stacks with metadata.
-
-        Parameters
-        ----------
-        display_data : bool
-            Flag to determine whether to export particle data after extraction
-        export_particles : bool
-            Flag to determine whether to export extracted particle data
-
-        Returns
-        -------
-        particle_data : arr
-            Individual particle data extracted from micrograph
-        """
-        self.create_crd_file(pad=5)
-        self.create_inp_file()
-
-        self.generate_metadata()
-
-        micrograph_data = self.get_image_data(display_data=display_data)
-        particle_data = self.extract_particles(
-            micrograph_data,
-            0.0,
-            export_particles=export_particles,
-            display_data=display_data,
-        )
-        return particle_data
 
     @staticmethod
     def get_raw_config_from_yaml(config_yaml):
@@ -237,6 +205,8 @@ class TEMSimulator:
         """
         self.create_crd_file(pad)
         self.write_inp_file()
+
+        self.generate_metadata()
 
         micrograph_data = self.get_image_data()
         particle_data = self.extract_particles(micrograph_data, pad=pad)
