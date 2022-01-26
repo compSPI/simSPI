@@ -35,7 +35,7 @@ jobs:
         id: linting
         with:
           command: |
-            flake8 .flake8 simSPI tests
+            flake8 --config=.flake8 simSPI tests
 
       - name: unit testing [pytest]
         uses: ./docker/
