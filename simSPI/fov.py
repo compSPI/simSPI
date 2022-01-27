@@ -55,7 +55,8 @@ def define_grid_in_fov(
 
     x_range = np.arange(x_origin, x_frontier, boxsize)
     y_range = np.arange(y_origin, y_frontier, boxsize)
-    n_particles = np.int(fov_nx * fov_ny)
+    n_particles = int(fov_nx * fov_ny)
+
     return x_range, y_range, n_particles
 
 
@@ -177,9 +178,9 @@ def micrograph2particles(
     fov_nx = np.floor(fov_lx / boxsize)
     fov_ny = np.floor(fov_ly / boxsize)
     pixel_size = (fov_lx / micrograph.shape[1] + fov_ly / micrograph.shape[0]) / 2.0
-    n_boxsize = np.int(boxsize / pixel_size)
-    x_pixels = np.int(fov_nx * n_boxsize)
-    y_pixels = np.int(fov_ny * n_boxsize)
+    n_boxsize = int(boxsize / pixel_size)
+    x_pixels = int(fov_nx * n_boxsize)
+    y_pixels = int(fov_ny * n_boxsize)
     data = micrograph[:y_pixels, :x_pixels]
     particles = slice_and_stack(data, n_boxsize=n_boxsize)
 
