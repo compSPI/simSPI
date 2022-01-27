@@ -112,7 +112,7 @@ def test_get_wavelength():
     """Test accuracy of the _get_wavelength."""
     path = "tests/data/ctf_data.npy"
 
-    saved_data, config = init_data(path)
+    _, config = init_data(path)
     ctf = CTF(config)
     wavelength = ctf._get_ewavelength()
     true_wavelength = 0.1968
