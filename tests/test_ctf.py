@@ -47,7 +47,7 @@ def init_data(path):
 def normalized_mse(a, b):
     """Return mean square error.
 
-    Calclulates mean square error between two inputs normalized
+    Calclulate mean square error between two inputs normalized
     by the norm of the first input.
 
     Parameters
