@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 
-from simSPI.linear_simulator.ctf_utils import CTF
+from simSPI.linear_simulator.ctf import CTF
 
 
 class AttrDict(dict):
