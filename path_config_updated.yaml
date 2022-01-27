@@ -1,8 +1,0 @@
-  pdb_dir: '../simSPI/'
-  mrc_keyword: 'randomrot'
-  pdb_keyword: '4v6x'
-  output_dir: 'simSPI/temp_workspace/output'
-  simulator_dir: '../../../TEM-simulator/src/TEM-simulator'
-
-  pdb_file: 'simSPI/data/4v6x.pdb'
-  local_sim_dir: 'TEM-simulator/src/TEM-simulator'
