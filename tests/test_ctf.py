@@ -47,7 +47,7 @@ def init_data(path):
 def normalized_mse(a, b):
     """Return mean square error.
 
-    Calclulate mean square error between two inputs normalized
+    Calculate mean square error between two inputs normalized
     by the norm of the first input.
 
     Parameters
@@ -82,7 +82,7 @@ def primal_to_fourier_2D(r):
     )
 
 
-def test_ctf():
+def test_ctf_forward():
     """Test accuracy of the ctf."""
     path = "tests/data/ctf_data.npy"
 
@@ -91,7 +91,30 @@ def test_ctf():
     im_input = saved_data["projector_output"]
 
     ctf = CTF(config)
-    ctf_out = ctf.get_ctf(ctf_params)
     ctf_output = ctf(primal_to_fourier_2D(im_input), ctf_params)
-    assert normalized_mse(saved_data["ctf_fourier"], ctf_out).abs() < 0.01
+
     assert normalized_mse(saved_data["ctf_output"], ctf_output).abs() < 0.01
+
+
+def test_get_ctf():
+    """Test accuracy of the get ctf."""
+    path = "tests/data/ctf_data.npy"
+
+    saved_data, config = init_data(path)
+    ctf_params = saved_data["ctf_params"]
+
+    ctf = CTF(config)
+    ctf_out = ctf.get_ctf(ctf_params)
+    assert normalized_mse(saved_data["ctf_fourier"], ctf_out).abs() < 0.01
+
+
+def test_get_wavelength():
+    """Test accuracy of the _get_wavelength."""
+    path = "tests/data/ctf_data.npy"
+
+    saved_data, config = init_data(path)
+    ctf = CTF(config)
+    wavelength = ctf._get_ewavelength()
+    true_wavelength = 0.1968
+    error = (wavelength - true_wavelength) / true_wavelength
+    assert error < 0.01
