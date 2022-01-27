@@ -35,14 +35,14 @@ jobs:
         id: linting
         with:
           command: |
-            flake8 --config=/work/.flake8 /work/simSPI /work/tests
+            flake8 --config=.flake8 simSPI tests
 
       - name: unit testing [pytest]
         uses: ./docker/
         id: testing
         with:
           command: |
-            pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI tests
 
       - name: uploading code coverage [codecov]
         run: |
