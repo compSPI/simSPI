@@ -125,7 +125,7 @@ class CTF(torch.nn.Module):
 
         Returns
         -------
-        hFourier: torch.Tensor
+        h_fourier: torch.Tensor
             ctf of shape (batch_size,1,ctf_size,ctf_size)
         """
         defocus_u = ctf_params["defocus_u"]
@@ -150,7 +150,7 @@ class CTF(torch.nn.Module):
 
         argument = abberation_contribution + defocus_contribution
 
-        hFourier = (1 - self.config.amplitude_contrast ** 2) ** 0.5 * torch.sin(
+        h_fourier = (1 - self.config.amplitude_contrast ** 2) ** 0.5 * torch.sin(
             argument
         ) + self.config.amplitude_contrast * torch.cos(argument)
 
@@ -164,8 +164,8 @@ class CTF(torch.nn.Module):
         else:
             envelope = torch.exp(-self.frequency ** 2 * self.config.b_factor / 4.0)
 
-        hFourier *= envelope
-        return hFourier
+        h_fourier *= envelope
+        return h_fourier
 
     def forward(self, x_fourier, ctf_params=None):
         """Multiply the CTF and projection in fourier domain.
