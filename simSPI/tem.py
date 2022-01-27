@@ -214,6 +214,8 @@ class TEMSimulator:
         self.create_crd_file(pad)
         self.write_inp_file()
 
+        self.generate_metadata()
+
         micrograph_data = self.get_image_data()
         particle_data = self.extract_particles(micrograph_data, pad=pad)
 
