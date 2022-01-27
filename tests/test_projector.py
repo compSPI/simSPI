@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from simSPI.linear_simulator.projector_utils import Projector
+from simSPI.linear_simulator.projector import Projector
 
 
 class AttrDict(dict):
