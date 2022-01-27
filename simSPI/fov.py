@@ -59,7 +59,7 @@ def define_grid_in_fov(
     return x_range, y_range, n_particles
 
 
-def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
+def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1):
     """Define field of view dimensions for displaying particle.
 
     Parameters
@@ -106,7 +106,7 @@ def get_dmax(filename):
 
     Parameters
     ----------
-    pdb_file : str
+    filename : str
         Relative path to .pdb file containing topological information of particle.
 
     Returns
