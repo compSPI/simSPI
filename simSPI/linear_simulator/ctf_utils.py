@@ -137,10 +137,10 @@ class CTF(torch.nn.Module):
             + (defocus_u - defocus_v)
             * torch.cos(self.angleFrequency - angle_astigmatism) ** 2
         )
-        defocusContribution = (
+        defocus_contribution = (
             np.pi * self.wavelength * 1e4 * elliptical * self.frequency ** 2
         )
-        abberationContribution = (
+        abberation_contribution = (
             -np.pi
             / 2.0
             * self.config.cs
@@ -149,7 +149,7 @@ class CTF(torch.nn.Module):
             * self.frequency ** 4
         )
 
-        argument = abberationContribution + defocusContribution
+        argument = abberation_contribution + defocus_contribution
 
         hFourier = (1 - self.config.amplitude_contrast ** 2) ** 0.5 * torch.sin(
             argument
@@ -186,8 +186,8 @@ class CTF(torch.nn.Module):
             modulated fourier transform of the projection (chunks,1,sidelen,sidelen)
         """
         if ctf_params is not None:
-            hFourier = self.get_ctf(ctf_params)
+            h_fourier = self.get_ctf(ctf_params)
 
-            x_fourier = x_fourier * hFourier
+            x_fourier = x_fourier * h_fourier
 
         return x_fourier
