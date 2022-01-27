@@ -1,7 +1,6 @@
 """Module that multiplies ctf to fourier transform of the projection."""
 import numpy as np
 import torch
-import torch.fft
 
 
 class CTF(torch.nn.Module):
