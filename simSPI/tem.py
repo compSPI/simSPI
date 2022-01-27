@@ -1,5 +1,4 @@
 """Wrapper for the TEM Simulator."""
-import os
 import random
 import string
 import subprocess
@@ -285,7 +284,6 @@ class TEMSimulator:
         sim_executable = f"{self.output_path_dict['local_sim_dir']}"
         input_file_arg = f"{self.output_path_dict['inp_file']}"
 
-        raise Exception(os.listdir(self.output_path_dict["mrc_file"][:-14]))
         subprocess.run([sim_executable, input_file_arg], check=True)
 
         data = io.mrc2data(self.output_path_dict["mrc_file"])
