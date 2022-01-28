@@ -248,32 +248,32 @@ def test_export_particle_stack(sample_class, sample_resources):
     assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
 
 
-# def test_get_image_data(sample_class):
-#     """Test whether mrc data is generated from local tem installation.
-#
-#     Notes
-#     -----
-#     This test requires a local TEM sim installation to run.
-#     """
-#     sample_class.write_inp_file()
-#     data = sample_class.get_image_data()
-#     assert os.path.isfile(sample_class.output_path_dict["log_file"])
-#     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
-#     assert data.shape == (4092, 5760)
+def test_get_image_data(sample_class):
+    """Test whether mrc data is generated from local tem installation.
+
+    Notes
+    -----
+    This test requires a local TEM sim installation to run.
+    """
+    sample_class.write_inp_file()
+    data = sample_class.get_image_data()
+    assert os.path.isfile(sample_class.output_path_dict["log_file"])
+    assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
+    assert data.shape == (4092, 5760)
 
 
-# def test_run(sample_class):
-#     """Test whether run returns and exports particles with expected shape.
-#
-#     Notes
-#     -----
-#     This test requires a local TEM sim installation to run.
-#     """
-#     particles = sample_class.run(export_particles=True)
-#     assert particles.shape == (
-#         35,
-#         809,
-#         809,
-#     )
-#     assert os.path.isfile(sample_class.output_path_dict["h5_file"])
-#     assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
+def test_run(sample_class):
+    """Test whether run returns and exports particles with expected shape.
+
+    Notes
+    -----
+    This test requires a local TEM sim installation to run.
+    """
+    particles = sample_class.run(export_particles=True)
+    assert particles.shape == (
+        35,
+        809,
+        809,
+    )
+    assert os.path.isfile(sample_class.output_path_dict["h5_file"])
+    assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
