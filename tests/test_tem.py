@@ -12,6 +12,7 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class(tmp_path):
     """Instantiate TEMSimulator for testing."""
+    #tmp_path="./tests/test_files/"
     test_files_path = "./tests/test_files"
     cwd = os.getcwd()
 
@@ -255,6 +256,7 @@ def test_get_image_data(sample_class):
     -----
     This test requires a local TEM sim installation to run.
     """
+    sample_class.create_crd_file()
     sample_class.write_inp_file()
     data = sample_class.get_image_data()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
