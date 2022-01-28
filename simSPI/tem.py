@@ -421,11 +421,18 @@ class TEMSimulator:
 
             f.write("particle_rotation_angles\n")
             f.write("loop_\n")
+            f.write("_x\n")
+            f.write("_y\n")
+            f.write("_z\n")
             f.write("_phi\n")
             f.write("_theta\n")
             f.write("_psi\n")
-            for angle in particle_metadata:
-                f.write("{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}\n".format(angle))
+
+            for coord in particle_metadata:
+                f.write(
+                    "{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}"
+                    "{0[3]:13.4f}{0[4]:13.4f}{0[5]:13.4f}\n".format(coord)
+                )
 
     @staticmethod
     def retrieve_rotation_metadata(path):
@@ -449,7 +456,7 @@ class TEMSimulator:
 
         for i, line in enumerate(lines):
             if i >= 4:
-                rotation_metadata.append([float(x) for x in line.split()[3:]])
+                rotation_metadata.append([float(x) for x in line.split()[:]])
 
         f.close()
         return rotation_metadata
