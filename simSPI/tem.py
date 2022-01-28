@@ -453,9 +453,7 @@ class TEMSimulator:
                     if key0[:3] == "mtf":
                         mtf_params[key0[4:]] = value0
                     else:
-                        key_fixed = (
-                            name_dict[key0] if key0 in name_dict.keys() else key0
-                        )
+                        key_fixed = name_dict[key0] if key0 in name_dict else key0
                         if type(value0) is list:
                             f.write("_" + "{0:24}{1}\n".format(key_fixed, value0))
                         else:
