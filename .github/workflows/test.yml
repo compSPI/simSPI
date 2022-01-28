@@ -35,7 +35,7 @@ jobs:
         id: testing
         with:
           command: |
-            pytest --cov-report term --cov-report xml:coverage.xml --cov=/work/simSPI /work/tests
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI tests
 
       - name: uploading code coverage [codecov]
         run: |
