@@ -7,6 +7,7 @@ import math
 
 import mdtraj as md
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy.spatial.distance import pdist
 
 
@@ -253,3 +254,26 @@ def blockshaped(data, nrows, ncols):
         .reshape(-1, nrows, ncols)
     )
     return reshaped_arr
+
+
+def view_particles(data, n_col=5):
+    """Display the particle stack in a pyplot.
+
+    Parameters
+    ----------
+    data : ndarray
+        Array of particles.
+    n_col : int
+        Number of columns in the display.
+    """
+    view = data[::1, ::1, ::1]
+    fig_size = int(n_col)
+    n_row = np.ceil(view.shape[0] / n_col)
+    fig = plt.figure(figsize=(n_col * fig_size, n_row * fig_size))
+
+    for i in np.arange(view.shape[0]):
+        fig.add_subplot(int(n_row), int(n_col), i + 1)
+        plt.imshow(view[i], cmap="Greys")
+
+    plt.tight_layout()
+    plt.show()
