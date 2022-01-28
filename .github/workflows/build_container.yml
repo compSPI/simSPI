@@ -2,7 +2,7 @@ name: "Building simSPI Container"
 
 on:
   push:
-    branches: [master, temsim-test-in-container]
+    branches: [tem_fix_generation]
     paths:
       - 'docker/Dockerfile'
       - 'docker/entrypoint.sh'
@@ -11,7 +11,7 @@ on:
       - '.github/workflows/build_container.yml'
 
   pull_request:
-    branch: [master]
+    branch: [tem_fix_generation]
     paths:
       - 'docker/Dockerfile'
       - 'docker/entrypoint.sh'
