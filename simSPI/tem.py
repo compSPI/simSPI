@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import cryoemio as io
 
-from simSPI import crd, fov
+from simSPI.simSPI import crd, fov
 
 
 class TEMSimulator:
@@ -143,7 +143,9 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None, **kwargs):
+    def generate_path_dict(
+        pdb_file, output_dir=None, mrc_keyword=None, pdb_keyword=None, **kwargs
+    ):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
@@ -154,6 +156,8 @@ class TEMSimulator:
             Relative path to output directory
         mrc_keyword : str, (default = None)
             user-specified keyword appended to output files
+        pdb_keyword: str, (default = None)
+            user-specified keyword naming output files
         kwargs
             Arbitrary keyword arguments.
 
@@ -182,17 +186,31 @@ class TEMSimulator:
             output_dir = str(Path(pdb_file).parent)
 
         if mrc_keyword is None:
-            mrc_keyword = str(Path(pdb_file).stem) + "".join(
-                random.choices(string.ascii_uppercase + string.digits, k=5)
+            mrc_keyword = (
+                str(Path(pdb_file).stem)
+                + "_"
+                + "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
             )
 
         path_dict["pdb_file"] = str(Path(pdb_file))
-        path_dict["crd_file"] = str(Path(output_dir, mrc_keyword + ".txt"))
-        path_dict["mrc_file"] = str(Path(output_dir, mrc_keyword + ".mrc"))
-        path_dict["log_file"] = str(Path(output_dir, mrc_keyword + ".log"))
-        path_dict["inp_file"] = str(Path(output_dir, mrc_keyword + ".inp"))
-        path_dict["h5_file"] = str(Path(output_dir, mrc_keyword + ".h5"))
-        path_dict["h5_file_noisy"] = str(Path(output_dir, mrc_keyword + "-noisy.h5"))
+        path_dict["crd_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".txt")
+        )
+        path_dict["mrc_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".mrc")
+        )
+        path_dict["log_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".log")
+        )
+        path_dict["inp_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".inp")
+        )
+        path_dict["h5_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".h5")
+        )
+        path_dict["h5_file_noisy"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + "-noisy.h5")
+        )
 
         return path_dict
 
@@ -226,6 +244,14 @@ class TEMSimulator:
             particle_data = self.apply_gaussian_noise(particle_data)
 
         if export_particles:
+            particle_data = self.extract_particles(particle_data, pad=pad)
+
+            if "other" in self.parameter_dict and (
+                self.parameter_dict["other"].get("signal_to_noise") is not None
+                or self.parameter_dict["other"].get("signal_to_noise_db") is not None
+            ):
+                particle_data = self.apply_gaussian_noise(particle_data)
+
             self.export_particle_stack(particle_data)
 
         return particle_data
@@ -243,6 +269,7 @@ class TEMSimulator:
             self.sim_dict["detector_parameters"],
             self.output_path_dict["pdb_file"],
             pad=pad,
+            dmax=30,
         )
 
         crd.write_crd_file(
@@ -275,7 +302,7 @@ class TEMSimulator:
         Raises
         ------
         subprocess.CalledProcessError
-            Raised if shell commmand exits with non zero code.
+            Raised if shell command exits with non-zero code.
 
         Notes
         -----
