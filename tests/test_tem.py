@@ -189,7 +189,7 @@ def test_create_crd_file(sample_class):
 
 def test_create_inp_file(sample_class):
     """Test creation of .inp file."""
-    sample_class.write_inp_file()
+    sample_class.create_inp_file()
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
 
 
@@ -255,7 +255,7 @@ def test_get_image_data(sample_class):
     -----
     This test requires a local TEM sim installation to run.
     """
-    sample_class.write_inp_file()
+    sample_class.create_inp_file()
     data = sample_class.get_image_data()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])

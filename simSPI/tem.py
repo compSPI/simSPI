@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import cryoemio as io
 
-from simSPI import crd, fov
+from simSPI import crd, distribution_utils, fov
 
 
 class TEMSimulator:
@@ -21,6 +21,9 @@ class TEMSimulator:
     sim_config : str
         Relative path to YAML file containing simulator paths for TEM Simulator.
 
+    Notes
+    -----
+    defocus_distribution_samples are in um.
     """
 
     def __init__(self, path_config, sim_config):
@@ -39,7 +42,10 @@ class TEMSimulator:
             self.output_path_dict["pdb_file"],
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
+            self.output_path_dict["defocus_file"],
         )
+
+        self.defocus_distribution_samples = []
 
     def get_config_from_yaml(self, config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
@@ -214,6 +220,9 @@ class TEMSimulator:
         path_dict["star_file"] = str(
             Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".star")
         )
+        path_dict["defocus_file"] = str(
+            Path(output_dir, pdb_keyword + "_defocus_" + mrc_keyword + ".txt")
+        )
 
         return path_dict
 
@@ -233,20 +242,14 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
         """
         self.create_crd_file(pad)
-        self.write_inp_file()
+        self.create_defocus_file()
+        self.create_inp_file()
         self.generate_metadata()
 
         particle_data = self.get_image_data()
 
         if export_particles:
             particle_data = self.extract_particles(particle_data, pad=pad)
-
-            if "other" in self.parameter_dict and (
-                self.parameter_dict["other"].get("signal_to_noise") is not None
-                or self.parameter_dict["other"].get("signal_to_noise_db") is not None
-            ):
-                particle_data = self.apply_gaussian_noise(particle_data)
-
             self.export_particle_stack(particle_data)
 
         return particle_data
@@ -274,7 +277,7 @@ class TEMSimulator:
             crd_file=self.output_path_dict["crd_file"],
         )
 
-    def write_inp_file(self):
+    def create_inp_file(self):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
         The .inp files contain the parameters controlling the simulation. These are text
@@ -286,6 +289,22 @@ class TEMSimulator:
         io.write_inp_file(
             inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
         )
+
+    def create_defocus_file(self):
+        """Sample defocus parameters and generate corresponding defocus file."""
+        defocus_params = self.parameter_dict["ctf"]
+        n_samples = self.parameter_dict["geometry"]["n_tilts"]
+
+        distribution = distribution_utils.make_distribution(
+            defocus_params["distribution_parameters"],
+            defocus_params["distribution_type"],
+        )
+        samples = distribution_utils.draw_samples_distribution_1d(
+            distribution, n_samples
+        ).tolist()
+        self.defocus_distribution_samples = samples
+
+        io.write_defocus_file(samples, self.output_path_dict["defocus_file"])
 
     def get_image_data(self):
         """Run simulator and return data.
@@ -307,11 +326,9 @@ class TEMSimulator:
         input_file_arg = f"{self.output_path_dict['inp_file']}"
 
         subprocess.run([sim_executable, input_file_arg], check=True)
-
         data = io.mrc2data(self.output_path_dict["mrc_file"])
-        micrograph = data[0, ...]
 
-        return micrograph
+        return data
 
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.
@@ -328,15 +345,19 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        particles = fov.micrograph2particles(
-            micrograph,
-            self.sim_dict["optics_parameters"],
-            self.sim_dict["detector_parameters"],
-            pdb_file=self.output_path_dict["pdb_file"],
-            pad=pad,
-        )
+        particle_arr = []
 
-        return particles
+        for i in range(self.parameter_dict["geometry"]["n_tilts"]):
+            particles = fov.micrograph2particles(
+                micrograph[i],
+                self.sim_dict["optics_parameters"],
+                self.sim_dict["detector_parameters"],
+                pdb_file=self.output_path_dict["pdb_file"],
+                pad=pad,
+            )
+            particle_arr.append(particles)
+
+        return np.array(particle_arr)
 
     def apply_gaussian_noise(self, particles):
         """Apply gaussian noise to particle data.
@@ -351,21 +372,26 @@ class TEMSimulator:
         noisy_particles : arr
             Individual particle data with gaussian noise applied
         """
-        variance = np.var(particles)
+        noisy_particles = np.array([])
+
         if "other" not in self.parameter_dict:
-            return particles.copy()
-        snr = 1.0
-        try:
-            snr = self.parameter_dict["other"]["signal_to_noise"]
-        except KeyError:
-            pass
-        try:
-            snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
-            snr = 10 ** (snr_db / 10)
-        except KeyError:
-            pass
-        scale = np.sqrt(variance / snr)
-        noisy_particles = np.random.normal(particles, scale)
+            return particles
+
+        for i in range(self.parameter_dict["geometry"]["n_tilts"]):
+            variance = np.var(particles[i])
+            snr = 1.0
+            try:
+                snr = self.parameter_dict["other"]["signal_to_noise"]
+            except KeyError:
+                pass
+            try:
+                snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
+                snr = 10 ** (snr_db / 10)
+            except KeyError:
+                pass
+            scale = np.sqrt(variance / snr)
+            np.append(noisy_particles, np.random.normal(particles[i], scale))
+
         return noisy_particles
 
     def export_particle_stack(self, particles):
@@ -377,21 +403,23 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
+        flattened_array = np.ndarray.flatten(particles)
         io.data_and_dic2hdf5(
-            particles,
+            flattened_array,
             self.output_path_dict["h5_file"],
         )
 
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
+            flattened_noisy_particles = np.ndarray.flatten(noisy_particles)
             if "h5_file_noisy" in self.output_path_dict:
                 io.data_and_dic2hdf5(
-                    noisy_particles,
+                    flattened_noisy_particles,
                     self.output_path_dict["h5_file_noisy"],
                 )
             else:
                 io.data_and_dic2hdf5(
-                    noisy_particles,
+                    flattened_noisy_particles,
                     self.output_path_dict["h5_file"][:-3]
                     + "-noisy"
                     + self.output_path_dict["h5_file"][-3:],
@@ -444,6 +472,9 @@ class TEMSimulator:
             "dqe": "detector_q_efficiency",
             "image_file_out": "image_file_out",
         }
+  
+        # defocus_params = self.parameter_dict["ctf"]
+        n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
         with open(self.output_path_dict["star_file"], "w") as f:
             mtf_params = {}
@@ -459,27 +490,32 @@ class TEMSimulator:
                         else:
                             f.write("_" + "{0:24}{1:>15}\n".format(key_fixed, value0))
                 f.write("\n")
-
+                
             f.write("mtf_params\n")
             for c in ("a", "b", "c", "alpha", "beta"):
                 if c in mtf_params:
                     f.write(f"{mtf_params[c]:13.4f}")
-            f.write("\n\n")
 
-            f.write("particle_rotation_angles\n")
-            f.write("loop_\n")
-            f.write("_x\n")
-            f.write("_y\n")
-            f.write("_z\n")
-            f.write("_phi\n")
-            f.write("_theta\n")
-            f.write("_psi\n")
+            for i in range(n_samples):
 
-            for coord in particle_metadata:
-                f.write(
-                    "{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}"
-                    "{0[3]:13.4f}{0[4]:13.4f}{0[5]:13.4f}\n".format(coord)
-                )
+                f.write(f"particle_rotation_angles: {i + 1}\n")
+                f.write("loop_\n")
+                f.write("_defocus\n")
+                f.write("_x\n")
+                f.write("_y\n")
+                f.write("_z\n")
+                f.write("_phi\n")
+                f.write("_theta\n")
+                f.write("_psi\n")
+
+                for coord in particle_metadata:
+                    f.write(
+                        "{0:13.4f}{1[0]:13.4f}{1[1]:13.4f}{1[2]:13.4f}"
+                        "{1[3]:13.4f}{1[4]:13.4f}"
+                        "{1[5]:13.4f}\n".format(
+                            self.defocus_distribution_samples[i], coord
+                        )
+                    )
 
     @staticmethod
     def retrieve_rotation_metadata(path):
