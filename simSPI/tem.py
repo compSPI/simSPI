@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import cryoemio as io
 
-from simSPI.simSPI import crd, fov
+from simSPI import crd, fov
 
 
 class TEMSimulator:
