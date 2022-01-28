@@ -293,7 +293,7 @@ class TEMSimulator:
         Raises
         ------
         subprocess.CalledProcessError
-            Raised if shell commmand exits with non zero code.
+            Raised if shell command exits with non-zero code.
 
         Notes
         -----

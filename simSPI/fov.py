@@ -11,7 +11,7 @@ from scipy.spatial.distance import pdist
 
 
 def define_grid_in_fov(
-    optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
+    optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0
 ):
     """Define particle grid for picking particles from micrograph.
 

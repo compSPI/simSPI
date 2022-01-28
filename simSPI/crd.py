@@ -60,11 +60,10 @@ def write_crd_file(
                     }
                     crd.write(
                         f"{crd_table['x']:14.4f}{crd_table['y']:14.4f}"
-                        f"{crd_table['z']:14.4f}{crd_table['phi']:14.4f}"
-                        f"{crd_table['theta']:14.4f}{crd_table['psi']:14.4f}\n"
+                        + f"{crd_table['z']:14.4f}{crd_table['phi']:14.4f}"
+                        + f"{crd_table['theta']:14.4f}{crd_table['psi']:14.4f}\n"
                     )
                     n += 1
-        crd.close()
 
 
 def get_rotlist(n_particles):
