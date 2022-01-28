@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import cryoemio as io
 
-from simSPI.simSPI import crd, fov
+from simSPI.simSPI import crd, distribution_utils, fov
 
 
 class TEMSimulator:
@@ -39,6 +39,7 @@ class TEMSimulator:
             self.output_path_dict["pdb_file"],
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
+            self.output_path_dict["defocus_file"],
         )
 
     def get_config_from_yaml(self, config_yaml):
@@ -214,6 +215,9 @@ class TEMSimulator:
         path_dict["star_file"] = str(
             Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".star")
         )
+        path_dict["defocus_file"] = str(
+            Path(output_dir, pdb_keyword + "_defocus_" + mrc_keyword + ".txt")
+        )
 
         return path_dict
 
@@ -233,7 +237,8 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
         """
         self.create_crd_file(pad)
-        self.write_inp_file()
+        self.create_defocus_file()
+        self.create_inp_file()
         self.generate_metadata()
 
         particle_data = self.get_image_data()
@@ -274,7 +279,7 @@ class TEMSimulator:
             crd_file=self.output_path_dict["crd_file"],
         )
 
-    def write_inp_file(self):
+    def create_inp_file(self):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
         The .inp files contain the parameters controlling the simulation. These are text
@@ -286,6 +291,20 @@ class TEMSimulator:
         io.write_inp_file(
             inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
         )
+
+    def create_defocus_file(self):
+        """Sample defocus parameters and generate corresponding defocus file."""
+        defocus_params = self.parameter_dict["ctf"]
+        n_samples = self.parameter_dict["geometry"]
+
+        distribution = distribution_utils.make_distribution(
+            defocus_params[1], defocus_params[0]
+        )
+        samples = distribution_utils.draw_samples_distribution_1d(
+            distribution, n_samples
+        )
+
+        io.write_defocus_file(samples, self.output_path_dict["defocus_file"])
 
     def get_image_data(self):
         """Run simulator and return data.
