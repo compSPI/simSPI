@@ -10,3 +10,4 @@ runs:
   image: 'docker://fpoitevi/simspi:latest'
   args:
     - ${{ inputs.command }}
+  post-entrypoint: 'post-entrypoint.sh'
