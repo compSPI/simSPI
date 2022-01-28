@@ -17,9 +17,9 @@ class TEMSimulator:
     Parameters
     ----------
     path_config : str
-        Relative path to YAML file containing file paths for TEM Simulator.
+        Relative path to YAML file containing file paths for the TEM Simulator.
     sim_config : str
-        Relative path to YAML file containing simulator paths for TEM Simulator.
+        Relative path to YAML file containing simulator paths for the TEM Simulator.
 
     """
 
