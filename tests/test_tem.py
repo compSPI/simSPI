@@ -21,7 +21,7 @@ def sample_class(tmp_path):
     )
 
     # from test_files/path_config
-    out_file_name = "4v6x_randomrot"
+    out_file_name = "_randomrot"
 
     tem_simulator.output_path_dict["crd_file"] = str(
         Path(cwd, tmp_path, out_file_name + ".txt")
