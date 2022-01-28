@@ -247,11 +247,9 @@ class TEMSimulator:
         self.generate_metadata()
 
         particle_data = self.get_image_data()
-        print(particle_data.shape)
 
         if export_particles:
             particle_data = self.extract_particles(particle_data, pad=pad)
-            print(particle_data.shape)
             self.export_particle_stack(particle_data)
 
         return particle_data
@@ -347,7 +345,7 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        particle_arr = np.array([])
+        particle_arr = []
 
         for i in range(self.parameter_dict["geometry"]["n_tilts"]):
             particles = fov.micrograph2particles(
@@ -357,11 +355,9 @@ class TEMSimulator:
                 pdb_file=self.output_path_dict["pdb_file"],
                 pad=pad,
             )
-            print(particles.shape)
-            np.append(particle_arr, particles)
+            particle_arr.append(particles)
 
-        print(particle_arr.shape)
-        return particle_arr
+        return np.array(particle_arr)
 
     def apply_gaussian_noise(self, particles):
         """Apply gaussian noise to particle data.
@@ -407,7 +403,6 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        print(particles.shape)
         flattened_array = np.ndarray.flatten(particles)
         io.data_and_dic2hdf5(
             flattened_array,
@@ -415,7 +410,6 @@ class TEMSimulator:
         )
 
         if "other" in self.parameter_dict:
-            print(particles.shape)
             noisy_particles = self.apply_gaussian_noise(particles)
             flattened_noisy_particles = np.ndarray.flatten(noisy_particles)
             if "h5_file_noisy" in self.output_path_dict:
