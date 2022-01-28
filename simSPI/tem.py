@@ -464,7 +464,7 @@ class TEMSimulator:
             for c in ("a", "b", "c", "alpha", "beta"):
                 if c in mtf_params:
                     f.write(f"{mtf_params[c]:13.4f}")
-            f.write("\n")
+            f.write("\n\n")
 
             f.write("particle_rotation_angles\n")
             f.write("loop_\n")
