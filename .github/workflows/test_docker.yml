@@ -2,7 +2,7 @@ name: "Linting and Testing (Docker)"
 # https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action
 on:
   push:
-    branches: [master,temsim-test-in-container]
+    branches: [tem_fix_generation]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
@@ -10,7 +10,7 @@ on:
     - 'setup.py'
 
   pull_request:
-    branches: [master]
+    branches: [tem_fix_generation]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
