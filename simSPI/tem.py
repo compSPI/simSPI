@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import cryoemio as io
 
-from simSPI.simSPI import crd, distribution_utils, fov
+from simSPI import crd, distribution_utils, fov
 
 
 class TEMSimulator:
@@ -437,18 +437,64 @@ class TEMSimulator:
             self.output_path_dict["crd_file"]
         )
 
+        name_dict = {
+            "seed": "seed",
+            "log_file": "log_file",
+            "signal_to_noise": "signal_to_noise",
+            "diameter": "hole_diameter_nm",
+            "thickness_center": "hole_thickness_center_nm",
+            "thickness_edge": "hole_thickness_edge_nm",
+            "name": "particle_name",
+            "voxel_size": "voxel_size_nm",
+            "pdb_file": "pdb_file",
+            "map_file_re_out": "map_file_re_out",
+            "map_file_im_out": "map_file_im_out",
+            "crd_file": "crd_file",
+            "voltage": "voltage_kv",
+            "spread": "energy_spread_v",
+            "dose_per_im": "electron_dose_e_per_nm2",
+            "dose_sd": "electron_dose_std_e_per_nm2",
+            "magnification": "magnification",
+            "cs": "spherical_aberration_mm",
+            "cc": "chromatic_aberration_mm",
+            "aperture": "aperture_diameter_um",
+            "focal_length": "focal_length_mm",
+            "cond_ap_angle": "aperture_angle_mrad",
+            "defocus_nominal": "defocus_um",
+            "defocus_syst_error": "defocus_syst_error_um",
+            "defocus_nonsyst_error": "defocus_nonsyst_error_um",
+            "defocus_file_out": "optics_defocusout",
+            "det_pix_x": "detector_nx_px",
+            "det_pix_y": "detector_ny_px",
+            "pixel_size": "detector_pixel_size_um",
+            "gain": "average_gain_count_per_electron",
+            "use_quantization": "noise",
+            "dqe": "detector_q_efficiency",
+            "image_file_out": "image_file_out",
+        }
+  
         # defocus_params = self.parameter_dict["ctf"]
         n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
         with open(self.output_path_dict["star_file"], "w") as f:
+            mtf_params = {}
             for key, value in self.parameter_dict.items():
                 f.write(f"{key}\n")
                 for key0, value0 in value.items():
-                    if type(value0) is list:
-                        f.write("_" + "{0:24}{1}\n".format(key0, value0))
+                    if key0[:3] == "mtf":
+                        mtf_params[key0[4:]] = value0
                     else:
-                        f.write("_" + "{0:24}{1:>15}\n".format(key0, value0))
+                        key_fixed = name_dict[key0] if key0 in name_dict else key0
+                        if type(value0) is list:
+                            f.write("_" + "{0:24}{1}\n".format(key_fixed, value0))
+                        else:
+                            f.write("_" + "{0:24}{1:>15}\n".format(key_fixed, value0))
                 f.write("\n")
+                
+            f.write("mtf_params\n")
+            for c in ("a", "b", "c", "alpha", "beta"):
+                if c in mtf_params:
+                    f.write(f"{mtf_params[c]:13.4f}")
 
             for i in range(n_samples):
 
