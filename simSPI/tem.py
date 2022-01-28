@@ -211,6 +211,9 @@ class TEMSimulator:
         path_dict["h5_file_noisy"] = str(
             Path(output_dir, pdb_keyword + "_" + mrc_keyword + "-noisy.h5")
         )
+        path_dict["star_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".star")
+        )
 
         return path_dict
 
@@ -231,17 +234,9 @@ class TEMSimulator:
         """
         self.create_crd_file(pad)
         self.write_inp_file()
-
         self.generate_metadata()
 
-        micrograph_data = self.get_image_data()
-        particle_data = self.extract_particles(micrograph_data, pad=pad)
-
-        if "other" in self.parameter_dict and (
-            self.parameter_dict["other"].get("signal_to_noise") is not None
-            or self.parameter_dict["other"].get("signal_to_noise_db") is not None
-        ):
-            particle_data = self.apply_gaussian_noise(particle_data)
+        particle_data = self.get_image_data()
 
         if export_particles:
             particle_data = self.extract_particles(particle_data, pad=pad)
@@ -414,14 +409,8 @@ class TEMSimulator:
             self.output_path_dict["crd_file"]
         )
 
-        file_name = (
-            self.path_dict["pdb_keyword"]
-            + self.path_dict["micrograph_keyword"]
-            + ".star"
-        )
-
-        with open(self.path_dict["output_dir"] + file_name, "w") as f:
-            for key, value in self.raw_sim_dict.items():
+        with open(self.output_path_dict["star_file"], "w") as f:
+            for key, value in self.parameter_dict.items():
                 f.write(f"{key}\n")
                 for key0, value0 in value.items():
                     if type(value0) is list:
@@ -459,7 +448,7 @@ class TEMSimulator:
             lines = f.readlines()
 
         for i, line in enumerate(lines):
-            if i < 4:
+            if i >= 4:
                 rotation_metadata.append([float(x) for x in line.split()[3:]])
 
         f.close()
