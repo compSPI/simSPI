@@ -4,9 +4,9 @@ import string
 import subprocess
 from pathlib import Path
 
+import ioSPI
 import numpy as np
 import yaml
-from ioSPI import cryoemio as io
 
 from simSPI import crd, fov
 
@@ -33,7 +33,7 @@ class TEMSimulator:
 
         self.sim_dict = self.get_config_from_yaml(sim_config)
 
-        self.parameter_dict = io.fill_parameters_dictionary(
+        self.parameter_dict = ioSPI.cryo.fill_parameters_dictionary(
             sim_config,
             self.output_path_dict["mrc_file"],
             self.output_path_dict["pdb_file"],
@@ -259,7 +259,7 @@ class TEMSimulator:
         different particles) and parameter assignments of the form
         "<parameter> = <value>".
         """
-        io.write_inp_file(
+        ioSPI.cryo.write_inp_file(
             inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
         )
 
@@ -283,7 +283,7 @@ class TEMSimulator:
         input_file_arg = f"{self.output_path_dict['inp_file']}"
         subprocess.run([sim_executable, input_file_arg], check=True)
 
-        data = io.mrc2data(self.output_path_dict["mrc_file"])
+        data = ioSPI.cryo.mrc2data(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
 
         return micrograph
@@ -352,7 +352,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        io.data_and_dic2hdf5(
+        ioSPI.cryo.data_and_dic2hdf5(
             particles,
             self.output_path_dict["h5_file"],
         )
@@ -360,12 +360,12 @@ class TEMSimulator:
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
             if "h5_file_noisy" in self.output_path_dict:
-                io.data_and_dic2hdf5(
+                ioSPI.cryo.data_and_dic2hdf5(
                     noisy_particles,
                     self.output_path_dict["h5_file_noisy"],
                 )
             else:
-                io.data_and_dic2hdf5(
+                ioSPI.cryo.data_and_dic2hdf5(
                     noisy_particles,
                     self.output_path_dict["h5_file"][:-3]
                     + "-noisy"
