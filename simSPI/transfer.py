@@ -4,6 +4,7 @@ import logging
 
 import numba as nb
 import numpy as np
+from math import hypot
 
 
 def ctf_freqs(n_pixels, psize=1.0, dim=2):
@@ -45,11 +46,10 @@ def ctf_freqs(n_pixels, psize=1.0, dim=2):
         freq_1d = freq_pix_1d_safe * psize
         return freq_1d
 
-    # assert d == 2
     freq_pix_1d = np.arange(-0.5, 0.5, 1 / n_pixels)
     freq_pix_1d_safe = freq_pix_1d[:n_pixels]
     x, y = np.meshgrid(freq_pix_1d_safe, freq_pix_1d_safe)
-    rho = np.sqrt(x**2 + y**2)
+    rho = hypot(x,y)
     angles_rad = np.arctan2(y, x)
     freq_mag_2d = rho * psize
     return (freq_mag_2d, angles_rad)
