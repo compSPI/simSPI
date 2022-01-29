@@ -12,7 +12,7 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class():
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "./tests/test_files"
+    test_files_path = "/work/tests/test_files"
     tmp_path = test_files_path
     cwd = os.getcwd()
 
