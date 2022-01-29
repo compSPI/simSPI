@@ -1,10 +1,10 @@
 """Transfer (CTF)."""
 
 import logging
+from math import hypot
 
 import numba as nb
 import numpy as np
-from math import hypot
 
 
 def ctf_freqs(n_pixels, psize=1.0, dim=2):
