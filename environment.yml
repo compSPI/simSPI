@@ -7,6 +7,7 @@ dependencies:
   - codecov
   - configparser
   - coverage
+  - flake8
   - flake8-black
   - flake8-docstrings
   - flake8-import-order
