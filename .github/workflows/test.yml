@@ -31,7 +31,7 @@ jobs:
         id: dryrun
 
       - name: unit testing [pytest]
-        uses: ./docker/
+        uses: .github/workflows/
         id: testing
         with:
           command: |
