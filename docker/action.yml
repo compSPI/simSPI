@@ -1,10 +1,6 @@
 name: 'Execute in Docker container'
 description: 'Execute command in Docker container'
 inputs:
-  tag:
-    description: 'Tag version of the Docker container to use'
-    required: true
-    default: 'latest'
   command:
     description: 'Command to be execute in Docker container'
     required: true
