@@ -11,6 +11,6 @@ inputs:
     default: 'ls -altrh /'
 runs:
   using: 'docker'
-  image: 'docker://fpoitevi/simspi:'${{ inputs.tag }}
+  image: 'docker://fpoitevi/simspi:test'
   args:
     - ${{ inputs.command }}

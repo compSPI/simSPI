@@ -17,6 +17,7 @@ on:
       - 'docker/entrypoint.sh'
       - 'environment.yml'
       - 'setup.py'
+      - '.github/workflows/build_container.yml'
 
 jobs:
   build:
@@ -60,7 +61,6 @@ jobs:
         uses: ./docker/
         id: testing
         with:
-          tag: test
           command: |
             pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI tests
 
