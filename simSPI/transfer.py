@@ -1,7 +1,6 @@
 """Transfer (CTF)."""
 
 import logging
-from math import hypot
 
 import numba as nb
 import numpy as np
