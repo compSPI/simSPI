@@ -52,6 +52,26 @@ jobs:
           file: ./docker/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:test
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: unit testing [pytest]
+        uses: ./docker/
+        id: testing
+        with:
+          tag: test
+          command: |
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI tests
+
+      - name: Build and push validated
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./docker/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
