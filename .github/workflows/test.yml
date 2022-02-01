@@ -1,8 +1,8 @@
-name: "Linting and Testing (Docker)"
-# https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action
+name: "Test"
+
 on:
   push:
-    branches: [master,temsim-test-in-container]
+    branches: [master,github-actions-test]
     paths-ignore:
     - 'README.md'
     - '.deepsource.toml'
@@ -27,18 +27,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: dryrun
-        uses: ./docker/
+        uses: ./tests/
         id: dryrun
 
-      - name: linting [flake8]
-        uses: ./docker/
-        id: linting
-        with:
-          command: |
-            flake8 --config=.flake8 simSPI tests
-
       - name: unit testing [pytest]
-        uses: ./docker/
+        uses: ./tests/
         id: testing
         with:
           command: |
