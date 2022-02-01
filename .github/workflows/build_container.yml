@@ -2,7 +2,7 @@ name: "Building simSPI Container"
 
 on:
   push:
-    branches: [master, temsim-test-in-container]
+    branches: [master, github-actions-test]
     paths:
       - 'docker/Dockerfile'
       - 'docker/entrypoint.sh'
@@ -17,6 +17,7 @@ on:
       - 'docker/entrypoint.sh'
       - 'environment.yml'
       - 'setup.py'
+      - '.github/workflows/build_container.yml'
 
 jobs:
   build:
@@ -44,7 +45,26 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push test
+        id: docker_test_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./docker/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:test
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: unit testing [pytest]
+        uses: ./docker/
+        id: testing
+        with:
+          command: |
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI tests
+
+      - name: Build and push validated
         id: docker_build
         uses: docker/build-push-action@v2
         with:

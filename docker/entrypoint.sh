@@ -10,4 +10,8 @@ conda activate base
 
 echo "PATH: $PATH"
 
+ls -ltrh /
+
+echo "Executing command: "
+
 bash -c "set -e; set -o pipefail; $1"
