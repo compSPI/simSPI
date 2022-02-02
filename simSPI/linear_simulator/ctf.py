@@ -136,6 +136,7 @@ class CTF(torch.nn.Module):
             + (defocus_u - defocus_v)
             * torch.cos(self.angleFrequency - angle_astigmatism) ** 2
         )
+
         defocus_contribution = (
             np.pi * self.wavelength * 1e4 * elliptical * self.frequency ** 2
         )
