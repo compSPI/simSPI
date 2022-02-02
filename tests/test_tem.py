@@ -10,9 +10,10 @@ from simSPI import fov, tem
 
 
 @pytest.fixture
-def sample_class(tmp_path):
+def sample_class():
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "./tests/test_files"
+    test_files_path = "/work/tests/test_files"
+    tmp_path = test_files_path
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
@@ -21,7 +22,7 @@ def sample_class(tmp_path):
     )
 
     # from test_files/path_config
-    out_file_name = "_randomrot"
+    out_file_name = "4v6x_randomrot"
 
     tem_simulator.output_path_dict["crd_file"] = str(
         Path(cwd, tmp_path, out_file_name + ".txt")
@@ -255,6 +256,7 @@ def test_get_image_data(sample_class):
     -----
     This test requires a local TEM sim installation to run.
     """
+    sample_class.create_crd_file(pad=5)
     sample_class.write_inp_file()
     data = sample_class.get_image_data()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])

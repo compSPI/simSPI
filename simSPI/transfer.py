@@ -45,11 +45,10 @@ def ctf_freqs(n_pixels, psize=1.0, dim=2):
         freq_1d = freq_pix_1d_safe * psize
         return freq_1d
 
-    # assert d == 2
     freq_pix_1d = np.arange(-0.5, 0.5, 1 / n_pixels)
     freq_pix_1d_safe = freq_pix_1d[:n_pixels]
     x, y = np.meshgrid(freq_pix_1d_safe, freq_pix_1d_safe)
-    rho = np.sqrt(x ** 2 + y ** 2)
+    rho = np.sqrt(x**2 + y**2)
     angles_rad = np.arctan2(y, x)
     freq_mag_2d = rho * psize
     return (freq_mag_2d, angles_rad)
@@ -93,14 +92,14 @@ def eval_ctf(s, a, def1, def2, angast=0, phase=0, kv=300, ac=0.1, cs=2.0, bf=0, 
     def_avg = -(def1 + def2) * 0.5
     def_dev = -(def1 - def2) * 0.5
     k1 = np.pi / 2.0 * 2 * lamb
-    k2 = np.pi / 2.0 * cs * lamb ** 3
-    k3 = np.sqrt(1 - ac ** 2)
+    k2 = np.pi / 2.0 * cs * lamb**3
+    k3 = np.sqrt(1 - ac**2)
     k4 = bf / 4.0  # B-factor, follows RELION convention.
     k5 = np.deg2rad(phase)  # Phase shift.
     if lp != 0:  # Hard low- or high-pass.
         s *= s <= (1.0 / lp)
-    s_2 = s ** 2
-    s_4 = s_2 ** 2
+    s_2 = s**2
+    s_4 = s_2**2
     dZ = def_avg + def_dev * (np.cos(2 * (a - angast)))
     gamma = (k1 * dZ * s_2) + (k2 * s_4) - k5
     ctf = -(k3 * np.sin(gamma) - ac * np.cos(gamma))

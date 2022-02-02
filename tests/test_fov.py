@@ -59,15 +59,12 @@ def test_get_fov():
     assert fov.get_fov(
         [magnification], [detector_nx, detector_ny, detector_pixel_size], pdb_path
     ) == (expected_fov_lx, expected_fov_ly, 21.367856950503086)
-    assert (
-        fov.get_fov(
-            [magnification],
-            [detector_nx, detector_ny, detector_pixel_size],
-            pdb_path,
-            d_max,
-        )
-        == (expected_fov_lx, expected_fov_ly, 21.367856950503086)
-    )
+    assert fov.get_fov(
+        [magnification],
+        [detector_nx, detector_ny, detector_pixel_size],
+        pdb_path,
+        d_max,
+    ) == (expected_fov_lx, expected_fov_ly, 21.367856950503086)
 
 
 def test_get_dmax():
