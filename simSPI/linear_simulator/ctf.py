@@ -25,7 +25,7 @@ class CTF(torch.nn.Module):
         n_half_len = float(self.config.ctf_size // 2)
         ax = torch.arange(-n_half_len, n_half_len + self.config.ctf_size % 2)
         mx, my = torch.meshgrid(ax, ax)
-        self.register_buffer("r2", mx ** 2 + my ** 2)
+        self.register_buffer("r2", mx**2 + my**2)
         self.register_buffer("frequency", torch.sqrt(self.r2) * self.frequency_step)
         self.register_buffer("angleFrequency", torch.atan2(my, mx))
 
@@ -38,7 +38,7 @@ class CTF(torch.nn.Module):
             wavelength of the electron beam in A.
         """
         wavelength = 12.2639 / np.sqrt(
-            self.config.kv * 1e3 + 0.97845 * self.config.kv ** 2
+            self.config.kv * 1e3 + 0.97845 * self.config.kv**2
         )
         return wavelength
 
@@ -138,20 +138,20 @@ class CTF(torch.nn.Module):
         )
 
         defocus_contribution = (
-            np.pi * self.wavelength * 1e4 * elliptical * self.frequency ** 2
+            np.pi * self.wavelength * 1e4 * elliptical * self.frequency**2
         )
         abberation_contribution = (
             -np.pi
             / 2.0
             * self.config.cs
-            * (self.wavelength ** 3)
+            * (self.wavelength**3)
             * 1e7
-            * self.frequency ** 4
+            * self.frequency**4
         )
 
         argument = abberation_contribution + defocus_contribution
 
-        h_fourier = (1 - self.config.amplitude_contrast ** 2) ** 0.5 * torch.sin(
+        h_fourier = (1 - self.config.amplitude_contrast**2) ** 0.5 * torch.sin(
             argument
         ) + self.config.amplitude_contrast * torch.cos(argument)
 
@@ -161,9 +161,9 @@ class CTF(torch.nn.Module):
                 * 2.0
                 * self.config.pixel_size
             )
-            envelope = torch.exp(-self.frequency ** 2 * decay ** 2)
+            envelope = torch.exp(-self.frequency**2 * decay**2)
         else:
-            envelope = torch.exp(-self.frequency ** 2 * self.config.b_factor / 4.0)
+            envelope = torch.exp(-self.frequency**2 * self.config.b_factor / 4.0)
 
         h_fourier *= envelope
         return h_fourier
