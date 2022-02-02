@@ -1,0 +1,5 @@
+  # absolute paths
+  pdb_file: './test_files/4v6x.pdb'
+  mrc_keyword: '_randomrot'
+  output_dir: './test_files'
+  local_sim_dir: '/work/TEM-simulator_1.3/src/TEM-simulator'
