@@ -95,8 +95,17 @@ def test_ctf_forward():
 
     assert normalized_mse(saved_data["ctf_output"], ctf_output).abs() < 0.01
 
+
+def test_ctf_forward_bfactor():
+    """Test accuracy of the ctf with bfactor."""
+    path = "tests/data/ctf_data.npy"
+
+    saved_data, config = init_data(path)
+    ctf_params = saved_data["ctf_params"]
+    im_input = saved_data["projector_output"]
     decay = np.sqrt(-np.log(config.value_nyquist)) * 2.0 * config.pixel_size
     config.b_factor = 4 * decay ** 2
+
     ctf = CTF(config)
 
     ctf_output = ctf(primal_to_fourier_2D(im_input), ctf_params)
