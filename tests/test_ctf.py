@@ -95,6 +95,14 @@ def test_ctf_forward():
 
     assert normalized_mse(saved_data["ctf_output"], ctf_output).abs() < 0.01
 
+    decay = np.sqrt(-np.log(config.value_nyquist)) * 2.0 * config.pixel_size
+    config.b_factor = 4 * decay ** 2
+    ctf = CTF(config)
+
+    ctf_output = ctf(primal_to_fourier_2D(im_input), ctf_params)
+
+    assert normalized_mse(saved_data["ctf_output"], ctf_output).abs() < 0.01
+
 
 def test_get_ctf():
     """Test accuracy of the get ctf."""
