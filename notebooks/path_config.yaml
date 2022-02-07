@@ -1,5 +1,5 @@
   # absolute paths
-  pdb_file: './notebooks/4v6x.pdb'
-  mrc_keyword: '_randomrot'
-  output_dir: './notebooks'
+  pdb_file: '4v6x.pdb'
+  mrc_keyword: '4v6x_randomrot'
+  output_dir: './'
   local_sim_dir: '/work/TEM-simulator_1.3/src/TEM-simulator'
