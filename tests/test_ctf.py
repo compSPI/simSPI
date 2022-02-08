@@ -98,7 +98,7 @@ def test_ctf_forward():
 
 def test_ctf_forward_bfactor():
     """Test accuracy of the ctf with bfactor."""
-    path = "tests/data/ctf_data.npy"
+    path = "tests/data/ctf_data_bfactor.npy"
 
     saved_data, config = init_data(path)
     ctf_params = saved_data["ctf_params"]
