@@ -6,9 +6,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import cryo as io
+from ioSPI import micrographs
 
-from simSPI import crd, fov
+from simSPI import crd, fov, tem_inputs
 
 
 class TEMSimulator:
@@ -33,7 +33,7 @@ class TEMSimulator:
 
         self.sim_dict = self.get_config_from_yaml(sim_config)
 
-        self.parameter_dict = io.fill_parameters_dictionary(
+        self.parameter_dict = tem_inputs.populate_tem_input_parameter_dict(
             sim_config,
             self.output_path_dict["mrc_file"],
             self.output_path_dict["pdb_file"],
@@ -143,7 +143,7 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None, **kwargs):
+    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
@@ -154,8 +154,6 @@ class TEMSimulator:
             Relative path to output directory
         mrc_keyword : str, (default = None)
             user-specified keyword appended to output files
-        kwargs
-            Arbitrary keyword arguments.
 
         Returns
         -------
@@ -259,7 +257,7 @@ class TEMSimulator:
         different particles) and parameter assignments of the form
         "<parameter> = <value>".
         """
-        io.write_inp_file(
+        tem_inputs.write_tem_inputs_to_inp_file(
             inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
         )
 
@@ -283,7 +281,7 @@ class TEMSimulator:
         input_file_arg = f"{self.output_path_dict['inp_file']}"
         subprocess.run([sim_executable, input_file_arg], check=True)
 
-        data = io.mrc2data(self.output_path_dict["mrc_file"])
+        data = micrographs.read_micrograph_from_mrc(self.output_path_dict["mrc_file"])
         micrograph = data[0, ...]
 
         return micrograph
@@ -352,7 +350,7 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        io.data_and_dic2hdf5(
+        micrographs.write_data_dict_to_hdf5(
             particles,
             self.output_path_dict["h5_file"],
         )
@@ -360,12 +358,12 @@ class TEMSimulator:
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
             if "h5_file_noisy" in self.output_path_dict:
-                io.data_and_dic2hdf5(
+                micrographs.write_data_dict_to_hdf5(
                     noisy_particles,
                     self.output_path_dict["h5_file_noisy"],
                 )
             else:
-                io.data_and_dic2hdf5(
+                micrographs.write_data_dict_to_hdf5(
                     noisy_particles,
                     self.output_path_dict["h5_file"][:-3]
                     + "-noisy"
