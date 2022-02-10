@@ -350,22 +350,13 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        micrographs.write_data_dict_to_hdf5(
-            particles,
-            self.output_path_dict["h5_file"],
-        )
+        micrographs.write_data_dict_to_hdf5(self.output_path_dict["h5_file"], particles)
 
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
             if "h5_file_noisy" in self.output_path_dict:
-                micrographs.write_data_dict_to_hdf5(
-                    noisy_particles,
-                    self.output_path_dict["h5_file_noisy"],
-                )
+                micrographs.write_data_dict_to_hdf5(self.output_path_dict["h5_file_noisy"], noisy_particles)
             else:
-                micrographs.write_data_dict_to_hdf5(
-                    noisy_particles,
-                    self.output_path_dict["h5_file"][:-3]
-                    + "-noisy"
-                    + self.output_path_dict["h5_file"][-3:],
-                )
+                micrographs.write_data_dict_to_hdf5(self.output_path_dict["h5_file"][:-3]
+                                                    + "-noisy"
+                                                    + self.output_path_dict["h5_file"][-3:], noisy_particles)
