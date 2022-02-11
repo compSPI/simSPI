@@ -2,7 +2,7 @@
 
 import numpy as np
 import raster_geometry
-from ioSPI import fourier
+import torch
 
 from simSPI import multislice, transfer
 
@@ -15,8 +15,10 @@ def test_exit_wave_to_image():
     ).astype(np.float32)
     ones = np.ones((n_pixels, n_pixels))
     exit_wave = sphere.sum(-1)
-    exit_wave_f = fourier.do_fft(exit_wave, dim=2)
-    high_dose = 1e9 * exit_wave.max()
+    exit_wave_torch = torch.tensor(exit_wave).reshape(1, 1, n_pixels, n_pixels)
+    exit_wave_f_torch = transfer.primal_to_fourier_2D(exit_wave_torch)
+    exit_wave_f = exit_wave_f_torch.detach().numpy().reshape(n_pixels, n_pixels)
+    high_dose = 1e6 * exit_wave.max()
 
     i, shot_noise_sample, i0_dqe, i0 = multislice.exit_wave_to_image(
         exit_wave_f=exit_wave_f,
