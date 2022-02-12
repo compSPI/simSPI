@@ -12,6 +12,7 @@ from simSPI.linear_simulator.projector import Projector
 from simSPI.linear_simulator.shift_utils import Shift
 from simSPI.linear_simulator.volume_utils import init_cube
 
+
 class LinearSimulator(torch.nn.Module):
     """Class to generate data using linear forward model.
 
