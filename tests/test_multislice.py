@@ -33,7 +33,7 @@ def test_exit_wave_to_image():
     assert shot_noise_sample.shape == (n_pixels, n_pixels)
     assert i0_dqe.shape == (n_pixels, n_pixels)
     assert i0.shape == (n_pixels, n_pixels)
-    assert np.allclose(i / high_dose, exit_wave, atol=1e-4)
+    assert np.allclose(i / high_dose, exit_wave, atol=1e-2)
 
 
 def test_apply_poisson_shot_noise_sample():
