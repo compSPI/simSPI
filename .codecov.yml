@@ -2,20 +2,6 @@ coverage:
   round: up
   precision: 2
   status:
-    project:
-      default:
-        target: 90%
-        threshold: 2%
-        base: auto
-        flags:
-          - unit
-       # advanced
-        branches:
-          - master
-        if_not_found: error
-        if_ci_failed: error
-        informational: False
-        only_pulls: false
     patch:
       default:
         # basic

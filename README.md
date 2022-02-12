@@ -1,5 +1,6 @@
-[![Build](https://github.com/compSPI/simSPI/actions/workflows/build.yml/badge.svg)](https://github.com/compSPI/simSPI/actions/workflows/build.yml)
-[![Codecov](https://codecov.io/gh/compSPI/ioSPI/branch/master/graph/badge.svg?token=OBVOV3ZM1O)](https://codecov.io/gh/compSPI/simSPI)
+[![Test](https://github.com/compSPI/simSPI/actions/workflows/test.yml/badge.svg)](https://github.com/compSPI/simSPI/actions/workflows/test.yml)
+[![Lint](https://github.com/compSPI/simSPI/actions/workflows/lint.yml/badge.svg)](https://github.com/compSPI/simSPI/actions/workflows/lint.yml)
+[![Codecov](https://codecov.io/gh/compSPI/simSPI/branch/master/graph/badge.svg?token=OBVOV3ZM1O)](https://codecov.io/gh/compSPI/simSPI)
 [![DeepSource](https://deepsource.io/gh/compSPI/simSPI.svg/?label=active+issues&show_trend=true&token=9eFu6aig3-oXQIuhdDoYTEq-)](https://deepsource.io/gh/compSPI/simSPI/?ref=repository-badge)
 
 # simSPI
@@ -8,13 +9,20 @@ Methods and tools for simulating SPI data.
 
 # Download
 
-First create a conda environment with the required dependencies using the `enviroment.yml` file as follows:
+First download:
+
+    git clone https://github.com/compSPI/simSPI.git 
+
+Then, create a conda environment with the required dependencies using the `environment.yml` file as follows:
 
     conda env create --file environment.yml
 
-Then download:
+Finally, install simSPI in this environment:
 
-    git clone https://github.com/compSPI/ioSPI.git
+    conda activate simSPI
+    pip install -e .
+
+Alternatively, pull the simSPI container from [DockerHub](https://hub.docker.com/repository/docker/fpoitevi/simspi)
 
 # Contribute
 

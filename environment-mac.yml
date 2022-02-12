@@ -1,8 +1,7 @@
-name: simSPI
+name: simSPI-mac
 channels:
   - conda-forge
   - defaults
-  - pytorch3d
 dependencies:
   - codecov
   - configparser
@@ -17,10 +16,10 @@ dependencies:
   - pytest
   - pytest-cov
   - pytorch=1.9.0
-  - pytorch3d
   - pip:
     - geomstats
     - git+https://github.com/compSPI/compSPI.git
     - git+https://github.com/compSPI/ioSPI.git
+    - pytorch3d
     - raster_geometry
     - starfile
