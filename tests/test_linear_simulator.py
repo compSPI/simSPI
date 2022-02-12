@@ -38,6 +38,7 @@ def init_data(path):
     saved_data = np.load(path, allow_pickle=True).item()
     if "config_dict" in saved_data:
         config_dict = saved_data["config_dict"]
+
     else:
         config_dict = {}
     config = AttrDict(config_dict)
@@ -65,7 +66,7 @@ def normalized_mse(a, b):
 
 def test_simulator():
     """Test accuracy of linear forward model."""
-    path = "simSPI/tests_simple_simulator/linear_simulator_data.npy"
+    path = "tests/data/linear_simulator_data.npy"
 
     saved_data, config = init_data(path)
     rot_params = saved_data["rot_params"]
@@ -73,7 +74,7 @@ def test_simulator():
     shift_params = saved_data["shift_params"]
 
     sim = LinearSimulator(config)
-    sim.Projector.vol = saved_data["volume"]
+    sim.projector.vol = saved_data["volume"]
     out = sim(rot_params, ctf_params, shift_params)
 
     assert normalized_mse(saved_data["final_output"].real, out) < 0.01
