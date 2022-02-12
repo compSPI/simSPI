@@ -2,8 +2,7 @@
 
 import numpy as np
 import torch
-
-from simSPI import transforms
+from compSPI import transforms
 
 
 def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):

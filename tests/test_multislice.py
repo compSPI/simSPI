@@ -3,8 +3,9 @@
 import numpy as np
 import raster_geometry
 import torch
+from compSPI import transforms
 
-from simSPI import multislice, transfer, transforms
+from simSPI import multislice, transfer
 
 
 def test_exit_wave_to_image():
