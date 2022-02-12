@@ -51,8 +51,8 @@ def apply_dqe(i0_f, dqe):
         Exit wave with dqe applied (in real space).
     """
     n_pixels = i0_f.shape[0]
-    np_to_torch = torch.tensor(i0_f * np.sqrt(dqe)).reshape(1, 1, n_pixels, n_pixels)
-    i0_dqe = transforms.fourier_to_primal_2D(np_to_torch)
+    i0_dqe_f_torch = torch.tensor(i0_f * np.sqrt(dqe)).reshape(1, 1, n_pixels, n_pixels)
+    i0_dqe = transforms.fourier_to_primal_2D(i0_dqe_f_torch).real
     return i0_dqe.detach().numpy().reshape(n_pixels, n_pixels)
 
 
@@ -106,7 +106,7 @@ def apply_ntf(shot_noise_sample, ntf):
     ntf_torch = torch.tensor(ntf).reshape(1, 1, n_pixels, n_pixels)
     i = transforms.fourier_to_primal_2D(
         transforms.primal_to_fourier_2D(shot_noise_sample_torch) * ntf_torch
-    )
+    ).real
     return i.detach().numpy().reshape(n_pixels, n_pixels)
 
 
