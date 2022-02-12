@@ -145,7 +145,12 @@ def exit_wave_to_image(exit_wave_f, complex_ctf, dose, noise_bg, dqe, ntf):
     i0 = apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf)
     n_pixels = i0.shape[0]
     i0_torch = torch.tensor(i0).reshape(1, 1, n_pixels, n_pixels)
-    i0_f = transforms.primal_to_fourier_2D(i0_torch).detach().numpy()
+    i0_f = (
+        transforms.primal_to_fourier_2D(i0_torch)
+        .detach()
+        .numpy()
+        .reshape(n_pixels, n_pixels)
+    )
     i0_dqe = apply_dqe(i0_f, dqe)
     shot_noise_sample = apply_poisson_shot_noise_sample(i0_dqe, dose, noise_bg)
     i = apply_ntf(shot_noise_sample, ntf)
