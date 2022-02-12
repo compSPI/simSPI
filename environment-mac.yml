@@ -19,6 +19,7 @@ dependencies:
   - pip:
     - geomstats
     - git+https://github.com/compSPI/compSPI.git
+    - git+https://github.com/compSPI/ioSPI.git
     - pytorch3d
     - raster_geometry
     - starfile
