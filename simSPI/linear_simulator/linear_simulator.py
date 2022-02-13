@@ -49,7 +49,7 @@ class LinearSimulator(torch.nn.Module):
         Returns
         -------
         projection.real : torch.Tensor
-            Tensor ([chunks,1,sidelen,sidelen]) contains cryoEM measurement
+            Tensor ([batch_size,1,side_len,side_len]) contains cryoEM measurement
         """
         projection = self.projector(rot_params)
         f_projection = primal_to_fourier_2D(projection)
