@@ -1,4 +1,4 @@
-"""contains functions and classed for parameter generation."""
+"""contains functions and classes for parameter generation."""
 from abc import ABCMeta, abstractstaticmethod
 
 import numpy as np
@@ -6,7 +6,7 @@ import starfile
 import torch
 import torch.fft
 from compSPI.distributions import uniform_to_triangular
-from ioSPI.starfile_utils import check_star_file, starfile_opticsparams
+from ioSPI.starfile import check_star_file, starfile_opticsparams
 from pytorch3d.transforms import (
     euler_angles_to_matrix,
     matrix_to_euler_angles,
@@ -32,7 +32,7 @@ def params_update(config):
     config.ctf_size = config.side_len  # TODO: make it adaptable
     print(
         f"Current CTF size has been configured to"
-        f" be equal to the projection size = ({config.sidelen},{config.sidelen})"
+        f" be equal to the projection size = ({config.side_len},{config.side_len})"
     )
     return config
 
@@ -58,9 +58,9 @@ class ParamsFactory:
         params_generator: class
         """
         if config.starfile_available:
-            return starfile_params(config)
+            return StarfileParams(config)
         else:
-            return distributional_params(config)
+            return DistributionalParams(config)
 
 
 class Iparams(metaclass=ABCMeta):
@@ -74,7 +74,7 @@ class Iparams(metaclass=ABCMeta):
 """Module to generate parameters using the input star file."""
 
 
-class starfile_params(Iparams):
+class StarfileParams(Iparams):
     """Class to generate parameters using the input star file.
 
     Parameters
@@ -87,9 +87,8 @@ class starfile_params(Iparams):
     def __init__(self, config):
 
         self.counter = 0
-        self.invert_hand = False
-        self.df = starfile.read(config.input_starfile_path)
         check_star_file(config.input_starfile_path)
+        self.df = starfile.read(config.input_starfile_path)
         self.config = config
         print("Reading parameters from the input starfile.")
 
@@ -150,9 +149,9 @@ class starfile_params(Iparams):
 
         return {
             "rotmat": rotmat,
-            "relion_AnglePsi": angle_psi,
-            "relion_AngleTilt": angle_tilt,
-            "relion_AngleRot": angle_rot,
+            "relion_angle_psi": angle_psi,
+            "relion_angle_tilt": angle_tilt,
+            "relion_angle_rot": angle_rot,
         }
 
     def get_ctf_params(self):
@@ -174,7 +173,7 @@ class starfile_params(Iparams):
                 Tensor of size (batch_size,1,1,1) that contains the major
                 defocus value in microns
         """
-        params = {}
+        params = None
         if self.config.ctf:
             defocus_u = (
                 torch.from_numpy(np.array(self.particle["rlnDefocusU"] / 1e4))
@@ -212,7 +211,7 @@ class starfile_params(Iparams):
             'shift_y': torch.Tensor (batch_size,)
                 batch of shifts along vertical axis
         """
-        params = {}
+        params = None
         if self.config.shift:
             shift_x = torch.from_numpy(np.array(self.particle["rlnOriginXAngst"]))
             shift_y = torch.from_numpy(np.array(self.particle["rlnOriginYAngst"]))
@@ -223,7 +222,7 @@ class starfile_params(Iparams):
 """Module to generate parameters using the specified distribution."""
 
 
-class distributional_params(Iparams):
+class DistributionalParams(Iparams):
     """Class to generate parameters using the specified distribution.
 
     Parameters
@@ -238,7 +237,18 @@ class distributional_params(Iparams):
         print("Parameters getting generated from specified distributions.")
 
     def get_params(self):
-        """Get the rotation, ctf, and shift parameters."""
+        """Get the rotation, ctf, and shift parameters.
+
+        Returns
+        -------
+        rot_params: dict of type str to {tensor}
+            Dictionary of rotation parameters for a projection batch
+        ctf_params: dict of type str to {tensor}
+            Dictionary of Contrast Transfer Function (CTF) parameters
+            for a projection batch
+        shift_params: dict of type str to {tensor}
+            Dictionary of shift parameters for a projection batch
+        """
         return self.get_rotmat(), self.get_ctf_params(), self.get_shift_params()
 
     def get_rotmat(self):
@@ -276,7 +286,7 @@ class distributional_params(Iparams):
             }
         else:
             raise NotImplementedError(
-                f"Angle distribution '{self.config.angle_distribution}' "
+                f"Angle distribution : '{self.config.angle_distribution}' "
                 f"has not been implemented!"
             )
 
@@ -313,7 +323,7 @@ class distributional_params(Iparams):
                 "defocus_angle": defocus_angle,
             }
         else:
-            return {}
+            return None
 
     def get_shift_params(self):
         """Get the parameters for the shift of the particle from a distribution.
@@ -334,7 +344,7 @@ class distributional_params(Iparams):
                 shiftNormalized = torch.Tensor(self.config.batch_size, 2).uniform_()
                 shifts = (
                     uniform_to_triangular(shiftNormalized)
-                    * self.config.sidelen
+                    * self.config.side_len
                     * self.config.shift_std_deviation
                     / 100.0
                 ).float()
@@ -348,4 +358,4 @@ class distributional_params(Iparams):
                 )
 
         else:
-            return {}
+            return None
