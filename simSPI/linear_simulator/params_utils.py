@@ -28,15 +28,12 @@ def params_update(config):
     config.starfile_available = config.input_starfile_path != ""
     if config.starfile_available:
         config = starfile_opticsparams(config)
-    config.ctf_size = config.side_len  # TODO: make it adaptable
+    config.ctf_size = config.side_len
     print(
         f"Current CTF size has been configured to"
         f" be equal to the projection size = ({config.side_len},{config.side_len})"
     )
     return config
-
-
-"""Module to instantiate param generator from a factory of choices."""
 
 
 class ParamsFactory:
@@ -57,9 +54,10 @@ class ParamsFactory:
         params_generator: class
         """
         if config.starfile_available:
-            return StarfileParams(config)
+            params_generator = StarfileParams(config)
         else:
-            return DistributionalParams(config)
+            params_generator = DistributionalParams(config)
+        return params_generator
 
 
 class Iparams(metaclass=ABCMeta):
@@ -68,9 +66,6 @@ class Iparams(metaclass=ABCMeta):
     @abstractstaticmethod
     def get_params(self):
         """Get the parameters."""
-
-
-"""Module to generate parameters using the input star file."""
 
 
 class StarfileParams(Iparams):
@@ -218,9 +213,6 @@ class StarfileParams(Iparams):
         return params
 
 
-"""Module to generate parameters using the specified distribution."""
-
-
 class DistributionalParams(Iparams):
     """Class to generate parameters using the specified distribution.
 
@@ -251,7 +243,7 @@ class DistributionalParams(Iparams):
         return self.get_rotmat(), self.get_ctf_params(), self.get_shift_params()
 
     def get_rotmat(self):
-        """Get the parameters for the rotation of the projection from a specified distribution.
+        """Get the rotation matrix from a specified distribution.
 
         Returns
         -------
