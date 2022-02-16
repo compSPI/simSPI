@@ -4,7 +4,6 @@ from abc import ABCMeta, abstractstaticmethod
 import numpy as np
 import starfile
 import torch
-import torch.fft
 from compSPI.distributions import uniform_to_triangular
 from ioSPI.starfile import check_star_file, starfile_opticsparams
 from pytorch3d.transforms import (
@@ -157,7 +156,7 @@ class StarfileParams(Iparams):
     def get_ctf_params(self):
         """Get the parameters for the CTF of the particle from the starfile.
 
-        If config.ctf is True else returns {}
+        If config.ctf is True else returns None
 
         Returns
         -------
@@ -170,8 +169,8 @@ class StarfileParams(Iparams):
                 Tensor of size (batch_size,1,1,1) that contains the minor
                 defocus value in microns
             "defocus_angle": torch.Tensor
-                Tensor of size (batch_size,1,1,1) that contains the major
-                defocus value in microns
+                Tensor of size (batch_size,1,1,1) that contains the astigmatism
+                angle in radians
         """
         params = None
         if self.config.ctf:
@@ -200,16 +199,16 @@ class StarfileParams(Iparams):
     def get_shift_params(self):
         """Get the parameters for the shift of the particle from the starfile.
 
-        If config.shift is True else returns {}
+        If config.shift is True else returns None
 
         Returns
         -------
             shift_params: dict of type str to {torch.Tensor}
             dictionary containing
             'shift_x': torch.Tensor (batch_size,)
-                batch of shifts along horizontal axis
+                batch of shifts along horizontal axis in Angstrom (A)
             'shift_y': torch.Tensor (batch_size,)
-                batch of shifts along vertical axis
+                batch of shifts along vertical axis in Angstrom (A)
         """
         params = None
         if self.config.shift:
@@ -293,7 +292,7 @@ class DistributionalParams(Iparams):
     def get_ctf_params(self):
         """Get the parameters for the CTF of the particle from a distribution.
 
-        If config.ctf is True else returns {}
+        If config.ctf is True else returns None
 
         Returns
         -------
@@ -306,8 +305,8 @@ class DistributionalParams(Iparams):
                 Tensor of size (batch_size,1,1,1) that contains the minor
                 defocus value in microns
             "defocus_angle": torch.Tensor
-                Tensor of size (batch_size,1,1,1) that contains the major
-                defocus value in microns
+                Tensor of size (batch_size,1,1,1) that contains the astigatism
+                angle in radians
         """
         if self.config.ctf:
             defocus_u = (
@@ -328,16 +327,16 @@ class DistributionalParams(Iparams):
     def get_shift_params(self):
         """Get the parameters for the shift of the particle from a distribution.
 
-        If config.shift is True else returns {}.
+        If config.shift is True else returns None.
 
         Returns
         -------
         shift_params: dict of type str to {torch.Tensor}
             dictionary containing
             'shift_x': torch.Tensor (batch_size,)
-                batch of shifts along horizontal axis
+                batch of shifts along horizontal axis in Angstrom
             'shift_y': torch.Tensor (batch_size,)
-                batch of shifts along vertical axis
+                batch of shifts along vertical axis in Angstrom
         """
         if self.config.shift:
             if self.config.shift_distribution == "triangular":
