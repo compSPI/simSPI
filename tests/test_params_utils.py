@@ -14,6 +14,8 @@ def test_params_factory():
     """Test if the factory outputs the right choice."""
 
     class config:
+        """Config object instantiated."""
+
         input_starfile_path = "tests/data/test.star"
         starfile_available = True
 
@@ -32,6 +34,8 @@ class TestStarfileParams:
         """Initialize the params generator."""
 
         class config:
+            """Config object instantiated."""
+
             input_starfile_path = "tests/data/test.star"
             batch_size = 4
             relion_invert_hand = False
@@ -95,6 +99,8 @@ class TestDistributionalParams:
         """Initialize the params generator."""
 
         class config:
+            """Config object instantiated."""
+
             batch_size = 4
             relion_invert_hand = False
             min_defocus = 1
@@ -181,6 +187,8 @@ def test_params_update():
     """Test if the parameters get updated."""
 
     class config:
+        """Config object instantiated."""
+
         input_starfile_path = ""
         side_len = 32
 
