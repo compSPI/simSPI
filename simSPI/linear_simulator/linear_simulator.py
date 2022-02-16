@@ -1,4 +1,4 @@
-"""contains simulator and its components classes."""
+"""Contain simulator and its component classes."""
 
 import os
 
@@ -12,11 +12,9 @@ from simSPI.linear_simulator.projector import Projector
 from simSPI.linear_simulator.shift_utils import Shift
 from simSPI.linear_simulator.volume_utils import init_cube
 
-"""Module to generate data using using liner forward model."""
-
 
 class LinearSimulator(torch.nn.Module):
-    """Class to generate data using liner forward model.
+    """Class to generate data using linear forward model.
 
     Parameters
     ----------
@@ -29,11 +27,11 @@ class LinearSimulator(torch.nn.Module):
         super(LinearSimulator, self).__init__()
 
         self.config = config
-        self.projector = Projector(config)  # class for tomographic projector
-        self.init_volume()  # changes the volume inside the projector
-        self.ctf = CTF(config)  # class for ctf
-        self.shift = Shift(config)  # class for shifts
-        self.noise = Noise(config)  # class for noise
+        self.projector = Projector(config)
+        self.init_volume()
+        self.ctf = CTF(config)
+        self.shift = Shift(config)
+        self.noise = Noise(config)
 
     def forward(self, rot_params, ctf_params, shift_params):
         """Create cryoEM measurements using input parameters.
@@ -50,8 +48,8 @@ class LinearSimulator(torch.nn.Module):
 
         Returns
         -------
-        projection.real : tensor
-            Tensor ([chunks,1,sidelen,sidelen]) contains cryoEM measurement
+        projection.real : torch.Tensor
+            Tensor ([batch_size,1,side_len,side_len]) contains cryoEM measurement
         """
         projection = self.projector(rot_params)
         f_projection = primal_to_fourier_2D(projection)

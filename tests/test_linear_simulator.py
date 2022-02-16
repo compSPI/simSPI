@@ -1,5 +1,8 @@
 """Test function for simulator module."""
 
+import os
+
+import mrcfile
 import numpy as np
 
 from simSPI.linear_simulator.linear_simulator import LinearSimulator
@@ -75,6 +78,19 @@ def test_simulator():
 
     sim = LinearSimulator(config)
     sim.projector.vol = saved_data["volume"]
+    out = sim(rot_params, ctf_params, shift_params)
+
+    assert normalized_mse(saved_data["final_output"].real, out) < 0.01
+
+    path = "tests/data/linear_simulator_data_cube.npy"
+
+    saved_data, config = init_data(path)
+    with mrcfile.new(config.input_volume_path, overwrite=True) as m:
+        m.set_data(saved_data["volume"].numpy())
+
+    sim = LinearSimulator(config)
+    os.remove(config.input_volume_path)
+
     out = sim(rot_params, ctf_params, shift_params)
 
     assert normalized_mse(saved_data["final_output"].real, out) < 0.01

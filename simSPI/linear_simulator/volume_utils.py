@@ -2,22 +2,22 @@
 import torch
 
 
-def init_cube(sidelen):
+def init_cube(side_len):
     """Create a volume with cube.
 
     Parameters
     ----------
-    sidelen: int
+    side_len: int
         size of the volume
     Returns
     -------
     volume: torch.Tensor
-        Tensor (sidelen,sidelen,sidelen) with a cube
-        of size (sidelen//4,sidelen//4,sidelen//4)
+        Tensor (side_len,side_len,side_len) with a cube
+        of size (side_len//4,side_len//4,side_len//4)
     """
-    half = sidelen // 2
-    length = sidelen // 8
-    volume = torch.zeros([sidelen] * 3)
+    half = side_len // 2
+    length = side_len // 8
+    volume = torch.zeros([side_len] * 3)
     volume[
         half - length : half + length,
         half - length : half + length,
