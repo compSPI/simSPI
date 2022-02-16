@@ -83,7 +83,6 @@ def populate_tem_input_parameter_dict(
     with open(input_params_file, "r") as f:
         parameters = yaml.safe_load(f)
 
-    # fill the dictionary
     dic = {"simulation": {}}
     try:
         dic["simulation"]["seed"] = parameters["miscellaneous"]["seed"]
@@ -256,47 +255,47 @@ def starfile_append_tem_simulator_data(
     return data_list
 
 
-def write_tem_inputs_to_inp_file(dict_params, inp_file="input.txt"):
+def write_tem_inputs_to_inp_file(path, tem_inputs):
     """Write tem simulator inputs to input .inp file.
 
     Parameters
     ----------
-    dict_params : dict
-        Dictionary containing parameters to write.
-    inp_file : str
+    path : str
         Relative path to input file.
+    tem_inputs : dict
+        Dictionary containing parameters to write.
     """
-    with open(inp_file, "w") as inp:
+    with open(path, "w") as inp:
         inp.write(
             "=== simulation ===\n"
             "generate_micrographs = yes\n"
             "rand_seed = {0[seed]}\n"
-            "log_file = {0[log_file]}\n".format(dict_params["simulation"])
+            "log_file = {0[log_file]}\n".format(tem_inputs["simulation"])
         )
         inp.write(
             "=== sample ===\n"
             "diameter = {0[diameter]:d}\n"
             "thickness_edge = {0[thickness_edge]:d}\n"
-            "thickness_center = {0[thickness_center]:d}\n".format(dict_params["sample"])
+            "thickness_center = {0[thickness_center]:d}\n".format(tem_inputs["sample"])
         )
         inp.write(
             "=== particle {0[name]} ===\n"
             "source = pdb\n"
             "voxel_size = {0[voxel_size]}\n"
-            "pdb_file_in = {0[pdb_file]}\n".format(dict_params["particle"])
+            "pdb_file_in = {0[pdb_file]}\n".format(tem_inputs["particle"])
         )
-        if dict_params["particle"]["map_file_re_out"] is not None:
+        if tem_inputs["particle"]["map_file_re_out"] is not None:
             inp.write(
                 "map_file_re_out = {0[map_file_re_out]}\n"
                 "map_file_im_out = {0[map_file_im_out]}\n".format(
-                    dict_params["particle"]
+                    tem_inputs["particle"]
                 )
             )
         inp.write(
             "=== particleset ===\n"
             "particle_type = {0[name]}\n"
             "particle_coords = file\n"
-            "coord_file_in = {0[crd_file]}\n".format(dict_params["particleset"])
+            "coord_file_in = {0[crd_file]}\n".format(tem_inputs["particleset"])
         )
         inp.write(
             "=== geometry ===\n"
@@ -313,7 +312,7 @@ def write_tem_inputs_to_inp_file(dict_params, inp_file="input.txt"):
             "energy_spread = {0[spread]}\n"
             "gen_dose = yes\n"
             "dose_per_im = {0[dose_per_im]}\n"
-            "dose_sd = {0[dose_sd]}\n".format(dict_params["beam"])
+            "dose_sd = {0[dose_sd]}\n".format(tem_inputs["beam"])
         )
         inp.write(
             "=== optics ===\n"
@@ -327,13 +326,13 @@ def write_tem_inputs_to_inp_file(dict_params, inp_file="input.txt"):
             "defocus_nominal = {0[defocus_nominal]}\n"
             "defocus_syst_error = {0[defocus_syst_error]}\n"
             "defocus_syst_error = {0[defocus_nonsyst_error]}\n".format(
-                dict_params["optics"]
+                tem_inputs["optics"]
             )
         )
-        if dict_params["optics"]["defocus_file_out"] is not None:
+        if tem_inputs["optics"]["defocus_file_out"] is not None:
             inp.write(
                 "defocus_file_out = {0[defocus_file_out]}\n".format(
-                    dict_params["optics"]
+                    tem_inputs["optics"]
                 )
             )
         inp.write(
@@ -349,5 +348,5 @@ def write_tem_inputs_to_inp_file(dict_params, inp_file="input.txt"):
             "mtf_c = {0[mtf_c]}\n"
             "mtf_alpha = {0[mtf_alpha]}\n"
             "mtf_beta = {0[mtf_beta]}\n"
-            "image_file_out = {0[image_file_out]}\n".format(dict_params["detector"])
+            "image_file_out = {0[image_file_out]}\n".format(tem_inputs["detector"])
         )

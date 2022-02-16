@@ -442,7 +442,7 @@ def test_write_inp_file():
         out_dict = populate_tem_input_parameter_dict(
             tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
         )
-        write_tem_inputs_to_inp_file(out_dict, tmp_inp.name)
+        write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
     finally:
         os.unlink(tmp_inp.name)
         os.unlink(tmp_yml.name)

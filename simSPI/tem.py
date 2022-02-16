@@ -258,7 +258,7 @@ class TEMSimulator:
         "<parameter> = <value>".
         """
         tem_inputs.write_tem_inputs_to_inp_file(
-            inp_file=self.output_path_dict["inp_file"], dict_params=self.parameter_dict
+            path=self.output_path_dict["inp_file"], tem_inputs=self.parameter_dict
         )
 
     def get_image_data(self):
