@@ -82,13 +82,14 @@ def test_simulator():
 
     assert normalized_mse(saved_data["final_output"].real, out) < 0.01
 
-    input_volume_path = "tests/data/cube.mrc"
-    with mrcfile.new(input_volume_path, overwrite=True) as m:
+    path = "tests/data/linear_simulator_data_cube.npy"
+
+    saved_data, config = init_data(path)
+    with mrcfile.new(config.input_volume_path, overwrite=True) as m:
         m.set_data(saved_data["volume"].numpy())
 
-    config.input_volume_path = input_volume_path
     sim = LinearSimulator(config)
-    os.remove(input_volume_path)
+    os.remove(config.input_volume_path)
 
     out = sim(rot_params, ctf_params, shift_params)
 
