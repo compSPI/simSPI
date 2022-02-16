@@ -5,7 +5,7 @@ import tempfile
 import numpy as np
 import torch
 import yaml
-from ioSPI.particle_metadata import update_optics_config_from_starfile
+from ..ioSPI.particle_metadata import update_optics_config_from_starfile
 
 from simSPI.tem_inputs import (
     populate_tem_input_parameter_dict,
