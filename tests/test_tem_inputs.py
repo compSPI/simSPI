@@ -5,14 +5,13 @@ import tempfile
 import numpy as np
 import torch
 import yaml
+from ioSPI.particle_metadata import update_optics_config_from_starfile
 
 from simSPI.tem_inputs import (
     populate_tem_input_parameter_dict,
     starfile_append_tem_simulator_data,
     write_tem_inputs_to_inp_file,
 )
-
-from ..ioSPI.particle_metadata import update_optics_config_from_starfile
 
 
 def normalized_mse(a, b):

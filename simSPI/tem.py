@@ -6,10 +6,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
+from ioSPI import micrographs
 
 from simSPI import crd, fov, tem_inputs
-
-from ..ioSPI import micrographs
 
 
 class TEMSimulator:
