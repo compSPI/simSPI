@@ -1,7 +1,8 @@
 """Multislice."""
 
 import numpy as np
-from ioSPI import fourier
+import torch
+from compSPI import transforms
 
 
 def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
@@ -12,18 +13,22 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
 
     Parameters
     ----------
-    exit_wave_f : numpy.ndarray, shape (N,N)
+    exit_wave_f : numpy.ndarray, shape (n_pixels,n_pixels)
         Exit wave array.
-    complex_ctf : numpy.ndarray, shape (N,N)
+    complex_ctf : numpy.ndarray, shape (n_pixels,n_pixels)
         Complex ctf array.
 
     Returns
     -------
-    i0 : numpy.ndarray, shape (N,N)
+    i0 : numpy.ndarray, shape (n_pixels,n_pixels)
         Exit wave ctf convolution (in real space).
     """
-    i0 = np.abs(fourier.do_ifft(exit_wave_f * complex_ctf, dim=2, only_real=False))
-    return i0
+    n_pixels = exit_wave_f.shape[0]
+    np_to_torch = torch.tensor(exit_wave_f * complex_ctf).reshape(
+        1, 1, n_pixels, n_pixels
+    )
+    i0 = torch.abs(transforms.fourier_to_primal_2D(np_to_torch))
+    return i0.detach().numpy().reshape(n_pixels, n_pixels)
 
 
 def apply_dqe(i0_f, dqe):
@@ -34,18 +39,20 @@ def apply_dqe(i0_f, dqe):
 
     Parameters
     ----------
-    i0_f : numpy.ndarray, shape (N,N)
+    i0_f : numpy.ndarray, shape (n_pixels,n_pixels)
         Image with ctf applied.
-    dqe : numpy.ndarray, shape (N,N)
+    dqe : numpy.ndarray, shape (n_pixels,n_pixels)
         Detective quantum efficiency (in 2D).
 
     Returns
     -------
-    i0_dqe : numpy.ndarray, shape (N,N)
+    i0_dqe : numpy.ndarray, shape (n_pixels,n_pixels)
         Exit wave with dqe applied (in real space).
     """
-    i0_dqe = fourier.do_ifft(i0_f * np.sqrt(dqe), dim=2)
-    return i0_dqe
+    n_pixels = i0_f.shape[0]
+    i0_dqe_f_torch = torch.tensor(i0_f * np.sqrt(dqe)).reshape(1, 1, n_pixels, n_pixels)
+    i0_dqe = transforms.fourier_to_primal_2D(i0_dqe_f_torch).real
+    return i0_dqe.detach().numpy().reshape(n_pixels, n_pixels)
 
 
 def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
@@ -56,7 +63,7 @@ def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
 
     Parameters
     ----------
-    signal : numpy.ndarray, shape (N,N)
+    signal : numpy.ndarray, shape (n_pixels,n_pixels)
         Input signal, (e.g. exit wave with ctf and dqe applied).
     dose : float
         Multiplicative scaling factor to simulate electron dose.
@@ -65,7 +72,7 @@ def apply_poisson_shot_noise_sample(signal, dose, noise_bg=0):
 
     Returns
     -------
-    shot_noise_sample : numpy.ndarray, shape (N,N)
+    shot_noise_sample : numpy.ndarray, shape (n_pixels,n_pixels)
         Poisson sampled signal.
     """
     shot_noise_sample = np.random.poisson(dose * signal + noise_bg)
@@ -80,18 +87,26 @@ def apply_ntf(shot_noise_sample, ntf):
 
     Parameters
     ----------
-    shot_noise_sample : numpy.ndarray, shape (N,N)
+    shot_noise_sample : numpy.ndarray, shape (n_pixels,n_pixels)
         Image with ctf applied.
-    ntf : numpy.ndarray, shape (N,N)
+    ntf : numpy.ndarray, shape (n_pixels,n_pixels)
         Noise transfer function (in 2D).
 
     Returns
     -------
-    i : numpy.ndarray, shape (N,N)
+    i : numpy.ndarray, shape (n_pixels,n_pixels)
         Exit wave with ntf applied (in real space).
     """
-    i = fourier.do_ifft(fourier.do_fft(shot_noise_sample, dim=2) * ntf, dim=2)
-    return i
+    n_pixels = shot_noise_sample.shape[0]
+    shot_noise_sample_torch = torch.tensor(shot_noise_sample).reshape(
+        1, 1, n_pixels, n_pixels
+    )
+
+    ntf_torch = torch.tensor(ntf).reshape(1, 1, n_pixels, n_pixels)
+    i = transforms.fourier_to_primal_2D(
+        transforms.primal_to_fourier_2D(shot_noise_sample_torch) * ntf_torch
+    ).real
+    return i.detach().numpy().reshape(n_pixels, n_pixels)
 
 
 def exit_wave_to_image(exit_wave_f, complex_ctf, dose, noise_bg, dqe, ntf):
@@ -108,26 +123,33 @@ def exit_wave_to_image(exit_wave_f, complex_ctf, dose, noise_bg, dqe, ntf):
 
     Parameters
     ----------
-    exit_wave_f : numpy.ndarray, shape (N,N)
+    exit_wave_f : numpy.ndarray, shape (n_pixels,n_pixels)
         Fourier transform of exit wave.
-    complex_ctf : numpy.ndarray, shape (N,N)
+    complex_ctf : numpy.ndarray, shape (n_pixels,n_pixels)
         Complex ctf array.
     dose : float
         Multiplicative scaling factor to simulate electron dose.
     noise_bg : float
         Additive factor to simulate dark current noise.
-    dqe : numpy.ndarray, shape (N,N)
+    dqe : numpy.ndarray, shape (n_pixels,n_pixels)
         Detective quantum efficiency (in 2D).
-    ntf : numpy.ndarray, shape (N,N)
+    ntf : numpy.ndarray, shape (n_pixels,n_pixels)
         Noise transfer function (in 2D).
 
     Returns
     -------
-    i : numpy.ndarray, shape (N,N)
+    i : numpy.ndarray, shape (n_pixels,n_pixels)
         Exit wave with ntf applied (in real space).
     """
     i0 = apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf)
-    i0_f = fourier.do_fft(i0, dim=2)
+    n_pixels = i0.shape[0]
+    i0_torch = torch.tensor(i0).reshape(1, 1, n_pixels, n_pixels)
+    i0_f = (
+        transforms.primal_to_fourier_2D(i0_torch)
+        .detach()
+        .numpy()
+        .reshape(n_pixels, n_pixels)
+    )
     i0_dqe = apply_dqe(i0_f, dqe)
     shot_noise_sample = apply_poisson_shot_noise_sample(i0_dqe, dose, noise_bg)
     i = apply_ntf(shot_noise_sample, ntf)
