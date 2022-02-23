@@ -6,9 +6,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import micrographs
+from ioSPI.ioSPI import micrographs
 
-from simSPI import crd, fov, tem_inputs
+from simSPI.simSPI import crd, fov, tem_inputs
 
 
 class TEMSimulator:
@@ -143,7 +143,9 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None, **kwargs):
+    def generate_path_dict(
+        pdb_file, output_dir=None, pdb_keyword=None, mrc_keyword=None, **kwargs
+    ):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
@@ -152,6 +154,8 @@ class TEMSimulator:
             Relative path to the pdb file
         output_dir : str, (default = None)
             Relative path to output directory
+        pdb_keyword : str, (default = None)
+            user-specified keyword preprended to output files
         mrc_keyword : str, (default = None)
             user-specified keyword appended to output files
         kwargs
@@ -187,12 +191,22 @@ class TEMSimulator:
             )
 
         path_dict["pdb_file"] = str(Path(pdb_file))
-        path_dict["crd_file"] = str(Path(output_dir, mrc_keyword + ".txt"))
-        path_dict["mrc_file"] = str(Path(output_dir, mrc_keyword + ".mrc"))
-        path_dict["log_file"] = str(Path(output_dir, mrc_keyword + ".log"))
-        path_dict["inp_file"] = str(Path(output_dir, mrc_keyword + ".inp"))
-        path_dict["h5_file"] = str(Path(output_dir, mrc_keyword + ".h5"))
-        path_dict["h5_file_noisy"] = str(Path(output_dir, mrc_keyword + "-noisy.h5"))
+        path_dict["crd_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".txt")
+        )
+        path_dict["mrc_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".mrc")
+        )
+        path_dict["log_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".log")
+        )
+        path_dict["inp_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".inp")
+        )
+        path_dict["h5_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".h5"))
+        path_dict["h5_file_noisy"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + "-noisy.h5")
+        )
 
         return path_dict
 
@@ -214,17 +228,17 @@ class TEMSimulator:
         self.create_crd_file(pad)
         self.write_inp_file()
 
-        micrograph_data = self.get_image_data()
-        particle_data = self.extract_particles(micrograph_data, pad=pad)
-
-        if "other" in self.parameter_dict and (
-            self.parameter_dict["other"].get("signal_to_noise") is not None
-            or self.parameter_dict["other"].get("signal_to_noise_db") is not None
-        ):
-            particle_data = self.apply_gaussian_noise(particle_data)
+        particle_data = self.get_image_data()
 
         if export_particles:
+            particle_data = self.extract_particles(particle_data, pad=pad)
             self.export_particle_stack(particle_data)
+
+            if "other" in self.parameter_dict and (
+                self.parameter_dict["other"].get("signal_to_noise") is not None
+                or self.parameter_dict["other"].get("signal_to_noise_db") is not None
+            ):
+                particle_data = self.apply_gaussian_noise(particle_data)
 
         return particle_data
 
@@ -281,6 +295,8 @@ class TEMSimulator:
         """
         sim_executable = f"{self.output_path_dict['local_sim_dir']}"
         input_file_arg = f"{self.output_path_dict['inp_file']}"
+        print(input_file_arg)
+
         subprocess.run([sim_executable, input_file_arg], check=True)
 
         data = micrographs.read_micrograph_from_mrc(self.output_path_dict["mrc_file"])
