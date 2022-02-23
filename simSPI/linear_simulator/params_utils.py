@@ -5,7 +5,7 @@ import numpy as np
 import starfile
 import torch
 from compSPI.distributions import uniform_to_triangular
-from ioSPI.starfile import check_star_file, starfile_opticsparams
+from ioSPI.particle_metadata import check_star_file, update_optics_config_from_starfile
 from pytorch3d.transforms import (
     euler_angles_to_matrix,
     matrix_to_euler_angles,
@@ -27,7 +27,7 @@ def params_update(config):
     """
     config.starfile_available = config.input_starfile_path != ""
     if config.starfile_available:
-        config = starfile_opticsparams(config)
+        config = update_optics_config_from_starfile(config)
     config.ctf_size = config.side_len
     print(
         f"Current CTF size has been configured to"
