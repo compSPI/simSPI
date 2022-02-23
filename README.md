@@ -12,7 +12,7 @@ Methods and tools for simulating SPI data.
 
 First download:
 
-    git clone https://github.com/compSPI/simSPI.git 
+    git clone https://github.com/compSPI/simSPI.git
 
 Then, create a conda environment with the required dependencies using the `environment.yml` file as follows:
 
