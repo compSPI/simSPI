@@ -143,7 +143,7 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None):
+    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None, **kwargs):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
@@ -154,6 +154,8 @@ class TEMSimulator:
             Relative path to output directory
         mrc_keyword : str, (default = None)
             user-specified keyword appended to output files
+        kwargs
+            compatibiltity for arbitrary extra parameters.
 
         Returns
         -------
