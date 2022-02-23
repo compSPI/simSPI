@@ -19,15 +19,15 @@ def upload_dataset_from_files(token: str, data_file: str, metadata_file: str, da
         """
 
     # Structure
-    #
+    #   Data Node (datasets) -> Structure Node (eg: 4v6x) -> Dataset Node (eg: 4v6x_randomrots) -> data file + meta data file
 
 
     # Workflow
-    # get molecule label eg. 4v6x
+    # get structure label eg. 4v6x
     # get dataset label eg. 4v6x_random_rotations
-    # check if node with molecule label exists in osf
+    # check if node with structure label exists in osf
     # if not, create it
-    # create a new node for dataset under molecule node
+    # create a new node for dataset under structure node
     # get tags for dataset
     # upload files with tags
 
