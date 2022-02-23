@@ -39,7 +39,7 @@ def params_update(config):
 class ParamsFactory:
     """Class to instantiate param generator from a factory of choices."""
 
-    def get_params_generator(config):
+    def get_params_generator(self, config):
         """Return the param generator.
 
         If the starfile is available then chooses it otherwise
@@ -275,11 +275,10 @@ class DistributionalParams(Iparams):
                 * euler[:, 1],
                 "relion_angle_rot": -euler[:, 2],
             }
-        else:
-            raise NotImplementedError(
-                f"Angle distribution : '{self.config.angle_distribution}' "
-                f"has not been implemented!"
-            )
+        raise NotImplementedError(
+            f"Angle distribution : '{self.config.angle_distribution}' "
+            f"has not been implemented!"
+        )
 
     def get_ctf_params(self):
         """Get the parameters for the CTF of the particle from a distribution.
@@ -313,8 +312,7 @@ class DistributionalParams(Iparams):
                 "defocus_v": defocus_v,
                 "defocus_angle": defocus_angle,
             }
-        else:
-            return None
+        return None
 
     def get_shift_params(self):
         """Get the parameters for the shift of the particle from a distribution.
@@ -341,12 +339,8 @@ class DistributionalParams(Iparams):
                 ).float()
                 params = {"shift_x": shifts[:, 0], "shift_y": shifts[:, 1]}
                 return params
-            else:
-                print("here")
-                raise NotImplementedError(
-                    f"Shift distribution '{self.config.shift_distribution}' "
-                    f"has not been implemented!"
-                )
-
-        else:
-            return None
+            raise NotImplementedError(
+                f"Shift distribution '{self.config.shift_distribution}' "
+                f"has not been implemented!"
+            )
+        return None
