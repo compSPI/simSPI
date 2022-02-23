@@ -19,11 +19,13 @@ def test_params_factory():
         input_starfile_path = "tests/data/test.star"
         starfile_available = True
 
-    param_generator = ParamsFactory.get_params_generator(config)
+    params_factory = ParamsFactory(config)
+    param_generator = params_factory.get_params_generator()
     assert type(param_generator).__name__ == "StarfileParams"
 
     config.starfile_available = False
-    param_generator = ParamsFactory.get_params_generator(config)
+    params_factory = ParamsFactory(config)
+    param_generator = params_factory.get_params_generator()
     assert type(param_generator).__name__ == "DistributionalParams"
 
 

@@ -39,7 +39,11 @@ def params_update(config):
 class ParamsFactory:
     """Class to instantiate param generator from a factory of choices."""
 
-    def get_params_generator(self, config):
+    def __init__(self, config):
+
+        self.config = config
+
+    def get_params_generator(self):
         """Return the param generator.
 
         If the starfile is available then chooses it otherwise
@@ -53,10 +57,10 @@ class ParamsFactory:
         -------
         params_generator: class
         """
-        if config.starfile_available:
-            params_generator = StarfileParams(config)
+        if self.config.starfile_available:
+            params_generator = StarfileParams(self.config)
         else:
-            params_generator = DistributionalParams(config)
+            params_generator = DistributionalParams(self.config)
         return params_generator
 
 
