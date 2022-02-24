@@ -8,6 +8,7 @@ def upload_dataset_from_files(token: str, data_file: str, metadata_file: str, da
     """Upload particle stack data and metadata as labelled datasets to OSF.io.
         Parameters
         ----------
+        TODO: update docstring.
         data_file : str
             File path to .h5 file containing datasets.
         metadata_file : str
@@ -58,8 +59,16 @@ def upload_dataset_from_files(token: str, data_file: str, metadata_file: str, da
 
 
 
-def get_tags_from_parsed_metadata(meta_data:CifFile):
+def get_tags_from_parsed_metadata(meta_data):
+    """Generate tags using parsed metadata from TEMSim.
+    Parameters
+    ----------
+    meta_data
 
+    Returns
+    -------
+
+    """
     # from https://github.com/compSPI/ioSPI/issues/20
     #
     #   pixel_size_ang [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0] : does it make sense to have bins or discrete values?. Use _detector_pixel_size_um
@@ -71,6 +80,10 @@ def get_tags_from_parsed_metadata(meta_data:CifFile):
     #   n_particles["<1000,1000-2500,2500-5000,5000+"] : no of tilts * no of particles in src. bins are arbitrily  chosen.TODO: add no of particles from fov to meta_data
 
     #TODO: implemented this.
+
+    tag_dict = {}
+    noise_type
+
 
 
 
