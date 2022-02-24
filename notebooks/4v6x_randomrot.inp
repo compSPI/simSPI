@@ -1,6 +1,6 @@
 === simulation ===
 generate_micrographs = yes
-rand_seed = 3564626683
+rand_seed = 374243514
 log_file = 4v6x_randomrot.log
 === sample ===
 diameter = 1200
