@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI.ioSPI import micrographs
+from ioSPI import micrographs
 
 from simSPI import crd, fov, tem_inputs
 
