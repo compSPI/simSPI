@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import micrographs
+from ioSPI.ioSPI import micrographs
 
 from simSPI import crd, fov, tem_inputs
 
@@ -181,7 +181,7 @@ class TEMSimulator:
         if output_dir is None:
             output_dir = str(Path(pdb_file).parent)
 
-        pdb_keyword = pdb_file.split("/", -1)[-1].split(".")[0]
+        pdb_keyword = pdb_file.split("/")[-1].split(".")[0]
 
         if mrc_keyword is None:
             mrc_keyword = str(Path(pdb_file).stem) + "".join(
