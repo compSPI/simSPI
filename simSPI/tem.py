@@ -6,9 +6,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI.ioSPI import micrographs
+from ioSPI import micrographs
 
-from simSPI.simSPI import crd, fov, tem_inputs
+from simSPI import crd, fov, tem_inputs
 
 
 class TEMSimulator:
@@ -295,7 +295,6 @@ class TEMSimulator:
         """
         sim_executable = f"{self.output_path_dict['local_sim_dir']}"
         input_file_arg = f"{self.output_path_dict['inp_file']}"
-        print(input_file_arg)
 
         subprocess.run([sim_executable, input_file_arg], check=True)
 
