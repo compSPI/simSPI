@@ -13,37 +13,11 @@ from simSPI import fov, tem
 def sample_class():
     """Instantiate TEMSimulator for testing."""
     test_files_path = "/work/tests/test_files"
-    tmp_path = test_files_path
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
         str(Path(cwd, test_files_path, "path_config.yaml")),
         str(Path(cwd, test_files_path, "sim_config.yaml")),
-    )
-
-    # from test_files/path_config
-    out_file_name = "4v6x_randomrot"
-
-    tem_simulator.output_path_dict["crd_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".txt")
-    )
-    tem_simulator.output_path_dict["mrc_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".mrc")
-    )
-    tem_simulator.output_path_dict["log_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".log")
-    )
-    tem_simulator.output_path_dict["inp_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".inp")
-    )
-    tem_simulator.output_path_dict["h5_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".h5")
-    )
-    tem_simulator.output_path_dict["h5_file_noisy"] = str(
-        Path(cwd, tmp_path, out_file_name + "-noisy.h5")
-    )
-    tem_simulator.output_path_dict["pdb_file"] = str(
-        Path(cwd, test_files_path, "4v6x.pdb")
     )
 
     return tem_simulator

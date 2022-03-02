@@ -181,10 +181,10 @@ class TEMSimulator:
         if output_dir is None:
             output_dir = str(Path(pdb_file).parent)
 
-        pdb_keyword = pdb_file.split("/")[-1].split(".")[0]
+        pdb_keyword = Path(pdb_file).stem
 
         if mrc_keyword is None:
-            mrc_keyword = str(Path(pdb_file).stem) + "".join(
+            mrc_keyword = "_" + "".join(
                 random.choices(string.ascii_uppercase + string.digits, k=5)
             )
 
