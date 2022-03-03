@@ -41,6 +41,8 @@ class TEMSimulator:
             self.output_path_dict["log_file"],
         )
 
+        self.defocus_distribution_samples = []
+
     def get_config_from_yaml(self, config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
 
@@ -205,6 +207,12 @@ class TEMSimulator:
         path_dict["h5_file_noisy"] = str(
             Path(output_dir, pdb_keyword + mrc_keyword + "-noisy.h5")
         )
+        path_dict["star_file"] = str(
+            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".star")
+        )
+        path_dict["defocus_file"] = str(
+            Path(output_dir, pdb_keyword + "_defocus_" + mrc_keyword + ".txt")
+        )
 
         return path_dict
 
@@ -224,7 +232,9 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
         """
         self.create_crd_file(pad)
+        self.create_defocus_file()
         self.write_inp_file()
+        self.generate_metadata()
 
         particle_data = self.get_image_data()
 
@@ -316,15 +326,19 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        particles = fov.micrograph2particles(
-            micrograph,
-            self.sim_dict["optics_parameters"],
-            self.sim_dict["detector_parameters"],
-            pdb_file=self.output_path_dict["pdb_file"],
-            pad=pad,
-        )
+        particle_stacks = []
 
-        return particles
+        for i in range(self.parameter_dict["geometry"]["n_tilts"]):
+            particles = fov.micrograph2particles(
+                micrograph[i],
+                self.sim_dict["optics_parameters"],
+                self.sim_dict["detector_parameters"],
+                pdb_file=self.output_path_dict["pdb_file"],
+                pad=pad,
+            )
+            particle_stacks.append(particles)
+
+        return np.array(particle_stacks)
 
     def apply_gaussian_noise(self, particles):
         """Apply gaussian noise to particle data.
@@ -380,3 +394,91 @@ class TEMSimulator:
                     + self.output_path_dict["h5_file"][-3:],
                     noisy_particles,
                 )
+
+    def generate_metadata(self):
+        """Generate metadata associated with picked particles from simulator.
+
+        Notes
+        -----
+        Exports particle metadata in .star file to output directory specified
+        in user config file.
+        """
+        particle_metadata = self.retrieve_rotation_metadata(
+            self.output_path_dict["crd_file"]
+        )
+
+        with open(Path("simSPI/data/metadata_fields.yaml"), "r") as stream:
+            metadata_fields = yaml.safe_load(stream)
+
+        # defocus_params = self.parameter_dict["ctf"]
+        n_samples = self.parameter_dict["geometry"]["n_tilts"]
+
+        with open(self.output_path_dict["star_file"], "w") as f:
+            mtf_params = {}
+            for key, value in self.parameter_dict.items():
+                f.write(f"data_{key}\n")
+                for key0, value0 in value.items():
+                    if key0[:3] == "mtf":
+                        mtf_params[key0[4:]] = value0
+                    else:
+                        key_fixed = (
+                            metadata_fields[key0] if key0 in metadata_fields else key0
+                        )
+                        if type(value0) is list:
+                            f.write("_" + "{0:24}{1}\n".format(key_fixed, value0))
+                        else:
+                            f.write("_" + "{0:24}{1:>15}\n".format(key_fixed, value0))
+                f.write("\n")
+
+            f.write("mtf_params\n")
+            for c in ("a", "b", "c", "alpha", "beta"):
+                if c in mtf_params:
+                    f.write(f"{mtf_params[c]:13.4f}")
+
+            for i in range(n_samples):
+
+                f.write(f"particle_rotation_angles: {i + 1}\n")
+                f.write("loop_\n")
+                f.write("_defocus\n")
+                f.write("_x\n")
+                f.write("_y\n")
+                f.write("_z\n")
+                f.write("_phi\n")
+                f.write("_theta\n")
+                f.write("_psi\n")
+
+                for coord in particle_metadata:
+                    f.write(
+                        "{0:13.4f}{1[0]:13.4f}{1[1]:13.4f}{1[2]:13.4f}"
+                        "{1[3]:13.4f}{1[4]:13.4f}"
+                        "{1[5]:13.4f}\n".format(
+                            self.defocus_distribution_samples[i], coord
+                        )
+                    )
+
+    @staticmethod
+    def retrieve_rotation_metadata(path):
+        """Retrieve particle rotation data from pre-generated simulator crd file.
+
+        Parameters
+        ----------
+        path : str
+            String specifying path to crd file generated during simulation.
+
+        Returns
+        -------
+        rotation_metadata : array-like, shape=[..., 3]
+            N x 3 matrix representing the rotation angles , phi, theta, psi, of
+            each particle in stack.
+        """
+        rotation_metadata = []
+        lines = []
+        with open(path) as f:
+            lines = f.readlines()
+
+        for i, line in enumerate(lines):
+            if i >= 4:
+                rotation_metadata.append([float(x) for x in line.split()[:]])
+
+        f.close()
+        return rotation_metadata

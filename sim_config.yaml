@@ -30,10 +30,17 @@
     detector_nx_px: 5760               # [px] number of pixels along X axis
     detector_ny_px: 4092               # [px] number of pixels along Y axis
     detector_pixel_size_um: 5          # [um]
-    average_gain_count_per_electron: 32  # average number of counts per electron
-    noise: 'no'                 # whether quantized electron waves result in noise
-    detector_q_efficiency: 0.5  # detector quantum efficiency
-    mtf_params: [0,0,1,0,0]     # to be described. [0,0,1,0,0] is perfect detector.
+    average_gain_count_per_electron: 2 # average number of counts per electron
+    noise: 'no'                        # whether quantized electron waves result in noise
+    detector_q_efficiency: 0.5         # detector quantum efficiency
+    mtf_params: [0,0,1,0,0]            # to be described. [0,0,1,0,0] is perfect detector.
+
+  geometry_parameters:
+    n_samples: 4                       # number of samples to be generated
+
+  ctf_parameters:
+    distribution_type: 'uniform'        # type of distribution, either 'gaussian' or 'uniform'
+    distribution_parameters: [0, 1]     # distribution parameters, uniform: (low, high), gaussian: (loc, scale)
 
   miscellaneous:
-    signal_to_noise: 0.67       # signal-to-noise-ratio for added white noise.
+    signal_to_noise: 0.67               # signal-to-noise-ratio for added white noise.
