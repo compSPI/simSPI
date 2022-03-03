@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import micrographs, write_defocus_file
+from ioSPI import micrographs
 
 from simSPI import crd, distribution_utils, fov, tem_inputs
 
@@ -303,7 +303,7 @@ class TEMSimulator:
         ).tolist()
         self.defocus_distribution_samples = samples
 
-        write_defocus_file(samples, self.output_path_dict["defocus_file"])
+        # write_defocus_file(samples, self.output_path_dict["defocus_file"])
 
     def get_image_data(self):
         """Run simulator and return data.
