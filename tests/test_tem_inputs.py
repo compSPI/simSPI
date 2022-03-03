@@ -169,7 +169,7 @@ def test_fill_parameters_dictionary_max():
         assert out_dict["other"]["signal_to_noise_db"] == snr_db
     finally:
         os.unlink(tmp_yml.name)
-
+#TODO: update test
 
 def test_fill_parameters_dictionary_min():
     """Test fill_parameters_dictionary with minimal garbage parameters."""
@@ -291,7 +291,7 @@ def test_fill_parameters_dictionary_min():
         assert out_dict["detector"]["image_file_out"] == mrc_file
     finally:
         os.unlink(tmp_yml.name)
-
+#TODO: update test
 
 def test_starfile_data():
     """Check if the data_list returned is equal to the input params."""

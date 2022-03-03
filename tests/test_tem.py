@@ -84,6 +84,7 @@ def test_temsimulator_constructor(sample_resources):
         "beam",
         "optics",
         "detector",
+        "geometry"
     ]
     assert tem_sim.output_path_dict is not None
     assert tem_sim.sim_dict is not None
