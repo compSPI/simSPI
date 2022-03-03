@@ -1,13 +1,13 @@
 """Help format TEM Simulator input parameters."""
 
 import random
-
+import logging
 import numpy as np
 import yaml
 
 
 def populate_tem_input_parameter_dict(
-    input_params_file, mrc_file, pdb_file, crd_file, log_file, dose=None, noise=None
+        input_params_file, mrc_file, pdb_file, crd_file, log_file, defocus_file, dose=None, noise=None
 ):
     """Return parameter dictionary with settings for simulation.
 
@@ -23,6 +23,8 @@ def populate_tem_input_parameter_dict(
         Coordinates of the sample copies
     log_file : str
         Log file for the run
+    defocus_file : str
+        Defocus File to store defocus distribution
     dose : int
         If present, overrides beam_parameters[electron_dose]
     noise : str
@@ -74,12 +76,22 @@ def populate_tem_input_parameter_dict(
     - detector_q_efficiency        : detector quantum efficiency
     - mtf_params                   : list of 5 MTF parameters
 
+    *** geometry ***
+    - n_samples : number of images of the sample
+
+    *** ctf ***
+    - distribution_type [OPTIONAL] : type of distribution. Overrides defocus_um parameter
+                                            if present.
+    - distribution_parameters [OPTIONAL] : distribution parameters. Required if distribution_type
+                                                is present.
+
     *** miscellaneous ***
     - seed [OPTIONAL]              : seed for the run. If not present, random.
     - signal_to_noise [OPTIONAL]   : signal-to-noise ratio for gaussian white noise.
     - signal_to_noise_db [OPTIONAL] : signal-to-noise ratio in decibels.
     """
     parameters = None
+    log = logging.getLogger()
     with open(input_params_file, "r") as f:
         parameters = yaml.safe_load(f)
 
@@ -89,6 +101,8 @@ def populate_tem_input_parameter_dict(
     except KeyError:
         random.seed()
         dic["simulation"]["seed"] = random.randint(0, int(1e10))
+    dic["simulation"]["log_file"] = log_file
+
     dic["other"] = {}
     try:
         dic["other"]["signal_to_noise"] = parameters["miscellaneous"]["signal_to_noise"]
@@ -100,7 +114,7 @@ def populate_tem_input_parameter_dict(
         ]
     except KeyError:
         pass
-    dic["simulation"]["log_file"] = log_file
+
     dic["sample"] = {}
     dic["sample"]["diameter"] = parameters["specimen_grid_params"]["hole_diameter_nm"]
     dic["sample"]["thickness_center"] = parameters["specimen_grid_params"][
@@ -119,9 +133,11 @@ def populate_tem_input_parameter_dict(
         dic["particle"]["map_file_im_out"] = key + "_imag.mrc"
     else:
         dic["particle"]["map_file_re_out"] = None
+
     dic["particleset"] = {}
     dic["particleset"]["name"] = parameters["molecular_model"]["particle_name"]
     dic["particleset"]["crd_file"] = crd_file
+
     dic["beam"] = {}
     dic["beam"]["voltage"] = parameters["beam_parameters"]["voltage_kv"]
     dic["beam"]["spread"] = parameters["beam_parameters"]["energy_spread_v"]
@@ -134,8 +150,8 @@ def populate_tem_input_parameter_dict(
     dic["beam"]["dose_sd"] = parameters["beam_parameters"][
         "electron_dose_std_e_per_nm2"
     ]
-    dic["optics"] = {}
 
+    dic["optics"] = {}
     dic["optics"]["magnification"] = parameters["optics_parameters"]["magnification"]
     dic["optics"]["cs"] = parameters["optics_parameters"]["spherical_aberration_mm"]
     dic["optics"]["cc"] = parameters["optics_parameters"]["chromatic_aberration_mm"]
@@ -144,6 +160,14 @@ def populate_tem_input_parameter_dict(
     dic["optics"]["cond_ap_angle"] = parameters["optics_parameters"][
         "aperture_angle_mrad"
     ]
+
+    if "optics_defocusout" in parameters["optics_parameters"]:
+        dic["optics"]["defocus_file_out"] = parameters["optics_parameters"][
+            "optics_defocusout"
+        ]
+    else:
+        dic["optics"]["defocus_file_out"] = None
+
     dic["detector"] = {}
     if "defocus_um" in parameters["optics_parameters"]:
         dic["optics"]["defocus_nominal"] = parameters["optics_parameters"]["defocus_um"]
@@ -159,12 +183,7 @@ def populate_tem_input_parameter_dict(
     dic["optics"]["defocus_nonsyst_error"] = parameters["optics_parameters"][
         "defocus_nonsyst_error_um"
     ]
-    if "optics_defocusout" in parameters["optics_parameters"]:
-        dic["optics"]["defocus_file_out"] = parameters["optics_parameters"][
-            "optics_defocusout"
-        ]
-    else:
-        dic["optics"]["defocus_file_out"] = None
+
     dic["detector"]["det_pix_x"] = parameters["detector_parameters"]["detector_nx_px"]
     dic["detector"]["det_pix_y"] = parameters["detector_parameters"]["detector_ny_px"]
     dic["detector"]["pixel_size"] = parameters["detector_parameters"][
@@ -184,16 +203,30 @@ def populate_tem_input_parameter_dict(
     dic["detector"]["mtf_beta"] = parameters["detector_parameters"]["mtf_params"][4]
     dic["detector"]["image_file_out"] = mrc_file
 
+    dic["geometry"] = {}
+    dic["geometry"]["n_tilts"] = parameters["geometry_parameters"]["n_samples"]
+
+    try:
+        dic["ctf"] = {}
+        dic["ctf"]["distribution_type"] = parameters["ctf_parameters"]["distribution_type"]
+        dic["ctf"]["distribution_parameters"] = parameters["ctf_parameters"]["distribution_parameters"]
+        dic["optics"]["gen_defocus"] = "no"
+        dic["optics"]["defocus_file_in"] = defocus_file
+    except KeyError:
+        log.warning("ctf_parameters not found/invalid. Using constant defocus.")
+        dic["optics"]["gen_defocus"] = "yes"
+        dic["optics"]["defocus_file_in"] = None
+
     return dic
 
 
 def starfile_append_tem_simulator_data(
-    data_list,
-    rotation,
-    contrast_transfer_function,
-    projection_shift,
-    iterations,
-    config,
+        data_list,
+        rotation,
+        contrast_transfer_function,
+        projection_shift,
+        iterations,
+        config,
 ):
     """Append the data list with the parameters of the simulator.
 

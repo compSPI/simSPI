@@ -39,6 +39,7 @@ class TEMSimulator:
             self.output_path_dict["pdb_file"],
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
+            self.output_path_dict["defocus_file"]
         )
 
     def get_config_from_yaml(self, config_yaml):
