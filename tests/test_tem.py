@@ -12,7 +12,8 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class():
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "/work/tests/test_files"
+    # test_files_path = "/work/tests/test_files"
+    test_files_path = "./test_files" #TODO: remove
     tmp_path = test_files_path
     cwd = os.getcwd()
 
@@ -52,7 +53,8 @@ def sample_class():
 @pytest.fixture
 def sample_resources():
     """Return sample resources for testing."""
-    test_files_path = "./tests/test_files"
+    # test_files_path = "./tests/test_files"
+    test_files_path = "./test_files"#TODO: remove
     cwd = os.getcwd()
     resources = {
         "files": {
@@ -171,6 +173,7 @@ def test_generate_path_dict(sample_class, sample_resources):
         "inp_file": ".inp",
         "h5_file": ".h5",
         "h5_file_noisy": "-noisy.h5",
+        "defocus_file" : ".txt"
     }
     returned_paths = sample_class.generate_path_dict(
         sample_resources["files"]["pdb_file"]

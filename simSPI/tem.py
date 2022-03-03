@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import micrographs
+from ioSPI.ioSPI import micrographs #TODO: remove extra ioSPI
 
 from simSPI import crd, fov, tem_inputs
 
@@ -61,7 +61,7 @@ class TEMSimulator:
                 beam_params : str maps to list
                     List containing the beam parameters
                 detector_params : str maps to list
-                    List containing the detector parameters
+                     List containing the detector parameters
                 optics_params : str maps to list
                     List containing the optic parameters
         """
@@ -175,6 +175,8 @@ class TEMSimulator:
                 relative path to desired output mrc file
             log_file
                 relative path to desired output log file
+            defocus_file
+                relative path to desired output defocus parameter file
         """
         path_dict = {}
 
@@ -193,6 +195,7 @@ class TEMSimulator:
         path_dict["inp_file"] = str(Path(output_dir, mrc_keyword + ".inp"))
         path_dict["h5_file"] = str(Path(output_dir, mrc_keyword + ".h5"))
         path_dict["h5_file_noisy"] = str(Path(output_dir, mrc_keyword + "-noisy.h5"))
+        path_dict["defocus_file"] = str(Path(output_dir, mrc_keyword + "_defocus_" + ".txt")) #TODO: incorporate Callum's pdb keyword
 
         return path_dict
 
