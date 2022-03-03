@@ -19,7 +19,7 @@ def normalized_mse(a, b):
     """Return normalized error between two numpy arrays."""
     return np.sum((a - b) ** 2) ** 0.5 / np.sum(a ** 2) ** 0.5
 
-
+# TODO: update test
 def test_fill_parameters_dictionary_max():
     """Test fill_parameters_dictionary with maximal garbage parameters."""
     tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
@@ -172,8 +172,8 @@ def test_fill_parameters_dictionary_max():
         os.unlink(tmp_yml.name)
 
 
-# TODO: update test
 
+# TODO: update test
 def test_fill_parameters_dictionary_min():
     """Test fill_parameters_dictionary with minimal garbage parameters."""
     tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
@@ -296,7 +296,7 @@ def test_fill_parameters_dictionary_min():
         os.unlink(tmp_yml.name)
 
 
-# TODO: update test
+
 
 def test_starfile_data():
     """Check if the data_list returned is equal to the input params."""
@@ -366,7 +366,7 @@ def test_starfile_data():
         assert normalized_mse(list_var[12], config.amplitude_contrast) < 0.01
         assert normalized_mse(list_var[13], config.b_factor) < 0.01
 
-
+# TODO: update test
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
     tmp_inp = tempfile.NamedTemporaryFile(delete = False, suffix = ".imp")

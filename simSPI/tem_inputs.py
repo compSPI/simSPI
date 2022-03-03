@@ -353,7 +353,7 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
             "=== geometry ===\n"
             "gen_tilt_data = yes\n"
             "tilt_axis = 0\n"
-            "ntilts = 1\n"
+            "ntilts = {0[n_tilts]}\n"
             "theta_start = 0\n"
             "theta_incr = 0\n"
             "geom_errors = none\n"
@@ -374,7 +374,7 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
             "aperture = {0[aperture]}\n"
             "focal_length = {0[focal_length]}\n"
             "cond_ap_angle = {0[cond_ap_angle]}\n"
-            "gen_defocus = yes\n"
+            "gen_defocus = {0[gen_defocus]}\n"
             "defocus_nominal = {0[defocus_nominal]}\n"
             "defocus_syst_error = {0[defocus_syst_error]}\n"
             "defocus_syst_error = {0[defocus_nonsyst_error]}\n".format(
@@ -384,6 +384,12 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
         if tem_inputs["optics"]["defocus_file_out"] is not None:
             inp.write(
                 "defocus_file_out = {0[defocus_file_out]}\n".format(
+                    tem_inputs["optics"]
+                )
+            )
+        if tem_inputs["optics"]["defocus_file_in"] is not None:
+            inp.write(
+                "defocus_file_in = {0[defocus_file_in]}\n".format(
                     tem_inputs["optics"]
                 )
             )
