@@ -288,6 +288,25 @@ def starfile_append_tem_simulator_data(
     return data_list
 
 
+def write_tem_defocus_file_from_distribution(path: str, distribution: list):
+    """Write defocus distribution into tabular formatted file.
+
+    Parameters
+    ----------
+    path : str
+        File path to defocus file.
+    distribution : list
+        Defocus distribution.
+
+    """
+
+    with open(path, "w") as inp:
+        inp.write("# File created by TEM-simulator, version 1.3.\n")
+        inp.write(f"{len(distribution)} 1\n")
+        for sample in distribution:
+            inp.write(f"{sample}\n")
+
+
 def write_tem_inputs_to_inp_file(path, tem_inputs):
     """Write tem simulator inputs to input .inp file.
 
