@@ -197,6 +197,10 @@ def test_create_inp_file(sample_class):
     sample_class.write_inp_file()
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
 
+def test_create_defocus_file(sample_class):
+    """Test creation of defocus file."""
+    sample_class.create_defocus_file()
+    assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
 
 def test_extract_particles(sample_class, sample_resources):
     """Test extract_particles returns particles of expected shape from mrc."""
