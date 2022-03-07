@@ -145,6 +145,7 @@ def test_generate_path_dict(sample_class, sample_resources):
         "inp_file": ".inp",
         "h5_file": ".h5",
         "h5_file_noisy": "-noisy.h5",
+        "star_file": ".star",
     }
     returned_paths = sample_class.generate_path_dict(
         sample_resources["files"]["pdb_file"]

@@ -41,6 +41,8 @@ class TEMSimulator:
             self.output_path_dict["log_file"],
         )
 
+        stream.close()
+
     def get_config_from_yaml(self, config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
 
@@ -67,6 +69,9 @@ class TEMSimulator:
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
+
+        stream.close()
+
         classified_params = self.classify_input_config(raw_params)
 
         return classified_params
@@ -143,13 +148,17 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None, **kwargs):
+    def generate_path_dict(
+        pdb_file, metadata_params_file, output_dir=None, mrc_keyword=None, **kwargs
+    ):
         """Return the paths to pdb, crd, log, inp, and h5 files as strings.
 
         Parameters
         ----------
         pdb_file : str
             Relative path to the pdb file
+        metadata_params_file : str
+            Relative path to metadata params file
         output_dir : str, (default = None)
             Relative path to output directory
         mrc_keyword : str, (default = None)
@@ -189,6 +198,7 @@ class TEMSimulator:
             )
 
         path_dict["pdb_file"] = str(Path(pdb_file))
+        path_dict["metadata_params_file"] = str(Path(metadata_params_file))
         path_dict["crd_file"] = str(
             Path(output_dir, pdb_keyword + mrc_keyword + ".txt")
         )
@@ -206,7 +216,7 @@ class TEMSimulator:
             Path(output_dir, pdb_keyword + mrc_keyword + "-noisy.h5")
         )
         path_dict["star_file"] = str(
-            Path(output_dir, pdb_keyword + "_" + mrc_keyword + ".star")
+            Path(output_dir, pdb_keyword + mrc_keyword + ".star")
         )
 
         return path_dict
@@ -397,8 +407,10 @@ class TEMSimulator:
             self.output_path_dict["crd_file"]
         )
 
-        with open(Path("simSPI/data/metadata_fields.yaml"), "r") as stream:
+        with open(Path(self.output_path_dict["metadata_params_file"]), "r") as stream:
             metadata_fields = yaml.safe_load(stream)
+
+        stream.close()
 
         with open(self.output_path_dict["star_file"], "w") as f:
             mtf_params = {}
@@ -417,11 +429,13 @@ class TEMSimulator:
                             f.write("_" + "{0:24}{1:>15}\n".format(key_fixed, value0))
                 f.write("\n")
 
-            f.write("mtf_params\n")
+            f.write("loop_\n")
+            f.write("_mtf_params\n")
             for c in ("a", "b", "c", "alpha", "beta"):
                 if c in mtf_params:
-                    f.write(f"{mtf_params[c]:13.4f}")
+                    f.write(f"{mtf_params[c]:13.4f}\n")
 
+            f.write("\n")
             f.write("loop_\n")
             f.write("_x\n")
             f.write("_y\n")
@@ -436,6 +450,8 @@ class TEMSimulator:
                     "{0[3]:13.4f}{0[4]:13.4f}"
                     "{0[5]:13.4f}\n".format(coord)
                 )
+
+        f.close()
 
     @staticmethod
     def retrieve_rotation_metadata(path):
@@ -457,9 +473,10 @@ class TEMSimulator:
         with open(path) as f:
             lines = f.readlines()
 
+        f.close()
+
         for i, line in enumerate(lines):
             if i >= 4:
                 rotation_metadata.append([float(x) for x in line.split()[:]])
 
-        f.close()
         return rotation_metadata
