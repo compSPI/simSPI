@@ -24,7 +24,7 @@
     defocus_um: 1.0                  # [um]
     defocus_syst_error_um: 0.0       # [um]
     defocus_nonsyst_error_um: 0.0    # [um]
-    optics_defocusout: None     # file to write defocus values
+    optics_defocusout: None          # file to write defocus values
 
   detector_parameters:
     detector_nx_px: 5760               # [px] number of pixels along X axis
@@ -35,12 +35,5 @@
     detector_q_efficiency: 0.5         # detector quantum efficiency
     mtf_params: [0,0,1,0,0]            # to be described. [0,0,1,0,0] is perfect detector.
 
-  geometry_parameters:
-    n_samples: 4                       # number of samples to be generated
-
-  ctf_parameters:
-    distribution_type: 'uniform'        # type of distribution, either 'gaussian' or 'uniform'
-    distribution_parameters: [0, 1]     # distribution parameters, uniform: (low, high), gaussian: (loc, scale)
-
   miscellaneous:
-    signal_to_noise: 0.67               # signal-to-noise-ratio for added white noise.
+    signal_to_noise: 0.67              # signal-to-noise-ratio for added white noise.
