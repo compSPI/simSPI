@@ -28,6 +28,8 @@ class TEMSimulator:
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
 
+        stream.close()
+
         self.output_path_dict = self.generate_path_dict(**parsed_path_config)
         self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
 
@@ -40,8 +42,6 @@ class TEMSimulator:
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
         )
-
-        stream.close()
 
     def get_config_from_yaml(self, config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
