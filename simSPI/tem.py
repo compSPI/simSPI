@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import micrographs
 
-from simSPI import crd, distribution_utils, fov, tem_inputs
+from simSPI import crd, fov, tem_inputs
 
 
 class TEMSimulator:
@@ -181,6 +181,8 @@ class TEMSimulator:
                 relative path to desired output mrc file
             log_file
                 relative path to desired output log file
+            defocus_file
+                relative path to desired output defocus parameter file
         """
         path_dict = {}
 
@@ -254,6 +256,28 @@ class TEMSimulator:
 
         return particle_data
 
+    def create_defocus_file(self):
+        """Sample defocus parameters and generate corresponding defocus file."""
+        # defocus_params = self.parameter_dict["ctf"] #TODO: implement this.
+        # n_samples = self.parameter_dict["geometry"]["n_tilts"]
+        #
+        # distribution = distribution_utils.make_distribution(
+        #     defocus_params["distribution_parameters"],
+        #     defocus_params["distribution_type"],
+        # )
+        # samples = distribution_utils.draw_samples_distribution_1d(
+        #     distribution, n_samples
+        # ).tolist()
+        #
+        #
+        # self.defocus_distribution_samples = samples
+
+        defocus_distribution = []
+
+        tem_inputs.write_tem_defocus_file_from_distribution(
+            self.output_path_dict["defocus_file"], defocus_distribution
+        )
+
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
 
@@ -288,22 +312,6 @@ class TEMSimulator:
         tem_inputs.write_tem_inputs_to_inp_file(
             path=self.output_path_dict["inp_file"], tem_inputs=self.parameter_dict
         )
-
-    def create_defocus_file(self):
-        """Sample defocus parameters and generate corresponding defocus file."""
-        defocus_params = self.parameter_dict["ctf"]
-        n_samples = self.parameter_dict["geometry"]["n_tilts"]
-
-        distribution = distribution_utils.make_distribution(
-            defocus_params["distribution_parameters"],
-            defocus_params["distribution_type"],
-        )
-        samples = distribution_utils.draw_samples_distribution_1d(
-            distribution, n_samples
-        ).tolist()
-        self.defocus_distribution_samples = samples
-
-        # write_defocus_file(samples, self.output_path_dict["defocus_file"])
 
     def get_image_data(self):
         """Run simulator and return data.

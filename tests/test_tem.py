@@ -56,6 +56,7 @@ def test_temsimulator_constructor(sample_resources):
         "beam",
         "optics",
         "detector",
+        "geometry",
     ]
     assert tem_sim.output_path_dict is not None
     assert tem_sim.sim_dict is not None
@@ -145,6 +146,7 @@ def test_generate_path_dict(sample_class, sample_resources):
         "inp_file": ".inp",
         "h5_file": ".h5",
         "h5_file_noisy": "-noisy.h5",
+        "defocus_file": ".txt",
     }
     returned_paths = sample_class.generate_path_dict(
         sample_resources["files"]["pdb_file"]
@@ -166,6 +168,12 @@ def test_create_inp_file(sample_class):
     """Test creation of .inp file."""
     sample_class.create_inp_file()
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
+
+
+def test_create_defocus_file(sample_class):
+    """Test creation of defocus file."""
+    sample_class.create_defocus_file()
+    assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
 
 
 def test_extract_particles(sample_class, sample_resources):
