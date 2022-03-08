@@ -12,7 +12,7 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class():
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "./test_files"
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
@@ -26,7 +26,7 @@ def sample_class():
 @pytest.fixture
 def sample_resources():
     """Return sample resources for testing."""
-    test_files_path = "./tests/test_files"
+    test_files_path = "./test_files"
     cwd = os.getcwd()
     resources = {
         "files": {
@@ -259,3 +259,56 @@ def test_run(sample_class):
     )
     assert os.path.isfile(sample_class.output_path_dict["h5_file"])
     assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
+
+
+def test_apply_gaussian_noise(sample_class, sample_resources):
+    """Test if gaussian noise is applied properly to particle stack.
+
+    Notes
+    -----
+    This test requires a local TEM sim installation to run.
+    """
+    sample_class.sim_dict["molecular_model"] = [0.1, "toto", "None"]
+    sample_class.sim_dict["optics_parameters"] = [
+        81000,
+        2.7,
+        2.7,
+        50,
+        3.5,
+        0.1,
+        1.0,
+        0.0,
+        0.0,
+        "None",
+    ]
+    sample_class.sim_dict["detector_parameters"] = [
+        5760,
+        4092,
+        5,
+        2,
+        "no",
+        0.5,
+        0,
+        0,
+        1,
+        0,
+        0,
+    ]
+
+    particles = fov.micrograph2particles(
+        sample_resources["data"]["micrograph"],
+        sample_class.sim_dict["optics_parameters"],
+        sample_class.sim_dict["detector_parameters"],
+        pdb_file=sample_resources["files"]["pdb_file"],
+        pad=5.0,
+    )
+
+    noisy_particles = sample_class.apply_gaussian_noise(particles)
+    np.testing.assert_raises(
+        AssertionError, np.testing.assert_array_equal, particles, noisy_particles
+    )
+
+    sample_class.parameter_dict.pop("other", None)
+
+    original_particles = sample_class.apply_gaussian_noise(particles)
+    np.testing.assert_array_equal(particles, original_particles)

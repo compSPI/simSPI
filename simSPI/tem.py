@@ -30,12 +30,9 @@ class TEMSimulator:
 
         stream.close()
 
-        print(parsed_path_config)
-
+        self.sim_dict = self.get_config_from_yaml(sim_config)
         self.output_path_dict = self.generate_path_dict(**parsed_path_config)
         self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
-
-        self.sim_dict = self.get_config_from_yaml(sim_config)
 
         self.parameter_dict = tem_inputs.populate_tem_input_parameter_dict(
             sim_config,
@@ -389,6 +386,8 @@ class TEMSimulator:
 
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
+            # TODO: update choosing of noisy params in output path dict to only have
+            #       to add "h5_file_noisy" to path dict only when noise is in sim_config
             if "h5_file_noisy" in self.output_path_dict:
                 micrographs.write_data_dict_to_hdf5(
                     self.output_path_dict["h5_file_noisy"], noisy_particles
