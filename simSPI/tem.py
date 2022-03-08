@@ -30,6 +30,8 @@ class TEMSimulator:
 
         stream.close()
 
+        print(parsed_path_config)
+
         self.output_path_dict = self.generate_path_dict(**parsed_path_config)
         self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
 
@@ -151,7 +153,7 @@ class TEMSimulator:
     def generate_path_dict(
         pdb_file, metadata_params_file, output_dir=None, mrc_keyword=None, **kwargs
     ):
-        """Return the paths to pdb, crd, log, inp, and h5 files as strings.
+        """Return the paths to pdb, metadata_params, crd, log, inp, and h5 files as strings.
 
         Parameters
         ----------
@@ -164,7 +166,7 @@ class TEMSimulator:
         mrc_keyword : str, (default = None)
             user-specified keyword appended to output files
         kwargs
-            compatibiltity for arbitrary extra parameters.
+            compatibility for arbitrary extra parameters.
 
         Returns
         -------
@@ -172,6 +174,8 @@ class TEMSimulator:
             Dict of file paths that includes keys:
             pdb_file
                 relative path to pdb input file
+            metadata_params_file
+                relative path to metadata_params file
             crd_file
                 relative path to desired output crd file
             h5_file
@@ -184,6 +188,8 @@ class TEMSimulator:
                 relative path to desired output mrc file
             log_file
                 relative path to desired output log file
+            star_file
+                relative poth to desured output star file
         """
         path_dict = {}
 
