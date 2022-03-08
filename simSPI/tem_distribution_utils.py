@@ -1,35 +1,54 @@
-from linear_simulator.params_utils import DistributionalParams
-import torch
+"""Utility file for generating and sampling distributions."""
+import torch.distributions as dist
+from torch import zeros
 
 
 
+class DistributionGenerator():
+    """Class to generate parameters using the specified distribution.
 
-class TEMDistributionalParams(DistributionalParams):
+    Parameters
+    ----------
+    distribution_params: arr
+      List of parameters to initialize distribution of interest.
+    distribution_type: str
+      String associated with a valid distribution.
+    """
 
-    def get_ctf_params(self):
-        if self.config.ctf:
-            defocus = None
-            if self.config.ctf.distribution_type == "uniform":
-                min_defocus, max_defocus = self.config.ctf.distribution_params
-                defocus = (
-                        min_defocus
-                        + (max_defocus - min_defocus)
-                        * torch.zeros(self.config.batch_size)[:].uniform_()
-                )
+    def __init__(self, distribution_params,distribution_type):
+        distribution_no_params = {
+            "gaussian": dist.normal.Normal,
+            "uniform": dist.uniform.Uniform,
+        }
 
-            elif self.config.ctf.distribution_type == "gaussian":
-                mean, std = self.config.ctf.distribution_params
-                defocus = torch.zeros(self.config.batch_size)[:].normal_(mean,std)
+        if distribution_type == "gaussian":
+            loc, scale = distribution_params
+            distribution = distribution_no_params["gaussian"](loc, scale)
 
-            else:
-                raise NotImplementedError(
-                    f"Distribution type: '{self.config.ctf.distribution_type}' "
-                    f"has not been implemented!"
-                )
-            try:
-                if self.config.ctf.is_numpy:
-                    return defocus.detach().numpy()
-            except KeyError:
-                pass
+        elif distribution_type == "uniform":
+            low, high = distribution_params
+            distribution = distribution_no_params["uniform"](low, high)
+        else:
+            raise NotImplementedError(
+                f"Distribution type '{distribution_type}' "
+                f"has not been implemented!"
+            )
 
-        return defocus
+        self.distribution = distribution
+
+    def draw_samples_1d(self,n_samples):
+        """Draw n samples from a distribution.
+        Parameters
+        ----------
+        n_samples: int
+          Number of samples to be drawn from distribution
+        Returns
+        -------
+        samples_1d: tensor
+          PyTorch tensor (array) containing n_samples samples from distribution.
+        """
+        samples_1d = zeros(n_samples)
+        for idx in range(n_samples):
+            samples_1d[idx] = self.distribution.sample()
+        return samples_1d
+
