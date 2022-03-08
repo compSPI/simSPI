@@ -33,6 +33,9 @@ def sample_resources():
             "path_yaml": str(Path(cwd, test_files_path, "path_config.yaml")),
             "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
             "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+            "metadata_params_file": str(
+                Path(cwd, test_files_path, "metadata_fields.yaml")
+            ),
         }
     }
 
