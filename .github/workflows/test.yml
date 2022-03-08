@@ -34,7 +34,6 @@ jobs:
         uses: ./tests/
         id: testing
         with:
-          no-cache: true
           command: |
             pytest --cov-report term --cov-report xml:coverage.xml --cov=simSPI tests
 
