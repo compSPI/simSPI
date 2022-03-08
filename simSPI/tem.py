@@ -153,7 +153,7 @@ class TEMSimulator:
     def generate_path_dict(
         pdb_file, metadata_params_file, output_dir=None, mrc_keyword=None, **kwargs
     ):
-        """Return the paths to pdb, metadata_params, crd, log, inp, and h5 files as strings.
+        """Return dict containing path_config paths and output files as strings.
 
         Parameters
         ----------
