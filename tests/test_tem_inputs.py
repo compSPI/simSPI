@@ -19,7 +19,7 @@ def normalized_mse(a, b):
     """Return normalized error between two numpy arrays."""
     return np.sum((a - b) ** 2) ** 0.5 / np.sum(a ** 2) ** 0.5
 
-# TODO: update test
+
 def test_fill_parameters_dictionary_max():
     """Test fill_parameters_dictionary with maximal garbage parameters."""
     tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
@@ -27,6 +27,7 @@ def test_fill_parameters_dictionary_max():
 
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
+    defocus_file = "a.txt"
     voxel_size = 0.2
     particle_name = "africa"
     particle_mrcout = "b.mrc"
@@ -62,7 +63,9 @@ def test_fill_parameters_dictionary_max():
     snr = 0.6
     snr_db = 10
     key = particle_mrcout.split(".mrc")[0]
-
+    n_samples = 5
+    dist_type = 'uniform'
+    dist_parameters = [0, 1]
     try:
         with open(tmp_yml.name, "w") as f:
             data = {
@@ -108,6 +111,14 @@ def test_fill_parameters_dictionary_max():
                     "signal_to_noise": snr,
                     "signal_to_noise_db": snr_db,
                 },
+                "geometry_parameters": {
+                    "n_samples": n_samples
+                },
+                "ctf_parameters":{
+                    "distribution_type": dist_type,
+                    "distribution_parameters": dist_parameters
+                }
+
             }
             contents = yaml.dump(data)
             f.write(contents)
@@ -117,6 +128,7 @@ def test_fill_parameters_dictionary_max():
             pdb_file,
             crd_file,
             log_file,
+            defocus_file,
             dose = dose,
             noise = noise_override,
         )
@@ -173,7 +185,6 @@ def test_fill_parameters_dictionary_max():
 
 
 
-# TODO: update test
 def test_fill_parameters_dictionary_min():
     """Test fill_parameters_dictionary with minimal garbage parameters."""
     tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
@@ -181,6 +192,7 @@ def test_fill_parameters_dictionary_min():
 
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
+    defocus_file = "a.txt"
     voxel_size = 0.2
     particle_name = "africa"
     crd_file = "a.crd"
@@ -207,6 +219,7 @@ def test_fill_parameters_dictionary_min():
     detector_q_efficiency = 0.1
     mtf_params = [0.1, 0.0, 0.7, 0, 0]
     log_file = "itslog.log"
+    n_samples = 5
 
     try:
         with open(tmp_yml.name, "w") as f:
@@ -245,11 +258,14 @@ def test_fill_parameters_dictionary_min():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
+                "geometry_parameters":{
+                    "n_samples": n_samples
+                }
             }
             contents = yaml.dump(data)
             f.write(contents)
         out_dict = populate_tem_input_parameter_dict(
-            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
+            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file,defocus_file
         )
 
         assert out_dict["simulation"]["log_file"] == log_file
@@ -366,7 +382,7 @@ def test_starfile_data():
         assert normalized_mse(list_var[12], config.amplitude_contrast) < 0.01
         assert normalized_mse(list_var[13], config.b_factor) < 0.01
 
-# TODO: update test
+
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
     tmp_inp = tempfile.NamedTemporaryFile(delete = False, suffix = ".imp")
@@ -374,6 +390,7 @@ def test_write_inp_file():
     tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
     tmp_yml.close()
 
+    defocus_file = "a.txt"
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
     voxel_size = 0.2
@@ -402,7 +419,7 @@ def test_write_inp_file():
     detector_q_efficiency = 0.1
     mtf_params = [0.1, 0.0, 0.7, 0, 0]
     log_file = "itslog.log"
-
+    n_samples = 10
     try:
         with open(tmp_yml.name, "w") as f:
             data = {
@@ -440,11 +457,14 @@ def test_write_inp_file():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
+                "geometry_parameters": {
+                    "n_samples": n_samples
+                }
             }
             contents = yaml.dump(data)
             f.write(contents)
         out_dict = populate_tem_input_parameter_dict(
-            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
+            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file,defocus_file
         )
         write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
     finally:
