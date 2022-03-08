@@ -26,8 +26,6 @@ jobs:
 
       - name: Check Out Repo
         uses: actions/checkout@v2
-        with:
-          - fetch-depth: 10
 
       - name: Set up Docker Buildx
         id: buildx
