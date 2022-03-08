@@ -142,6 +142,7 @@ def test_generate_path_dict(sample_class, sample_resources):
     """Test whether returned path dictionary has expected file paths."""
     expected_path_template = {
         "pdb_file": ".pdb",
+        "metadata_params_file": ".yaml",
         "crd_file": ".txt",
         "mrc_file": ".mrc",
         "log_file": ".log",
@@ -151,7 +152,8 @@ def test_generate_path_dict(sample_class, sample_resources):
         "star_file": ".star",
     }
     returned_paths = sample_class.generate_path_dict(
-        sample_resources["files"]["pdb_file"]
+        sample_resources["files"]["pdb_file"],
+        sample_resources["files"]["metadata_params_file"],
     )
     for file_type, file_path in returned_paths.items():
         assert file_type in expected_path_template
