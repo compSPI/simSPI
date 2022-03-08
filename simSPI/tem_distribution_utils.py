@@ -9,13 +9,13 @@ class DistributionGenerator():
 
     Parameters
     ----------
-    distribution_params: arr
-      List of parameters to initialize distribution of interest.
     distribution_type: str
       String associated with a valid distribution.
+    distribution_params: arr
+      List of parameters to initialize distribution of interest.
     """
 
-    def __init__(self, distribution_params,distribution_type):
+    def __init__(self,distribution_type, distribution_params):
         distribution_no_params = {
             "gaussian": dist.normal.Normal,
             "uniform": dist.uniform.Uniform,
