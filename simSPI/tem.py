@@ -69,6 +69,8 @@ class TEMSimulator:
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
+
+        print(raw_params)
         classified_params = self.classify_input_config(raw_params)
 
         return classified_params
