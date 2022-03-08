@@ -53,6 +53,7 @@ jobs:
           file: ./docker/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
+          pull: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:test
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
@@ -72,6 +73,7 @@ jobs:
           file: ./docker/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
+          pull: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
