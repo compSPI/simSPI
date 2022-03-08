@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 from simSPI.tem_distribution_utils import DistributionGenerator
-from ioSPI.ioSPI import micrographs #TODO: remove extra ioSPI
+from ioSPI import micrographs #TODO: remove extra ioSPI
 
 from simSPI import crd, fov, tem_inputs
 
