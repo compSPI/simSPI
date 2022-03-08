@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
+from simSPI.tem_distribution_utils import DistributionGenerator
 from ioSPI.ioSPI import micrographs #TODO: remove extra ioSPI
 
 from simSPI import crd, fov, tem_inputs
@@ -235,23 +236,20 @@ class TEMSimulator:
 
     def create_defocus_file(self):
         """Sample defocus parameters and generate corresponding defocus file."""
-        # defocus_params = self.parameter_dict["ctf"] #TODO: implement this.
-        # n_samples = self.parameter_dict["geometry"]["n_tilts"]
-        #
-        # distribution = distribution_utils.make_distribution(
-        #     defocus_params["distribution_parameters"],
-        #     defocus_params["distribution_type"],
-        # )
-        # samples = distribution_utils.draw_samples_distribution_1d(
-        #     distribution, n_samples
-        # ).tolist()
 
-        #
-        # self.defocus_distribution_samples = samples
+        defocus_params = self.parameter_dict["ctf"]
+        n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
-        defocus_distribution = []
+        distribution_generator = DistributionGenerator(
+            defocus_params["distribution_type"],
+            defocus_params["distribution_parameters"]
+        )
+        samples = distribution_generator.draw_samples_1d(
+             n_samples
+        ).tolist()
 
-        tem_inputs.write_tem_defocus_file_from_distribution(self.output_path_dict["defocus_file"],defocus_distribution)
+        samples = [round(num, 4) for num in samples]
+        tem_inputs.write_tem_defocus_file_from_distribution(self.output_path_dict["defocus_file"],samples)
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
