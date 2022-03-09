@@ -3,8 +3,7 @@ import torch.distributions as dist
 from torch import zeros
 
 
-
-class DistributionGenerator():
+class DistributionGenerator:
     """Class to generate parameters using the specified distribution.
 
     Parameters
@@ -15,7 +14,7 @@ class DistributionGenerator():
       List of parameters to initialize distribution of interest.
     """
 
-    def __init__(self,distribution_type, distribution_params):
+    def __init__(self, distribution_type, distribution_params):
         distribution_no_params = {
             "gaussian": dist.normal.Normal,
             "uniform": dist.uniform.Uniform,
@@ -30,14 +29,14 @@ class DistributionGenerator():
             distribution = distribution_no_params["uniform"](low, high)
         else:
             raise NotImplementedError(
-                f"Distribution type '{distribution_type}' "
-                f"has not been implemented!"
+                f"Distribution type '{distribution_type}' " f"has not been implemented!"
             )
 
         self.distribution = distribution
 
-    def draw_samples_1d(self,n_samples):
+    def draw_samples_1d(self, n_samples):
         """Draw n samples from a distribution.
+
         Parameters
         ----------
         n_samples: int
@@ -51,4 +50,3 @@ class DistributionGenerator():
         for idx in range(n_samples):
             samples_1d[idx] = self.distribution.sample()
         return samples_1d
-
