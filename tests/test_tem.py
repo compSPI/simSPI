@@ -13,37 +13,11 @@ from simSPI import fov, tem
 def sample_class():
     """Instantiate TEMSimulator for testing."""
     test_files_path = "/work/tests/test_files"
-    tmp_path = test_files_path
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
         str(Path(cwd, test_files_path, "path_config.yaml")),
         str(Path(cwd, test_files_path, "sim_config.yaml")),
-    )
-
-    # from test_files/path_config
-    out_file_name = "4v6x_randomrot"
-
-    tem_simulator.output_path_dict["crd_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".txt")
-    )
-    tem_simulator.output_path_dict["mrc_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".mrc")
-    )
-    tem_simulator.output_path_dict["log_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".log")
-    )
-    tem_simulator.output_path_dict["inp_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".inp")
-    )
-    tem_simulator.output_path_dict["h5_file"] = str(
-        Path(cwd, tmp_path, out_file_name + ".h5")
-    )
-    tem_simulator.output_path_dict["h5_file_noisy"] = str(
-        Path(cwd, tmp_path, out_file_name + "-noisy.h5")
-    )
-    tem_simulator.output_path_dict["pdb_file"] = str(
-        Path(cwd, test_files_path, "4v6x.pdb")
     )
 
     return tem_simulator
@@ -52,13 +26,16 @@ def sample_class():
 @pytest.fixture
 def sample_resources():
     """Return sample resources for testing."""
-    test_files_path = "./tests/test_files"
+    test_files_path = "/work/tests/test_files"
     cwd = os.getcwd()
     resources = {
         "files": {
             "path_yaml": str(Path(cwd, test_files_path, "path_config.yaml")),
             "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
             "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+            "metadata_params_file": str(
+                Path(cwd, test_files_path, "metadata_fields.yaml")
+            ),
         }
     }
 
@@ -165,15 +142,18 @@ def test_generate_path_dict(sample_class, sample_resources):
     """Test whether returned path dictionary has expected file paths."""
     expected_path_template = {
         "pdb_file": ".pdb",
+        "metadata_params_file": ".yaml",
         "crd_file": ".txt",
         "mrc_file": ".mrc",
         "log_file": ".log",
         "inp_file": ".inp",
         "h5_file": ".h5",
         "h5_file_noisy": "-noisy.h5",
+        "star_file": ".star",
     }
     returned_paths = sample_class.generate_path_dict(
-        sample_resources["files"]["pdb_file"]
+        sample_resources["files"]["pdb_file"],
+        sample_resources["files"]["metadata_params_file"],
     )
     for file_type, file_path in returned_paths.items():
         assert file_type in expected_path_template
@@ -279,3 +259,56 @@ def test_run(sample_class):
     )
     assert os.path.isfile(sample_class.output_path_dict["h5_file"])
     assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
+
+
+def test_apply_gaussian_noise(sample_class, sample_resources):
+    """Test if gaussian noise is applied properly to particle stack.
+
+    Notes
+    -----
+    This test requires a local TEM sim installation to run.
+    """
+    sample_class.sim_dict["molecular_model"] = [0.1, "toto", "None"]
+    sample_class.sim_dict["optics_parameters"] = [
+        81000,
+        2.7,
+        2.7,
+        50,
+        3.5,
+        0.1,
+        1.0,
+        0.0,
+        0.0,
+        "None",
+    ]
+    sample_class.sim_dict["detector_parameters"] = [
+        5760,
+        4092,
+        5,
+        2,
+        "no",
+        0.5,
+        0,
+        0,
+        1,
+        0,
+        0,
+    ]
+
+    particles = fov.micrograph2particles(
+        sample_resources["data"]["micrograph"],
+        sample_class.sim_dict["optics_parameters"],
+        sample_class.sim_dict["detector_parameters"],
+        pdb_file=sample_resources["files"]["pdb_file"],
+        pad=5.0,
+    )
+
+    noisy_particles = sample_class.apply_gaussian_noise(particles)
+    np.testing.assert_raises(
+        AssertionError, np.testing.assert_array_equal, particles, noisy_particles
+    )
+
+    sample_class.parameter_dict.pop("other", None)
+
+    original_particles = sample_class.apply_gaussian_noise(particles)
+    np.testing.assert_array_equal(particles, original_particles)
