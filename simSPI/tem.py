@@ -6,10 +6,10 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from simSPI.tem_distribution_utils import DistributionGenerator
-from ioSPI import micrographs #TODO: remove extra ioSPI
+from ioSPI.ioSPI import micrographs  # TODO: remove extra ioSPI
 
 from simSPI import crd, fov, tem_inputs
+from simSPI.tem_distribution_utils import DistributionGenerator
 
 
 class TEMSimulator:
@@ -40,7 +40,7 @@ class TEMSimulator:
             self.output_path_dict["pdb_file"],
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
-            self.output_path_dict["defocus_file"]
+            self.output_path_dict["defocus_file"],
         )
 
     def get_config_from_yaml(self, config_yaml):
@@ -70,7 +70,6 @@ class TEMSimulator:
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
 
-        print(raw_params)
         classified_params = self.classify_input_config(raw_params)
 
         return classified_params
@@ -199,7 +198,9 @@ class TEMSimulator:
         path_dict["inp_file"] = str(Path(output_dir, mrc_keyword + ".inp"))
         path_dict["h5_file"] = str(Path(output_dir, mrc_keyword + ".h5"))
         path_dict["h5_file_noisy"] = str(Path(output_dir, mrc_keyword + "-noisy.h5"))
-        path_dict["defocus_file"] = str(Path(output_dir, mrc_keyword + "_defocus_" + ".txt")) #TODO: incorporate Callum's pdb keyword
+        path_dict["defocus_file"] = str(
+            Path(output_dir, mrc_keyword + "_defocus_" + ".txt")
+        )
 
         return path_dict
 
@@ -238,20 +239,19 @@ class TEMSimulator:
 
     def create_defocus_file(self):
         """Sample defocus parameters and generate corresponding defocus file."""
-
         defocus_params = self.parameter_dict["ctf"]
         n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
         distribution_generator = DistributionGenerator(
             defocus_params["distribution_type"],
-            defocus_params["distribution_parameters"]
+            defocus_params["distribution_parameters"],
         )
-        samples = distribution_generator.draw_samples_1d(
-             n_samples
-        ).tolist()
+        samples = distribution_generator.draw_samples_1d(n_samples).tolist()
 
         samples = [round(num, 4) for num in samples]
-        tem_inputs.write_tem_defocus_file_from_distribution(self.output_path_dict["defocus_file"],samples)
+        tem_inputs.write_tem_defocus_file_from_distribution(
+            self.output_path_dict["defocus_file"], samples
+        )
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
