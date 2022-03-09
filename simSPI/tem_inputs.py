@@ -1,13 +1,23 @@
 """Help format TEM Simulator input parameters."""
 
-import random
 import logging
+import random
+
 import numpy as np
 import yaml
 
 
+#
+# comment
 def populate_tem_input_parameter_dict(
-        input_params_file, mrc_file, pdb_file, crd_file, log_file, defocus_file, dose=None, noise=None
+    input_params_file,
+    mrc_file,
+    pdb_file,
+    crd_file,
+    log_file,
+    defocus_file,
+    dose=None,
+    noise=None,
 ):
     """Return parameter dictionary with settings for simulation.
 
@@ -80,10 +90,11 @@ def populate_tem_input_parameter_dict(
     - n_samples : number of images of the sample
 
     *** ctf ***
-    - distribution_type [OPTIONAL] : type of distribution. Overrides defocus_um parameter
-                                            if present.
-    - distribution_parameters [OPTIONAL] : distribution parameters. Required if distribution_type
-                                                is present.
+    - distribution_type [OPTIONAL] : type of distribution. Overrides defocus_um
+                                        parameter if present.
+
+    - distribution_parameters [OPTIONAL] : distribution parameters. Required if
+                                                distribution_type is present.
 
     *** miscellaneous ***
     - seed [OPTIONAL]              : seed for the run. If not present, random.
@@ -208,8 +219,12 @@ def populate_tem_input_parameter_dict(
 
     try:
         dic["ctf"] = {}
-        dic["ctf"]["distribution_type"] = parameters["ctf_parameters"]["distribution_type"]
-        dic["ctf"]["distribution_parameters"] = parameters["ctf_parameters"]["distribution_parameters"]
+        dic["ctf"]["distribution_type"] = parameters["ctf_parameters"][
+            "distribution_type"
+        ]
+        dic["ctf"]["distribution_parameters"] = parameters["ctf_parameters"][
+            "distribution_parameters"
+        ]
         dic["optics"]["gen_defocus"] = "no"
         dic["optics"]["defocus_file_in"] = defocus_file
     except KeyError:
@@ -221,12 +236,12 @@ def populate_tem_input_parameter_dict(
 
 
 def starfile_append_tem_simulator_data(
-        data_list,
-        rotation,
-        contrast_transfer_function,
-        projection_shift,
-        iterations,
-        config,
+    data_list,
+    rotation,
+    contrast_transfer_function,
+    projection_shift,
+    iterations,
+    config,
 ):
     """Append the data list with the parameters of the simulator.
 
@@ -299,7 +314,6 @@ def write_tem_defocus_file_from_distribution(path: str, distribution: list):
         Defocus distribution.
 
     """
-
     with open(path, "w") as inp:
         inp.write("# File created by TEM-simulator, version 1.3.\n")
         inp.write(f"{len(distribution)} 1\n")
@@ -389,9 +403,7 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
             )
         if tem_inputs["optics"]["defocus_file_in"] is not None:
             inp.write(
-                "defocus_file_in = {0[defocus_file_in]}\n".format(
-                    tem_inputs["optics"]
-                )
+                "defocus_file_in = {0[defocus_file_in]}\n".format(tem_inputs["optics"])
             )
         inp.write(
             "=== detector ===\n"
