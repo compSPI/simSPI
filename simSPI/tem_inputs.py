@@ -7,7 +7,6 @@ import numpy as np
 import yaml
 
 
-
 def populate_tem_input_parameter_dict(
     input_params_file,
     mrc_file,

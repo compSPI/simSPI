@@ -22,5 +22,5 @@ def test_draw_samples_1d():
     generator = tem_distribution_utils.DistributionGenerator("uniform", (0, 10))
 
     samples = generator.draw_samples_1d(10)
-    assert type(samples) == torch.Tensor
+    assert type(samples) is torch.Tensor
     assert samples.shape == torch.Size([10])
