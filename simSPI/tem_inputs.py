@@ -2,12 +2,12 @@
 
 import logging
 import random
+import string
 from pathlib import Path
 
 import numpy as np
 import yaml
-import random
-import string
+
 
 def populate_tem_input_parameter_dict(
     input_params_file,
@@ -119,7 +119,9 @@ def populate_tem_input_parameter_dict(
 
     dic["noise"] = {}
     try:
-        dic["noise"]["signal_to_noise"] = parameters["noise_parameters"]["signal_to_noise"]
+        dic["noise"]["signal_to_noise"] = parameters["noise_parameters"][
+            "signal_to_noise"
+        ]
     except KeyError:
         pass
 
@@ -520,9 +522,7 @@ def generate_path_dict(
     path_dict["log_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".log"))
     path_dict["inp_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".inp"))
     path_dict["h5_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".h5"))
-    path_dict["star_file"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + ".star")
-    )
+    path_dict["star_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".star"))
     path_dict["defocus_file"] = str(
         Path(output_dir, pdb_keyword + mrc_keyword + "_defocus" + ".txt")
     )
@@ -577,9 +577,6 @@ def classify_input_config(raw_params):
             "detector_q_efficiency",
             "mtf_params",
         ],
-        "geometry_parameters": ["n_samples"],
-        "ctf_parameters": ["distribution_type", "distribution_parameters"],
-        "miscellaneous": ["signal_to_noise"],
     }
 
     classified_sim_params = {}
