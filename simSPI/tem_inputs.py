@@ -89,17 +89,20 @@ def populate_tem_input_parameter_dict(
     except KeyError:
         random.seed()
         dic["simulation"]["seed"] = random.randint(0, int(1e10))
+
     dic["other"] = {}
     try:
         dic["other"]["signal_to_noise"] = parameters["miscellaneous"]["signal_to_noise"]
     except KeyError:
         pass
+
     try:
         dic["other"]["signal_to_noise_db"] = parameters["miscellaneous"][
             "signal_to_noise_db"
         ]
     except KeyError:
         pass
+
     dic["simulation"]["log_file"] = log_file
     dic["sample"] = {}
     dic["sample"]["diameter"] = parameters["specimen_grid_params"]["hole_diameter_nm"]
@@ -113,29 +116,33 @@ def populate_tem_input_parameter_dict(
     dic["particle"]["name"] = parameters["molecular_model"]["particle_name"]
     dic["particle"]["voxel_size"] = parameters["molecular_model"]["voxel_size_nm"]
     dic["particle"]["pdb_file"] = pdb_file
+
     if "particle_mrcout" in parameters["molecular_model"]:
         key = parameters["molecular_model"]["particle_mrcout"].split(".mrc")[0]
         dic["particle"]["map_file_re_out"] = key + "_real.mrc"
         dic["particle"]["map_file_im_out"] = key + "_imag.mrc"
     else:
         dic["particle"]["map_file_re_out"] = None
+
     dic["particleset"] = {}
     dic["particleset"]["name"] = parameters["molecular_model"]["particle_name"]
     dic["particleset"]["crd_file"] = crd_file
     dic["beam"] = {}
     dic["beam"]["voltage"] = parameters["beam_parameters"]["voltage_kv"]
     dic["beam"]["spread"] = parameters["beam_parameters"]["energy_spread_v"]
+
     if dose is not None:
         dic["beam"]["dose_per_im"] = dose
     else:
         dic["beam"]["dose_per_im"] = parameters["beam_parameters"][
             "electron_dose_e_per_nm2"
         ]
+
     dic["beam"]["dose_sd"] = parameters["beam_parameters"][
         "electron_dose_std_e_per_nm2"
     ]
-    dic["optics"] = {}
 
+    dic["optics"] = {}
     dic["optics"]["magnification"] = parameters["optics_parameters"]["magnification"]
     dic["optics"]["cs"] = parameters["optics_parameters"]["spherical_aberration_mm"]
     dic["optics"]["cc"] = parameters["optics_parameters"]["chromatic_aberration_mm"]
@@ -144,7 +151,9 @@ def populate_tem_input_parameter_dict(
     dic["optics"]["cond_ap_angle"] = parameters["optics_parameters"][
         "aperture_angle_mrad"
     ]
+
     dic["detector"] = {}
+
     if "defocus_um" in parameters["optics_parameters"]:
         dic["optics"]["defocus_nominal"] = parameters["optics_parameters"]["defocus_um"]
         dic["detector"]["mtf_a"] = parameters["optics_parameters"]["defocus_um"]
@@ -153,18 +162,21 @@ def populate_tem_input_parameter_dict(
             "mtf_params"
         ][0]
         dic["detector"]["mtf_a"] = parameters["detector_parameters"]["mtf_params"][0]
+
     dic["optics"]["defocus_syst_error"] = parameters["optics_parameters"][
         "defocus_syst_error_um"
     ]
     dic["optics"]["defocus_nonsyst_error"] = parameters["optics_parameters"][
         "defocus_nonsyst_error_um"
     ]
+
     if "optics_defocusout" in parameters["optics_parameters"]:
         dic["optics"]["defocus_file_out"] = parameters["optics_parameters"][
             "optics_defocusout"
         ]
     else:
         dic["optics"]["defocus_file_out"] = None
+
     dic["detector"]["det_pix_x"] = parameters["detector_parameters"]["detector_nx_px"]
     dic["detector"]["det_pix_y"] = parameters["detector_parameters"]["detector_ny_px"]
     dic["detector"]["pixel_size"] = parameters["detector_parameters"][
@@ -173,10 +185,12 @@ def populate_tem_input_parameter_dict(
     dic["detector"]["gain"] = parameters["detector_parameters"][
         "average_gain_count_per_electron"
     ]
+
     if noise is not None:
         dic["detector"]["use_quantization"] = noise
     else:
         dic["detector"]["use_quantization"] = parameters["detector_parameters"]["noise"]
+
     dic["detector"]["dqe"] = parameters["detector_parameters"]["detector_q_efficiency"]
     dic["detector"]["mtf_b"] = parameters["detector_parameters"]["mtf_params"][1]
     dic["detector"]["mtf_c"] = parameters["detector_parameters"]["mtf_params"][2]
