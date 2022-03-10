@@ -378,7 +378,7 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
             "ntilts = {0[n_tilts]}\n"
             "theta_start = 0\n"
             "theta_incr = 0\n"
-            "geom_errors = none\n"
+            "geom_errors = none\n".format(tem_inputs["geometry"])
         )
         inp.write(
             "=== electronbeam ===\n"

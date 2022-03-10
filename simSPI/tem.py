@@ -8,8 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import micrographs
 
-from simSPI import crd, fov, tem_inputs
-from simSPI.tem_distribution_utils import DistributionGenerator
+from simSPI import crd, fov, tem_distribution_utils, tem_inputs
 
 
 class TEMSimulator:
@@ -31,8 +30,6 @@ class TEMSimulator:
 
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
-
-        stream.close()
 
         self.sim_dict = self.get_config_from_yaml(sim_config)
         self.output_path_dict = self.generate_path_dict(**parsed_path_config)
@@ -273,16 +270,18 @@ class TEMSimulator:
         defocus_params = self.parameter_dict["ctf"]
         n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
-        distribution_generator = DistributionGenerator(
+        distribution_generator = tem_distribution_utils.DistributionGenerator(
             defocus_params["distribution_type"],
             defocus_params["distribution_parameters"],
         )
         samples = distribution_generator.draw_samples_1d(n_samples).tolist()
-
         samples = [round(num, 4) for num in samples]
+
         tem_inputs.write_tem_defocus_file_from_distribution(
             self.output_path_dict["defocus_file"], samples
         )
+
+        self.defocus_distribution_samples = samples
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
@@ -388,7 +387,7 @@ class TEMSimulator:
         noisy_particles : arr
             Individual particle data with gaussian noise applied
         """
-        noisy_particles = np.array([])
+        noisy_particles = []
 
         if "other" not in self.parameter_dict:
             return particles
@@ -406,9 +405,9 @@ class TEMSimulator:
             except KeyError:
                 pass
             scale = np.sqrt(variance / snr)
-            np.append(noisy_particles, np.random.normal(particles[i], scale))
+            noisy_particles.append(np.random.normal(particles[i], scale))
 
-        return noisy_particles
+        return np.array(noisy_particles)
 
     def export_particle_stack(self, particles):
         """Export extracted particle data to h5 file.
@@ -427,6 +426,7 @@ class TEMSimulator:
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
             flattened_noisy_particles = np.ndarray.flatten(noisy_particles)
+
             if "h5_file_noisy" in self.output_path_dict:
                 micrographs.write_data_dict_to_hdf5(
                     self.output_path_dict["h5_file_noisy"], flattened_noisy_particles

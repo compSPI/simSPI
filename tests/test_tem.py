@@ -41,7 +41,7 @@ def sample_resources():
 
     micrograph = np.load(str(Path(cwd, test_files_path, "micrograph.npz")))
 
-    resources["data"] = {"micrograph": micrograph.f.arr_0}
+    resources["data"] = {"micrograph": np.array([micrograph.f.arr_0])}
 
     return resources
 
@@ -189,6 +189,7 @@ def test_extract_particles(sample_class, sample_resources):
     )
 
     assert particles.shape == (
+        1,
         35,
         809,
         809,
@@ -225,7 +226,7 @@ def test_export_particle_stack(sample_class, sample_resources):
     ]
 
     particles = fov.micrograph2particles(
-        sample_resources["data"]["micrograph"],
+        sample_resources["data"]["micrograph"][0],
         sample_class.sim_dict["optics_parameters"],
         sample_class.sim_dict["detector_parameters"],
         pdb_file=sample_resources["files"]["pdb_file"],
@@ -249,7 +250,7 @@ def test_get_image_data(sample_class):
     data = sample_class.get_image_data()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
-    assert data.shape == (4092, 5760)
+    assert data.shape == (1, 4092, 5760)
 
 
 def test_run(sample_class):
@@ -261,6 +262,7 @@ def test_run(sample_class):
     """
     particles = sample_class.run(export_particles=True)
     assert particles.shape == (
+        1,
         35,
         809,
         809,
@@ -304,7 +306,7 @@ def test_apply_gaussian_noise(sample_class, sample_resources):
     ]
 
     particles = fov.micrograph2particles(
-        sample_resources["data"]["micrograph"],
+        sample_resources["data"]["micrograph"][0],
         sample_class.sim_dict["optics_parameters"],
         sample_class.sim_dict["detector_parameters"],
         pdb_file=sample_resources["files"]["pdb_file"],
