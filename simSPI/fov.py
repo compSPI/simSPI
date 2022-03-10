@@ -11,7 +11,7 @@ from scipy.spatial.distance import pdist
 
 
 def define_grid_in_fov(
-    optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
+        optics_params, detector_params, pdb_file=None, dmax=None, pad=1.0
 ):
     """Define particle grid for picking particles from micrograph.
 
@@ -40,9 +40,9 @@ def define_grid_in_fov(
     fov_lx, fov_ly, boxsize = get_fov(
         optics_params,
         detector_params,
-        pdb_file=pdb_file,
-        dmax=dmax,
-        pad=pad,
+        pdb_file = pdb_file,
+        dmax = dmax,
+        pad = pad,
     )
 
     fov_nx = np.floor(fov_lx / boxsize)
@@ -98,7 +98,7 @@ def get_fov(optics_params, detector_params, pdb_file=None, dmax=100, pad=1.0):
     if pdb_file is not None:
         dmax = get_dmax(pdb_file)
 
-    boxsize = dmax + 2 * pad
+    boxsize = dmax + 2 * pad  # TODO: get this from detector_params
     return fov_lx, fov_ly, boxsize
 
 
@@ -148,7 +148,7 @@ def get_xyz_from_pdb(pdb_file=None, atom_selection="name CA or name P"):
 
 
 def micrograph2particles(
-    micrograph, optics_params, detector_params, pdb_file=None, dmax=30, pad=5.0
+        micrograph, optics_params, detector_params, pdb_file=None, dmax=30, pad=5.0
 ):
     """Extract particles from given micrograph.
 
@@ -172,8 +172,8 @@ def micrograph2particles(
     particles : ndarray
         Picked and sliced particle data from micrograph.
     """
-    fov_lx, fov_ly, boxsize = get_fov(
-        optics_params, detector_params, pdb_file=pdb_file, dmax=dmax, pad=pad
+    fov_lx, fov_ly, boxsize = get_fov(  # TODO: remove pad
+        optics_params, detector_params, pdb_file = pdb_file, dmax = dmax, pad = pad
     )
     fov_nx = np.floor(fov_lx / boxsize)
     fov_ny = np.floor(fov_ly / boxsize)
@@ -182,7 +182,7 @@ def micrograph2particles(
     x_pixels = int(fov_nx * n_boxsize)
     y_pixels = int(fov_ny * n_boxsize)
     data = micrograph[:y_pixels, :x_pixels]
-    particles = slice_and_stack(data, n_boxsize=n_boxsize)
+    particles = slice_and_stack(data, n_boxsize = n_boxsize)
 
     return particles
 
@@ -249,7 +249,7 @@ def blockshaped(data, nrows, ncols):
     h, _ = data.shape
     reshaped_arr = (
         data.reshape(h // nrows, nrows, -1, ncols)
-        .swapaxes(1, 2)
-        .reshape(-1, nrows, ncols)
+            .swapaxes(1, 2)
+            .reshape(-1, nrows, ncols)
     )
     return reshaped_arr

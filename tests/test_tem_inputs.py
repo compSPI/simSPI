@@ -477,3 +477,83 @@ def test_write_tem_defocus_file_from_distribution(tmp_path):
         rows = generated_file.readlines()
         assert len(rows) == test_distribution_len + 2
         assert str(test_distribution_len) in rows[1]
+
+
+def test_generate_path_dict(sample_class, sample_resources):
+    """Test whether returned path dictionary has expected file paths."""
+    expected_path_template = {
+        "pdb_file": ".pdb",
+        "metadata_params_file": ".yaml",
+        "crd_file": ".txt",
+        "mrc_file": ".mrc",
+        "log_file": ".log",
+        "inp_file": ".inp",
+        "h5_file": ".h5",
+        "h5_file_noisy": "-noisy.h5",
+        "star_file": ".star",
+        "defocus_file": ".txt",
+    }
+    returned_paths = sample_class.generate_path_dict(
+        sample_resources["files"]["pdb_file"],
+        sample_resources["files"]["metadata_params_file"],
+    )
+    for file_type, file_path in returned_paths.items():
+        assert file_type in expected_path_template
+        directory, file = os.path.split(file_path)
+        assert os.path.isdir(directory)
+        assert expected_path_template[file_type] in file
+
+
+def test_classify_input_config(sample_class):
+    """Test classification of simulation parameters."""
+    raw_params = {
+        "molecular_model": {
+            "voxel_size_nm": 0.1,
+            "particle_name": "toto",
+            "particle_mrcout": "None",
+        },
+        "specimen_grid_params": {
+            "hole_diameter_nm": 1200,
+            "hole_thickness_center_nm": 100,
+            "hole_thickness_edge_nm": 100,
+        },
+        "beam_parameters": {
+            "voltage_kv": 300,
+            "energy_spread_v": 1.3,
+            "electron_dose_e_nm2": 100,
+            "electron_dose_std_e_per_nm2": 0,
+        },
+        "optics_parameters": {
+            "magnification": 81000,
+            "spherical_aberration_mm": 2.7,
+            "chromatic_aberration_mm": 2.7,
+            "aperture_diameter_um": 50,
+            "focal_length_mm": 3.5,
+            "aperture_angle_mrad": 0.1,
+            "defocus_um": 1.0,
+            "defocus_syst_error_um": 0.0,
+            "defocus_nonsyst_error_um": 0.0,
+            "optics_defocusout": "None",
+        },
+        "detector_parameters": {
+            "detector_nx_px": 5760,
+            "detector_ny_px": 4092,
+            "detector_pixel_size_um": 5,
+            "average_gain_count_per_electron": 2,
+            "noise": "no",
+            "detector_q_efficiency": 0.5,
+            "mtf_params": [0, 0, 1, 0, 0],
+        },
+    }
+
+    returned_params = sample_class.classify_input_config(raw_params)
+
+    for param_group_name, param_list in returned_params.items():
+        assert param_group_name in raw_params
+
+        for param_value in raw_params[param_group_name].values():
+            if type(param_value) is list:
+                for items in param_value:
+                    assert items in param_list
+            else:
+                assert param_value in param_list
