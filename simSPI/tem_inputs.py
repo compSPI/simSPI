@@ -94,11 +94,12 @@ def populate_tem_input_parameter_dict(
 
     - distribution_parameters [OPTIONAL] : distribution parameters. Required if
                                                 distribution_type is present.
+    *** noise ***
+    - signal_to_noise [OPTIONAL]   : signal-to-noise ratio for gaussian white noise.
+    - signal_to_noise_db [OPTIONAL] : signal-to-noise ratio in decibels.
 
     *** miscellaneous ***
     - seed [OPTIONAL]              : seed for the run. If not present, random.
-    - signal_to_noise [OPTIONAL]   : signal-to-noise ratio for gaussian white noise.
-    - signal_to_noise_db [OPTIONAL] : signal-to-noise ratio in decibels.
     """
     parameters = None
     log = logging.getLogger()
@@ -114,14 +115,14 @@ def populate_tem_input_parameter_dict(
 
     dic["simulation"]["log_file"] = log_file
 
-    dic["other"] = {}
+    dic["noise"] = {}
     try:
-        dic["other"]["signal_to_noise"] = parameters["miscellaneous"]["signal_to_noise"]
+        dic["noise"]["signal_to_noise"] = parameters["noise_parameters"]["signal_to_noise"]
     except KeyError:
         pass
 
     try:
-        dic["other"]["signal_to_noise_db"] = parameters["miscellaneous"][
+        dic["noise"]["signal_to_noise_db"] = parameters["noise_parameters"][
             "signal_to_noise_db"
         ]
     except KeyError:

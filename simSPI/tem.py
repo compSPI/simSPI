@@ -197,18 +197,18 @@ class TEMSimulator:
         """
         noisy_particles = []
 
-        if "other" not in self.parameter_dict:
+        if "noise" not in self.parameter_dict:
             return particle_stacks
 
         for i in range(self.parameter_dict["geometry"]["n_tilts"]):
             variance = np.var(particle_stacks[i])
             snr = 1.0
             try:
-                snr = self.parameter_dict["other"]["signal_to_noise"]
+                snr = self.parameter_dict["noise"]["signal_to_noise"]
             except KeyError:
                 pass
             try:
-                snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
+                snr_db = self.parameter_dict["noise"]["signal_to_noise_db"]
                 snr = 10 ** (snr_db / 10)
             except KeyError:
                 pass
