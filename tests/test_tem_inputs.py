@@ -2,20 +2,19 @@
 import os
 import tempfile
 from pathlib import Path
-import pytest
 
 import numpy as np
+import pytest
+import tem_inputs
 import torch
 import yaml
-from ioSPI.ioSPI.particle_metadata import update_optics_config_from_starfile  # TODO:remove ioSPI
-
-import tem_inputs
+from ioSPI.particle_metadata import update_optics_config_from_starfile
 
 
 @pytest.fixture
 def test_resources():
     """Return resources for testing."""
-    test_files_path = "./test_files"  # TODO: replace
+    test_files_path = "/work/tests/test_files"
     cwd = os.getcwd()
     resources = {
         "files": {
@@ -36,7 +35,7 @@ def normalized_mse(a, b):
 
 def test_fill_parameters_dictionary_max():
     """Test fill_parameters_dictionary with maximal garbage parameters."""
-    tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
+    tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
     mrc_file = "a.mrc"
@@ -120,10 +119,12 @@ def test_fill_parameters_dictionary_max():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
-                "miscellaneous": {
-                    "seed": seed,
+                "noise_parameters": {
                     "signal_to_noise": snr,
                     "signal_to_noise_db": snr_db,
+                },
+                "miscellaneous": {
+                    "seed": seed,
                 },
                 "geometry_parameters": {"n_samples": n_samples},
                 "ctf_parameters": {
@@ -140,8 +141,8 @@ def test_fill_parameters_dictionary_max():
             crd_file,
             log_file,
             defocus_file,
-            dose = dose,
-            noise = noise_override,
+            dose=dose,
+            noise=noise_override,
         )
 
         assert out_dict["simulation"]["seed"] == seed
@@ -189,15 +190,14 @@ def test_fill_parameters_dictionary_max():
         assert out_dict["detector"]["mtf_beta"] == mtf_params[4]
         assert out_dict["detector"]["image_file_out"] == mrc_file
 
-        assert out_dict["other"]["signal_to_noise"] == snr
-        assert out_dict["other"]["signal_to_noise_db"] == snr_db
+        assert out_dict["noise"]["signal_to_noise"] == snr
     finally:
         os.unlink(tmp_yml.name)
 
 
 def test_fill_parameters_dictionary_min():
     """Test fill_parameters_dictionary with minimal garbage parameters."""
-    tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
+    tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
     mrc_file = "a.mrc"
@@ -355,32 +355,32 @@ def test_starfile_data():
     for num, list_var in enumerate(data_list):
         assert isinstance(list_var[0], str)
         assert (
-                normalized_mse(list_var[1], rot_params["relion_angle_rot"][num].numpy())
-                < 0.01
+            normalized_mse(list_var[1], rot_params["relion_angle_rot"][num].numpy())
+            < 0.01
         )
         assert (
-                normalized_mse(list_var[2], rot_params["relion_angle_tilt"][num].numpy())
-                < 0.01
+            normalized_mse(list_var[2], rot_params["relion_angle_tilt"][num].numpy())
+            < 0.01
         )
         assert (
-                normalized_mse(list_var[3], rot_params["relion_angle_psi"][num].numpy())
-                < 0.01
+            normalized_mse(list_var[3], rot_params["relion_angle_psi"][num].numpy())
+            < 0.01
         )
         assert normalized_mse(list_var[4], shift_params["shift_x"][num].numpy()) < 0.01
         assert normalized_mse(list_var[5], shift_params["shift_y"][num].numpy()) < 0.01
         assert (
-                normalized_mse(list_var[6], 1e4 * ctf_params["defocus_u"][num].numpy())
-                < 0.01
+            normalized_mse(list_var[6], 1e4 * ctf_params["defocus_u"][num].numpy())
+            < 0.01
         )
         assert (
-                normalized_mse(list_var[7], 1e4 * ctf_params["defocus_v"][num].numpy())
-                < 0.01
+            normalized_mse(list_var[7], 1e4 * ctf_params["defocus_v"][num].numpy())
+            < 0.01
         )
         assert (
-                normalized_mse(
-                    list_var[8], np.radians(ctf_params["defocus_angle"][num].numpy())
-                )
-                < 0.01
+            normalized_mse(
+                list_var[8], np.radians(ctf_params["defocus_angle"][num].numpy())
+            )
+            < 0.01
         )
         assert normalized_mse(list_var[9], config.kv) < 0.01
         assert normalized_mse(list_var[10], config.pixel_size) < 0.01
@@ -391,9 +391,9 @@ def test_starfile_data():
 
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
-    tmp_inp = tempfile.NamedTemporaryFile(delete = False, suffix = ".imp")
+    tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".imp")
     tmp_inp.close()
-    tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
+    tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
     defocus_file = "a.txt"
@@ -484,7 +484,9 @@ def test_write_tem_defocus_file_from_distribution(tmp_path):
 
     print(test_distribution)
 
-    tem_inputs.write_tem_defocus_file_from_distribution(test_defocus_file, test_distribution)
+    tem_inputs.write_tem_defocus_file_from_distribution(
+        test_defocus_file, test_distribution
+    )
 
     with open(test_defocus_file, "r") as generated_file:
         rows = generated_file.readlines()

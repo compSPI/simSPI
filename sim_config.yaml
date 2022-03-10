@@ -43,5 +43,8 @@
    distribution_type: 'uniform'        # type of distribution, either 'gaussian' or 'uniform'
    distribution_parameters: [0, 1]     # distribution parameters, uniform: (low, high), gaussian: (loc, scale)
 
-  miscellaneous:
+   noise_parameters:
     signal_to_noise: 0.67       # signal-to-noise-ratio for added white noise.
+
+   miscellaneous:
+    seed : 1234                 # seed for simulator.
