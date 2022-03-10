@@ -251,7 +251,12 @@ class TEMSimulator:
         self.create_inp_file()
         self.generate_metadata()
 
-        particle_data = self.get_image_data()
+        self.run_simulator()
+
+        micrograph_data = micrographs.read_micrograph_from_mrc(
+            self.output_path_dict["mrc_file"]
+        )
+
 
         if export_particles:
             particle_data = self.extract_particles(particle_data, pad=pad)
@@ -318,12 +323,8 @@ class TEMSimulator:
             path=self.output_path_dict["inp_file"], tem_inputs=self.parameter_dict
         )
 
-    def get_image_data(self):
-        """Run simulator and return data.
-
-        Returns
-        -------
-        List containing parsed .mrc data from Simulator
+    def run_simulator(self):
+        """Run TEM simulator.
 
         Raises
         ------
@@ -339,11 +340,7 @@ class TEMSimulator:
 
         subprocess.run([sim_executable, input_file_arg], check=True)
 
-        micrograph_data = micrographs.read_micrograph_from_mrc(
-            self.output_path_dict["mrc_file"]
-        )
 
-        return micrograph_data
 
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.

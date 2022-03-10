@@ -238,7 +238,7 @@ def test_export_particle_stack(sample_class, sample_resources):
     assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
 
 
-def test_get_image_data(sample_class):
+def test_run_simulator(sample_class):
     """Test whether mrc data is generated from local tem installation.
 
     Notes
@@ -247,10 +247,9 @@ def test_get_image_data(sample_class):
     """
     sample_class.create_crd_file(pad=5)
     sample_class.create_inp_file()
-    data = sample_class.get_image_data()
+    data = sample_class.run_simulator()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
-    assert data.shape == (1, 4092, 5760)
 
 
 def test_run(sample_class):
