@@ -1,3 +1,4 @@
 .idea
 *__pycache__*
 temp_workspace/*
+notebooks/.ipynb_checkpoints
