@@ -1,4 +1,5 @@
 """Helper functions for tem.py.
+
 Write particle stack data (slice of protein)
 to .txt file containing coordinate (crd) information on particle.
 """
@@ -17,7 +18,9 @@ def write_crd_file(
     crd_file="crd.txt",
 ):
     """Write particle data to .txt file containing particle stack data.
+
     Particle center coordinates as well as its Euler angles is written to file.
+
     Parameters
     ----------
     n_particles : int
@@ -66,6 +69,7 @@ def write_crd_file(
 
 def get_rotlist(n_particles):
     """Return a rotation list containing Euler angles.
+
     Parameters
     ----------
     n_particles : int
