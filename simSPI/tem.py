@@ -1,6 +1,4 @@
 """Wrapper for the TEM Simulator."""
-import random
-import string
 import subprocess
 from pathlib import Path
 

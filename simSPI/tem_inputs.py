@@ -5,7 +5,8 @@ import random
 from pathlib import Path
 import numpy as np
 import yaml
-
+import random
+import string
 
 def populate_tem_input_parameter_dict(
         input_params_file,
@@ -486,8 +487,6 @@ def generate_path_dict(
             relative path to desired output crd file
         h5_file
             relative path to desired output h5 file
-        h5_file_noisy
-            relative path to desired output h5 file with noise
         inp_file
             relative path to desired output inp file
         mrc_file
@@ -497,7 +496,7 @@ def generate_path_dict(
         defocus_file
             relative path to desired output defocus parameter file
         star_file
-            relative poth to desured output star file #TODO: remove h5-noisy,update test, docsting
+            relative poth to desured output star file
     """
     path_dict = {}
 
@@ -526,9 +525,6 @@ def generate_path_dict(
         Path(output_dir, pdb_keyword + mrc_keyword + ".inp")
     )
     path_dict["h5_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".h5"))
-    path_dict["h5_file_noisy"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + "-noisy.h5")
-    )
     path_dict["star_file"] = str(
         Path(output_dir, pdb_keyword + mrc_keyword + ".star")
     )

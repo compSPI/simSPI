@@ -2,28 +2,41 @@
 import os
 import tempfile
 from pathlib import Path
+import pytest
 
 import numpy as np
 import torch
 import yaml
-from ioSPI.particle_metadata import update_optics_config_from_starfile
+from ioSPI.ioSPI.particle_metadata import update_optics_config_from_starfile  # TODO:remove ioSPI
 
-from simSPI.tem_inputs import (
-    populate_tem_input_parameter_dict,
-    starfile_append_tem_simulator_data,
-    write_tem_defocus_file_from_distribution,
-    write_tem_inputs_to_inp_file,
-)
+import tem_inputs
+
+
+@pytest.fixture
+def test_resources():
+    """Return resources for testing."""
+    test_files_path = "./test_files"  # TODO: replace
+    cwd = os.getcwd()
+    resources = {
+        "files": {
+            "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+            "metadata_params_file": str(
+                Path(cwd, test_files_path, "metadata_fields.yaml")
+            ),
+        }
+    }
+
+    return resources
 
 
 def normalized_mse(a, b):
     """Return normalized error between two numpy arrays."""
-    return np.sum((a - b) ** 2) ** 0.5 / np.sum(a**2) ** 0.5
+    return np.sum((a - b) ** 2) ** 0.5 / np.sum(a ** 2) ** 0.5
 
 
 def test_fill_parameters_dictionary_max():
     """Test fill_parameters_dictionary with maximal garbage parameters."""
-    tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
+    tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
     tmp_yml.close()
 
     mrc_file = "a.mrc"
@@ -120,15 +133,15 @@ def test_fill_parameters_dictionary_max():
             }
             contents = yaml.dump(data)
             f.write(contents)
-        out_dict = populate_tem_input_parameter_dict(
+        out_dict = tem_inputs.populate_tem_input_parameter_dict(
             tmp_yml.name,
             mrc_file,
             pdb_file,
             crd_file,
             log_file,
             defocus_file,
-            dose=dose,
-            noise=noise_override,
+            dose = dose,
+            noise = noise_override,
         )
 
         assert out_dict["simulation"]["seed"] == seed
@@ -184,7 +197,7 @@ def test_fill_parameters_dictionary_max():
 
 def test_fill_parameters_dictionary_min():
     """Test fill_parameters_dictionary with minimal garbage parameters."""
-    tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
+    tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
     tmp_yml.close()
 
     mrc_file = "a.mrc"
@@ -259,7 +272,7 @@ def test_fill_parameters_dictionary_min():
             }
             contents = yaml.dump(data)
             f.write(contents)
-        out_dict = populate_tem_input_parameter_dict(
+        out_dict = tem_inputs.populate_tem_input_parameter_dict(
             tmp_yml.name, mrc_file, pdb_file, crd_file, log_file, defocus_file
         )
 
@@ -335,39 +348,39 @@ def test_starfile_data():
         "defocus_angle": ctf_val[:, 2],
     }
     data_list = []
-    data_list = starfile_append_tem_simulator_data(
+    data_list = tem_inputs.starfile_append_tem_simulator_data(
         data_list, rot_params, ctf_params, shift_params, iterations, config
     )
     assert len(data_list) == config.batch_size
     for num, list_var in enumerate(data_list):
         assert isinstance(list_var[0], str)
         assert (
-            normalized_mse(list_var[1], rot_params["relion_angle_rot"][num].numpy())
-            < 0.01
+                normalized_mse(list_var[1], rot_params["relion_angle_rot"][num].numpy())
+                < 0.01
         )
         assert (
-            normalized_mse(list_var[2], rot_params["relion_angle_tilt"][num].numpy())
-            < 0.01
+                normalized_mse(list_var[2], rot_params["relion_angle_tilt"][num].numpy())
+                < 0.01
         )
         assert (
-            normalized_mse(list_var[3], rot_params["relion_angle_psi"][num].numpy())
-            < 0.01
+                normalized_mse(list_var[3], rot_params["relion_angle_psi"][num].numpy())
+                < 0.01
         )
         assert normalized_mse(list_var[4], shift_params["shift_x"][num].numpy()) < 0.01
         assert normalized_mse(list_var[5], shift_params["shift_y"][num].numpy()) < 0.01
         assert (
-            normalized_mse(list_var[6], 1e4 * ctf_params["defocus_u"][num].numpy())
-            < 0.01
+                normalized_mse(list_var[6], 1e4 * ctf_params["defocus_u"][num].numpy())
+                < 0.01
         )
         assert (
-            normalized_mse(list_var[7], 1e4 * ctf_params["defocus_v"][num].numpy())
-            < 0.01
+                normalized_mse(list_var[7], 1e4 * ctf_params["defocus_v"][num].numpy())
+                < 0.01
         )
         assert (
-            normalized_mse(
-                list_var[8], np.radians(ctf_params["defocus_angle"][num].numpy())
-            )
-            < 0.01
+                normalized_mse(
+                    list_var[8], np.radians(ctf_params["defocus_angle"][num].numpy())
+                )
+                < 0.01
         )
         assert normalized_mse(list_var[9], config.kv) < 0.01
         assert normalized_mse(list_var[10], config.pixel_size) < 0.01
@@ -378,9 +391,9 @@ def test_starfile_data():
 
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
-    tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".imp")
+    tmp_inp = tempfile.NamedTemporaryFile(delete = False, suffix = ".imp")
     tmp_inp.close()
-    tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
+    tmp_yml = tempfile.NamedTemporaryFile(delete = False, suffix = ".yml")
     tmp_yml.close()
 
     defocus_file = "a.txt"
@@ -454,10 +467,10 @@ def test_write_inp_file():
             }
             contents = yaml.dump(data)
             f.write(contents)
-        out_dict = populate_tem_input_parameter_dict(
+        out_dict = tem_inputs.populate_tem_input_parameter_dict(
             tmp_yml.name, mrc_file, pdb_file, crd_file, log_file, defocus_file
         )
-        write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
+        tem_inputs.write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
     finally:
         os.unlink(tmp_inp.name)
         os.unlink(tmp_yml.name)
@@ -471,7 +484,7 @@ def test_write_tem_defocus_file_from_distribution(tmp_path):
 
     print(test_distribution)
 
-    write_tem_defocus_file_from_distribution(test_defocus_file, test_distribution)
+    tem_inputs.write_tem_defocus_file_from_distribution(test_defocus_file, test_distribution)
 
     with open(test_defocus_file, "r") as generated_file:
         rows = generated_file.readlines()
@@ -479,7 +492,7 @@ def test_write_tem_defocus_file_from_distribution(tmp_path):
         assert str(test_distribution_len) in rows[1]
 
 
-def test_generate_path_dict(sample_class, sample_resources):
+def test_generate_path_dict(test_resources):
     """Test whether returned path dictionary has expected file paths."""
     expected_path_template = {
         "pdb_file": ".pdb",
@@ -489,13 +502,13 @@ def test_generate_path_dict(sample_class, sample_resources):
         "log_file": ".log",
         "inp_file": ".inp",
         "h5_file": ".h5",
-        "h5_file_noisy": "-noisy.h5",
         "star_file": ".star",
         "defocus_file": ".txt",
     }
-    returned_paths = sample_class.generate_path_dict(
-        sample_resources["files"]["pdb_file"],
-        sample_resources["files"]["metadata_params_file"],
+    print(test_resources)
+    returned_paths = tem_inputs.generate_path_dict(
+        test_resources["files"]["pdb_file"],
+        test_resources["files"]["metadata_params_file"],
     )
     for file_type, file_path in returned_paths.items():
         assert file_type in expected_path_template
@@ -504,7 +517,7 @@ def test_generate_path_dict(sample_class, sample_resources):
         assert expected_path_template[file_type] in file
 
 
-def test_classify_input_config(sample_class):
+def test_classify_input_config():
     """Test classification of simulation parameters."""
     raw_params = {
         "molecular_model": {
@@ -546,7 +559,7 @@ def test_classify_input_config(sample_class):
         },
     }
 
-    returned_params = sample_class.classify_input_config(raw_params)
+    returned_params = tem_inputs.classify_input_config(raw_params)
 
     for param_group_name, param_list in returned_params.items():
         assert param_group_name in raw_params
