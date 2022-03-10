@@ -213,7 +213,7 @@ class TEMSimulator:
 
         return np.array(noisy_particles)
 
-    def export_simulated_data(self, particles):
+    def export_simulated_data(self, particle_stacks):
         """Export extracted particle data to h5 file and generate meta data.
 
         Parameters

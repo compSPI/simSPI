@@ -122,7 +122,7 @@ def test_run_simulator(sample_class):
     """
     sample_class.create_crd_file()
     sample_class.create_inp_file()
-    data = sample_class.run_simulator()
+    sample_class.run_simulator()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
 
