@@ -51,6 +51,7 @@ def populate_tem_input_parameter_dict(
     - hole_diameter_nm             : diameter in nm
     - hole_thickness_center_nm     : thickness at center in nm
     - hole_thickness_edge_nm       : thickness at edge in nm.
+    - particle_slice_pad [OPTIONAL]: pad surrounding sliced particles from micrograph
 
     *** beam_parameters ***
     - voltage_kv                   : voltage in kV
@@ -137,6 +138,10 @@ def populate_tem_input_parameter_dict(
     dic["sample"]["thickness_edge"] = parameters["specimen_grid_params"][
         "hole_thickness_edge_nm"
     ]
+    dic["sample"]["particle_slice_pad"] = parameters["specimen_grid_params"][
+        "particle_slice_pad"
+    ]
+
     dic["particle"] = {}
     dic["particle"]["name"] = parameters["molecular_model"]["particle_name"]
     dic["particle"]["voxel_size"] = parameters["molecular_model"]["voxel_size_nm"]

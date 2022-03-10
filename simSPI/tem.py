@@ -264,8 +264,9 @@ class TEMSimulator:
                 if c in mtf_params:
                     f.write(f"{mtf_params[c]:13.4f}\n")
 
-            for i in range(n_samples):
+            f.write("\n")
 
+            for i in range(n_samples):
                 f.write(f"particle_rotation_angles: {i + 1}\n")
                 f.write("loop_\n")
                 f.write("_defocus\n")
