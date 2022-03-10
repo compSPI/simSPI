@@ -454,7 +454,6 @@ class TEMSimulator:
         with open(Path(self.output_path_dict["metadata_params_file"]), "r") as stream:
             metadata_fields = yaml.safe_load(stream)
 
-        # defocus_params = self.parameter_dict["ctf"]
         n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
         with open(self.output_path_dict["star_file"], "w") as f:
