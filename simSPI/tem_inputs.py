@@ -110,6 +110,7 @@ def populate_tem_input_parameter_dict(
     except KeyError:
         random.seed()
         dic["simulation"]["seed"] = random.randint(0, int(1e10))
+
     dic["simulation"]["log_file"] = log_file
 
     dic["other"] = {}
@@ -117,6 +118,7 @@ def populate_tem_input_parameter_dict(
         dic["other"]["signal_to_noise"] = parameters["miscellaneous"]["signal_to_noise"]
     except KeyError:
         pass
+
     try:
         dic["other"]["signal_to_noise_db"] = parameters["miscellaneous"][
             "signal_to_noise_db"
@@ -124,6 +126,7 @@ def populate_tem_input_parameter_dict(
     except KeyError:
         pass
 
+    dic["simulation"]["log_file"] = log_file
     dic["sample"] = {}
     dic["sample"]["diameter"] = parameters["specimen_grid_params"]["hole_diameter_nm"]
     dic["sample"]["thickness_center"] = parameters["specimen_grid_params"][
@@ -136,6 +139,7 @@ def populate_tem_input_parameter_dict(
     dic["particle"]["name"] = parameters["molecular_model"]["particle_name"]
     dic["particle"]["voxel_size"] = parameters["molecular_model"]["voxel_size_nm"]
     dic["particle"]["pdb_file"] = pdb_file
+
     if "particle_mrcout" in parameters["molecular_model"]:
         key = parameters["molecular_model"]["particle_mrcout"].split(".mrc")[0]
         dic["particle"]["map_file_re_out"] = key + "_real.mrc"
@@ -150,12 +154,14 @@ def populate_tem_input_parameter_dict(
     dic["beam"] = {}
     dic["beam"]["voltage"] = parameters["beam_parameters"]["voltage_kv"]
     dic["beam"]["spread"] = parameters["beam_parameters"]["energy_spread_v"]
+
     if dose is not None:
         dic["beam"]["dose_per_im"] = dose
     else:
         dic["beam"]["dose_per_im"] = parameters["beam_parameters"][
             "electron_dose_e_per_nm2"
         ]
+
     dic["beam"]["dose_sd"] = parameters["beam_parameters"][
         "electron_dose_std_e_per_nm2"
     ]
@@ -178,6 +184,7 @@ def populate_tem_input_parameter_dict(
         dic["optics"]["defocus_file_out"] = None
 
     dic["detector"] = {}
+
     if "defocus_um" in parameters["optics_parameters"]:
         dic["optics"]["defocus_nominal"] = parameters["optics_parameters"]["defocus_um"]
         dic["detector"]["mtf_a"] = parameters["optics_parameters"]["defocus_um"]
@@ -186,6 +193,7 @@ def populate_tem_input_parameter_dict(
             "mtf_params"
         ][0]
         dic["detector"]["mtf_a"] = parameters["detector_parameters"]["mtf_params"][0]
+
     dic["optics"]["defocus_syst_error"] = parameters["optics_parameters"][
         "defocus_syst_error_um"
     ]
@@ -201,10 +209,12 @@ def populate_tem_input_parameter_dict(
     dic["detector"]["gain"] = parameters["detector_parameters"][
         "average_gain_count_per_electron"
     ]
+
     if noise is not None:
         dic["detector"]["use_quantization"] = noise
     else:
         dic["detector"]["use_quantization"] = parameters["detector_parameters"]["noise"]
+
     dic["detector"]["dqe"] = parameters["detector_parameters"]["detector_q_efficiency"]
     dic["detector"]["mtf_b"] = parameters["detector_parameters"]["mtf_params"][1]
     dic["detector"]["mtf_c"] = parameters["detector_parameters"]["mtf_params"][2]

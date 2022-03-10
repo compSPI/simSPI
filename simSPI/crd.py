@@ -45,22 +45,26 @@ def write_crd_file(
                 "#            x             y             z       "
                 "    phi         theta           psi  \n"
             )
+            n = 0
             for y in yrange:
                 for x in xrange:
-                    for i in range(n_particles):
-                        crd_table = {
-                            "x": x,
-                            "y": y,
-                            "z": 0,
-                            "phi": rotlist[i][0],
-                            "theta": rotlist[i][1],
-                            "psi": rotlist[i][2],
-                        }
-                        crd.write(
-                            f"{crd_table['x']:14.4f}{crd_table['y']:14.4f}"
-                            f"{crd_table['z']:14.4f}{crd_table['phi']:14.4f}"
-                            f"{crd_table['theta']:14.4f}{crd_table['psi']:14.4f}\n"
-                        )
+                    if n == int(n_particles):
+                        break
+
+                    crd_table = {
+                        "x": x,
+                        "y": y,
+                        "z": 0,
+                        "phi": rotlist[n][0],
+                        "theta": rotlist[n][1],
+                        "psi": rotlist[n][2],
+                    }
+                    crd.write(
+                        f"{crd_table['x']:14.4f}{crd_table['y']:14.4f}"
+                        f"{crd_table['z']:14.4f}{crd_table['phi']:14.4f}"
+                        f"{crd_table['theta']:14.4f}{crd_table['psi']:14.4f}\n"
+                    )
+                    n += 1
 
 
 def get_rotlist(n_particles):

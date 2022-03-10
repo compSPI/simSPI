@@ -29,10 +29,11 @@ class TEMSimulator:
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
 
-        self.output_path_dict = self.generate_path_dict(**parsed_path_config)
-        self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
+        stream.close()
 
         self.sim_dict = self.get_config_from_yaml(sim_config)
+        self.output_path_dict = self.generate_path_dict(**parsed_path_config)
+        self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
 
         self.parameter_dict = tem_inputs.populate_tem_input_parameter_dict(
             sim_config,
@@ -63,12 +64,14 @@ class TEMSimulator:
                 beam_params : str maps to list
                     List containing the beam parameters
                 detector_params : str maps to list
-                     List containing the detector parameters
+                    List containing the detector parameters
                 optics_params : str maps to list
                     List containing the optic parameters
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
+
+        stream.close()
 
         classified_params = self.classify_input_config(raw_params)
 
@@ -146,19 +149,23 @@ class TEMSimulator:
         return classified_sim_params
 
     @staticmethod
-    def generate_path_dict(pdb_file, output_dir=None, mrc_keyword=None, **kwargs):
-        """Return the paths to pdb, crd, log, inp, and h5 files as strings.
+    def generate_path_dict(
+        pdb_file, metadata_params_file, output_dir=None, mrc_keyword=None, **kwargs
+    ):
+        """Return dict containing path_config paths and output files as strings.
 
         Parameters
         ----------
         pdb_file : str
             Relative path to the pdb file
+        metadata_params_file : str
+            Relative path to metadata params file
         output_dir : str, (default = None)
             Relative path to output directory
         mrc_keyword : str, (default = None)
             user-specified keyword appended to output files
         kwargs
-            compatibiltity for arbitrary extra parameters.
+            compatibility for arbitrary extra parameters.
 
         Returns
         -------
@@ -166,6 +173,8 @@ class TEMSimulator:
             Dict of file paths that includes keys:
             pdb_file
                 relative path to pdb input file
+            metadata_params_file
+                relative path to metadata_params file
             crd_file
                 relative path to desired output crd file
             h5_file
@@ -180,26 +189,44 @@ class TEMSimulator:
                 relative path to desired output log file
             defocus_file
                 relative path to desired output defocus parameter file
+            star_file
+                relative poth to desured output star file
         """
         path_dict = {}
 
         if output_dir is None:
             output_dir = str(Path(pdb_file).parent)
 
+        pdb_keyword = Path(pdb_file).stem
+
         if mrc_keyword is None:
-            mrc_keyword = str(Path(pdb_file).stem) + "".join(
+            mrc_keyword = "_" + "".join(
                 random.choices(string.ascii_uppercase + string.digits, k=5)
             )
 
         path_dict["pdb_file"] = str(Path(pdb_file))
-        path_dict["crd_file"] = str(Path(output_dir, mrc_keyword + ".txt"))
-        path_dict["mrc_file"] = str(Path(output_dir, mrc_keyword + ".mrc"))
-        path_dict["log_file"] = str(Path(output_dir, mrc_keyword + ".log"))
-        path_dict["inp_file"] = str(Path(output_dir, mrc_keyword + ".inp"))
-        path_dict["h5_file"] = str(Path(output_dir, mrc_keyword + ".h5"))
-        path_dict["h5_file_noisy"] = str(Path(output_dir, mrc_keyword + "-noisy.h5"))
+        path_dict["metadata_params_file"] = str(Path(metadata_params_file))
+        path_dict["crd_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".txt")
+        )
+        path_dict["mrc_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".mrc")
+        )
+        path_dict["log_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".log")
+        )
+        path_dict["inp_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".inp")
+        )
+        path_dict["h5_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".h5"))
+        path_dict["h5_file_noisy"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + "-noisy.h5")
+        )
+        path_dict["star_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + ".star")
+        )
         path_dict["defocus_file"] = str(
-            Path(output_dir, mrc_keyword + "_defocus_" + ".txt")
+            Path(output_dir, pdb_keyword + mrc_keyword + "_defocus" + ".txt")
         )
 
         return path_dict
@@ -222,18 +249,19 @@ class TEMSimulator:
         self.create_crd_file(pad)
         self.create_defocus_file()
         self.write_inp_file()
+        self.generate_metadata()
 
-        micrograph_data = self.get_image_data()
-        particle_data = self.extract_particles(micrograph_data, pad=pad)
-
-        if "other" in self.parameter_dict and (
-            self.parameter_dict["other"].get("signal_to_noise") is not None
-            or self.parameter_dict["other"].get("signal_to_noise_db") is not None
-        ):
-            particle_data = self.apply_gaussian_noise(particle_data)
+        particle_data = self.get_image_data()
 
         if export_particles:
+            particle_data = self.extract_particles(particle_data, pad=pad)
             self.export_particle_stack(particle_data)
+
+            if "other" in self.parameter_dict and (
+                self.parameter_dict["other"].get("signal_to_noise") is not None
+                or self.parameter_dict["other"].get("signal_to_noise_db") is not None
+            ):
+                particle_data = self.apply_gaussian_noise(particle_data)
 
         return particle_data
 
@@ -306,6 +334,7 @@ class TEMSimulator:
         """
         sim_executable = f"{self.output_path_dict['local_sim_dir']}"
         input_file_arg = f"{self.output_path_dict['inp_file']}"
+
         subprocess.run([sim_executable, input_file_arg], check=True)
 
         data = micrographs.read_micrograph_from_mrc(self.output_path_dict["mrc_file"])
@@ -392,3 +421,89 @@ class TEMSimulator:
                     + self.output_path_dict["h5_file"][-3:],
                     noisy_particles,
                 )
+
+    def generate_metadata(self):
+        """Generate metadata associated with picked particles from simulator.
+
+        Notes
+        -----
+        Exports particle metadata in .star file to output directory specified
+        in user config file.
+        """
+        particle_metadata = self.retrieve_rotation_metadata(
+            self.output_path_dict["crd_file"]
+        )
+
+        with open(Path(self.output_path_dict["metadata_params_file"]), "r") as stream:
+            metadata_fields = yaml.safe_load(stream)
+
+        stream.close()
+
+        with open(self.output_path_dict["star_file"], "w") as f:
+            mtf_params = {}
+            for key, value in self.parameter_dict.items():
+                f.write(f"data_{key}\n")
+                for key0, value0 in value.items():
+                    if key0[:3] == "mtf":
+                        mtf_params[key0[4:]] = value0
+                    else:
+                        key_fixed = (
+                            metadata_fields[key0] if key0 in metadata_fields else key0
+                        )
+                        if type(value0) is list:
+                            f.write("_" + "{0:24}{1}\n".format(key_fixed, value0))
+                        else:
+                            f.write("_" + "{0:24}{1:>15}\n".format(key_fixed, value0))
+                f.write("\n")
+
+            f.write("loop_\n")
+            f.write("_mtf_params\n")
+            for c in ("a", "b", "c", "alpha", "beta"):
+                if c in mtf_params:
+                    f.write(f"{mtf_params[c]:13.4f}\n")
+
+            f.write("\n")
+            f.write("loop_\n")
+            f.write("_x\n")
+            f.write("_y\n")
+            f.write("_z\n")
+            f.write("_phi\n")
+            f.write("_theta\n")
+            f.write("_psi\n")
+
+            for coord in particle_metadata:
+                f.write(
+                    "{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}"
+                    "{0[3]:13.4f}{0[4]:13.4f}"
+                    "{0[5]:13.4f}\n".format(coord)
+                )
+
+        f.close()
+
+    @staticmethod
+    def retrieve_rotation_metadata(path):
+        """Retrieve particle rotation data from pre-generated simulator crd file.
+
+        Parameters
+        ----------
+        path : str
+            String specifying path to crd file generated during simulation.
+
+        Returns
+        -------
+        rotation_metadata : array-like, shape=[..., 3]
+            N x 3 matrix representing the rotation angles , phi, theta, psi, of
+            each particle in stack.
+        """
+        rotation_metadata = []
+        lines = []
+        with open(path) as f:
+            lines = f.readlines()
+
+        f.close()
+
+        for i, line in enumerate(lines):
+            if i >= 4:
+                rotation_metadata.append([float(x) for x in line.split()[:]])
+
+        return rotation_metadata

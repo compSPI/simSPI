@@ -1,6 +1,7 @@
   # absolute paths
   pdb_file: '/work/tests/test_files/4v6x.pdb'
-  mrc_keyword: '4v6x_randomrot'
-  output_dir: '/work/tests/test_files'
+  metadata_params_file: '/work/tests/test_files/metadata_fields.yaml'
+  mrc_keyword: '_randomrot'
+  output_dir: '/work/tests/test_files/'
   local_sim_dir: '/work/TEM-simulator_1.3/src/TEM-simulator'
 
