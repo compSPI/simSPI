@@ -7,6 +7,7 @@
     hole_diameter_nm: 1200         # [nm]
     hole_thickness_center_nm: 100  # [nm]
     hole_thickness_edge_nm: 100    # [nm]
+    particle_slice_pad: 5          #
 
   beam_parameters:
     voltage_kv: 300                  # [kV]
@@ -15,7 +16,7 @@
     electron_dose_std_e_per_nm2: 0   # standard deviation of dose per image
 
   optics_parameters:
-    magnification: 81000        #
+    magnification: 81000             #
     spherical_aberration_mm: 2.7     # [mm]
     chromatic_aberration_mm: 2.7     # [mm]
     aperture_diameter_um: 50         # [um] in back focal plane
@@ -24,7 +25,7 @@
     defocus_um: 1.0                  # [um]
     defocus_syst_error_um: 0.0       # [um]
     defocus_nonsyst_error_um: 0.0    # [um]
-    optics_defocusout: None     # file to write defocus values
+    optics_defocusout: None          # file to write defocus values
 
   detector_parameters:
     detector_nx_px: 5760               # [px] number of pixels along X axis

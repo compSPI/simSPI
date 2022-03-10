@@ -2,20 +2,22 @@
 
 import logging
 import random
+import string
 from pathlib import Path
+
 import numpy as np
 import yaml
 
 
 def populate_tem_input_parameter_dict(
-        input_params_file,
-        mrc_file,
-        pdb_file,
-        crd_file,
-        log_file,
-        defocus_file,
-        dose=None,
-        noise=None,
+    input_params_file,
+    mrc_file,
+    pdb_file,
+    crd_file,
+    log_file,
+    defocus_file,
+    dose=None,
+    noise=None,
 ):
     """Return parameter dictionary with settings for simulation.
 
@@ -244,12 +246,12 @@ def populate_tem_input_parameter_dict(
 
 
 def starfile_append_tem_simulator_data(
-        data_list,
-        rotation,
-        contrast_transfer_function,
-        projection_shift,
-        iterations,
-        config,
+    data_list,
+    rotation,
+    contrast_transfer_function,
+    projection_shift,
+    iterations,
+    config,
 ):
     """Append the data list with the parameters of the simulator.
 
@@ -434,7 +436,7 @@ def retrieve_rotation_metadata(path):
     """Retrieve particle rotation data from pre-generated simulator crd file.
 
     Parameters
-    ---------- #TODO:test
+    ----------
     path : str
         String specifying path to crd file generated during simulation.
 
@@ -457,7 +459,7 @@ def retrieve_rotation_metadata(path):
 
 
 def generate_path_dict(
-        pdb_file, metadata_params_file, output_dir=None, mrc_keyword=None, **kwargs
+    pdb_file, metadata_params_file, output_dir=None, mrc_keyword=None, **kwargs
 ):
     """Return dict containing path_config paths and output files as strings.
 
@@ -497,7 +499,8 @@ def generate_path_dict(
         defocus_file
             relative path to desired output defocus parameter file
         star_file
-            relative poth to desured output star file #TODO: remove h5-noisy,update test, docsting
+            relative poth to desured output star file
+            #TODO: remove h5-noisy,update test, docsting
     """
     path_dict = {}
 
@@ -508,30 +511,20 @@ def generate_path_dict(
 
     if mrc_keyword is None:
         mrc_keyword = "_" + "".join(
-            random.choices(string.ascii_uppercase + string.digits, k = 5)
+            random.choices(string.ascii_uppercase + string.digits, k=5)
         )
 
     path_dict["pdb_file"] = str(Path(pdb_file))
     path_dict["metadata_params_file"] = str(Path(metadata_params_file))
-    path_dict["crd_file"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + ".txt")
-    )
-    path_dict["mrc_file"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + ".mrc")
-    )
-    path_dict["log_file"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + ".log")
-    )
-    path_dict["inp_file"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + ".inp")
-    )
+    path_dict["crd_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".txt"))
+    path_dict["mrc_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".mrc"))
+    path_dict["log_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".log"))
+    path_dict["inp_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".inp"))
     path_dict["h5_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".h5"))
     path_dict["h5_file_noisy"] = str(
         Path(output_dir, pdb_keyword + mrc_keyword + "-noisy.h5")
     )
-    path_dict["star_file"] = str(
-        Path(output_dir, pdb_keyword + mrc_keyword + ".star")
-    )
+    path_dict["star_file"] = str(Path(output_dir, pdb_keyword + mrc_keyword + ".star"))
     path_dict["defocus_file"] = str(
         Path(output_dir, pdb_keyword + mrc_keyword + "_defocus" + ".txt")
     )
@@ -557,6 +550,7 @@ def classify_input_config(raw_params):
             "hole_diameter_nm",
             "hole_thickness_center_nm",
             "hole_thickness_edge_nm",
+            "particle_slice_pad",
         ],
         "beam_parameters": [
             "voltage_kv",
@@ -585,6 +579,9 @@ def classify_input_config(raw_params):
             "detector_q_efficiency",
             "mtf_params",
         ],
+        "geometry_parameters": ["n_samples"],
+        "ctf_parameters": ["distribution_type", "distribution_parameters"],
+        "miscellaneous": ["signal_to_noise"],
     }
 
     classified_sim_params = {}
@@ -595,9 +592,7 @@ def classify_input_config(raw_params):
                 raw_params[param_type].get(key) for key in param_order
             ]
         elif param_type == "detector_parameters":
-            ordered_params = [
-                raw_params[param_type].get(key) for key in param_order
-            ]
+            ordered_params = [raw_params[param_type].get(key) for key in param_order]
             flattened_params = []
 
             for i in range(6):

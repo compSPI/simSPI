@@ -84,15 +84,13 @@ def test_get_config_from_yaml(sample_resources, sample_class):
         assert len(config_list) is expected_config_template[config_group]
 
 
-def test_generate_simulator_inputs(sample_class): #TODO: update test
-    """Test whether simulator required files are created.
-    """
+def test_generate_simulator_inputs(sample_class):  # TODO: update test
+    """Test whether simulator required files are created."""
     sample_class.generate_simulator_inputs()
 
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
     assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
     assert os.path.isfile(sample_class.output_path_dict["crd_file"])
-
 
 
 def test_create_crd_file(sample_class):
@@ -113,7 +111,7 @@ def test_create_defocus_file(sample_class):
     assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
 
 
-def test_parse_simulator_data (sample_class, sample_resources): #TODO: update test
+def test_parse_simulator_data(sample_class, sample_resources):  # TODO: update test
     """Test parse_simulator_data returns particles of expected shape from mrc."""
     particles = sample_class.parse_simulator_data(
         sample_resources["data"]["micrograph"], 5.0
@@ -176,12 +174,11 @@ def test_run_simulator(sample_class):
     -----
     This test requires a local TEM sim installation to run.
     """
-    sample_class.create_crd_file(pad=5)
-    sample_class.create_inp_file()
-    data = sample_class.run_simulator()
+    sample_class.generate_simulator_inputs()
+    sample_class.run_simulator()
+
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
-
 
 
 def test_apply_gaussian_noise(sample_class, sample_resources):

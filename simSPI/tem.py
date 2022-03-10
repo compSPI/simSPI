@@ -1,12 +1,10 @@
 """Wrapper for the TEM Simulator."""
-import random
-import string
 import subprocess
 from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI.ioSPI import micrographs #TODO: remove
+from ioSPI import micrographs
 
 from simSPI import crd, fov, tem_distribution_utils, tem_inputs
 
@@ -77,9 +75,8 @@ class TEMSimulator:
 
         return classified_params
 
-    def generate_simulator_inputs(self, pad=5):
-        """Generate input files for TEM simulator.
-        """
+    def generate_simulator_inputs(self):
+        """Generate input files for TEM simulator."""
         self.create_crd_file()
         self.create_defocus_file()  # TODO: private?
         self.create_inp_file()
@@ -103,21 +100,19 @@ class TEMSimulator:
         self.defocus_distribution_samples = samples
 
     def create_crd_file(self):
-        """Format and write molecular model data to crd_file for use in TEM-simulator.
-        """
-        pad = 5  # TODO: get this from sim config
+        """Format and write molecular model data to crd_file to use in TEM-simulator."""
         x_range, y_range, num_part = fov.define_grid_in_fov(
             self.sim_dict["optics_parameters"],
             self.sim_dict["detector_parameters"],
             self.output_path_dict["pdb_file"],
-            pad = pad,
+            pad=self.sim_dict["specimen_grid_params"][3],
         )
 
         crd.write_crd_file(
             num_part,
-            xrange = x_range,
-            yrange = y_range,
-            crd_file = self.output_path_dict["crd_file"],
+            xrange=x_range,
+            yrange=y_range,
+            crd_file=self.output_path_dict["crd_file"],
         )
 
     def create_inp_file(self):
@@ -130,7 +125,7 @@ class TEMSimulator:
         "<parameter> = <value>".
         """
         tem_inputs.write_tem_inputs_to_inp_file(
-            path = self.output_path_dict["inp_file"], tem_inputs = self.parameter_dict
+            path=self.output_path_dict["inp_file"], tem_inputs=self.parameter_dict
         )
 
     def run_simulator(self):
@@ -148,20 +143,16 @@ class TEMSimulator:
         sim_executable = f"{self.output_path_dict['local_sim_dir']}"
         input_file_arg = f"{self.output_path_dict['inp_file']}"
 
-        subprocess.run([sim_executable, input_file_arg], check = True)
+        subprocess.run([sim_executable, input_file_arg], check=True)
 
     def parse_simulator_data(self):
         """Extract particle data from micrograph.
-
-        Parameters
-        ----------
 
         Returns
         -------
         particles : arr #TODO:docstring
             Individual particle data extracted from micrograph
         """
-        pad = 5.0  # TODO: get from sim_condif
         micrograph_data = micrographs.read_micrograph_from_mrc(
             self.output_path_dict["mrc_file"]
         )
@@ -172,8 +163,8 @@ class TEMSimulator:
                 micrograph_data[i],
                 self.sim_dict["optics_parameters"],
                 self.sim_dict["detector_parameters"],
-                pdb_file = self.output_path_dict["pdb_file"],
-                pad = pad,
+                pad=self.sim_dict["specimen_grid_params"][3],
+                pdb_file=self.output_path_dict["pdb_file"],
             )
             particle_stacks.append(particles)
 
