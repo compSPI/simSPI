@@ -6,9 +6,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import micrographs
+from ioSPI.ioSPI import micrographs
 
-from simSPI import crd, fov, tem_inputs
+from simSPI.simSPI import crd, fov, tem_inputs
 
 
 class TEMSimulator:
