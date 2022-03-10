@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI import micrographs
+from ioSPI.ioSPI import micrographs #TODO: remove
 
 from simSPI import crd, fov, tem_distribution_utils, tem_inputs
 
@@ -32,7 +32,7 @@ class TEMSimulator:
             parsed_path_config = yaml.safe_load(stream)
 
         self.sim_dict = self.get_config_from_yaml(sim_config)
-        self.output_path_dict = self.generate_path_dict(**parsed_path_config)
+        self.output_path_dict = tem_inputs.generate_path_dict(**parsed_path_config)
         self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
 
         self.parameter_dict = tem_inputs.populate_tem_input_parameter_dict(
@@ -73,24 +73,14 @@ class TEMSimulator:
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
 
-        classified_params = self.classify_input_config(raw_params)
+        classified_params = tem_inputs.classify_input_config(raw_params)
 
         return classified_params
 
     def generate_simulator_inputs(self, pad=5):
         """Generate input files for TEM simulator.
-
-        Parameters
-        ----------
-        pad : double, (default = 5)
-            Pad to be added to maximal dimension of the object read from pdb_file
-
-        Returns
-        -------
-        particles : arr
-            Individual particle data extracted from micrograph
         """
-        self.create_crd_file(pad)
+        self.create_crd_file()
         self.create_defocus_file()  # TODO: private?
         self.create_inp_file()
 

@@ -12,7 +12,7 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class():
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "./test_files"
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
@@ -26,7 +26,7 @@ def sample_class():
 @pytest.fixture
 def sample_resources():
     """Return sample resources for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "./test_files"
     cwd = os.getcwd()
     resources = {
         "files": {
@@ -82,6 +82,16 @@ def test_get_config_from_yaml(sample_resources, sample_class):
     for config_group, config_list in returned_config.items():
         assert config_group in expected_config_template
         assert len(config_list) is expected_config_template[config_group]
+
+
+def test_generate_simulator_inputs(sample_class): #TODO: update test
+    """Test whether simulator required files are created.
+    """
+    sample_class.generate_simulator_inputs()
+
+    assert os.path.isfile(sample_class.output_path_dict["inp_file"])
+    assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
+    assert os.path.isfile(sample_class.output_path_dict["crd_file"])
 
 
 
@@ -172,23 +182,6 @@ def test_run_simulator(sample_class):
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
 
-
-def test_generate_simulator_inputs(sample_class): #TODO: update test
-    """Test whether run returns and exports particles with expected shape.
-
-    Notes
-    -----
-    This test requires a local TEM sim installation to run.
-    """
-    particles = sample_class.run(export_particles=True)
-    assert particles.shape == (
-        1,
-        35,
-        809,
-        809,
-    )
-    assert os.path.isfile(sample_class.output_path_dict["h5_file"])
-    assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
 
 
 def test_apply_gaussian_noise(sample_class, sample_resources):

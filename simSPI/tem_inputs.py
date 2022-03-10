@@ -497,7 +497,7 @@ def generate_path_dict(
         defocus_file
             relative path to desired output defocus parameter file
         star_file
-            relative poth to desured output star file
+            relative poth to desured output star file #TODO: remove h5-noisy,update test, docsting
     """
     path_dict = {}
 
