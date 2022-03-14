@@ -66,24 +66,6 @@ def test_temsimulator_constructor(sample_resources):
     assert set(parameters_dict_keys).issubset(tem_sim.parameter_dict.keys())
 
 
-def test_get_config_from_yaml(sample_resources, sample_class):
-    """Test whether yaml is parsed."""
-    expected_config_template = {
-        "beam_parameters": 4,
-        "optics_parameters": 10,
-        "detector_parameters": 11,
-        "specimen_grid_params": 4,
-        "molecular_model": 3,
-    }
-
-    test_yaml = sample_resources["files"]["sim_yaml"]
-    returned_config = sample_class.get_config_from_yaml(test_yaml)
-
-    for config_group, config_list in returned_config.items():
-        assert config_group in expected_config_template
-        assert len(config_list) is expected_config_template[config_group]
-
-
 def test_generate_simulator_inputs(sample_class):
     """Test whether simulator required files are created."""
     sample_class.generate_simulator_inputs()

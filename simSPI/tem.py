@@ -44,37 +44,6 @@ class TEMSimulator:
 
         self.defocus_distribution_samples = []
 
-    def get_config_from_yaml(self, config_yaml):
-        """Create dictionary with parameters from YAML file and groups them into lists.
-
-        Parameters
-        ----------
-        config_yaml : str
-            Relative path to YAML file containing parameters for TEM Simulator
-        Returns
-        -------
-        classified_params : dict
-            Dictionary containing grouped parameters for TEM Simulator, with keys:
-                seed : str maps to int
-                    Seed for TEM Simulator
-                particle_mrcout : str maps to bool
-                    Flag for optional volume map of sample
-                sample_dimensions : str maps to
-                    List containing the specimen grid parameters
-                beam_params : str maps to list
-                    List containing the beam parameters
-                detector_params : str maps to list
-                    List containing the detector parameters
-                optics_params : str maps to list
-                    List containing the optic parameters
-        """
-        with open(config_yaml, "r") as stream:
-            raw_params = yaml.safe_load(stream)
-
-        classified_params = tem_inputs.classify_input_config(raw_params)
-
-        return classified_params
-
     def generate_simulator_inputs(self):
         """Generate input files for TEM simulator."""
         self.create_crd_file()

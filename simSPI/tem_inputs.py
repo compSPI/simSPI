@@ -598,3 +598,35 @@ def classify_input_config(raw_params):
             classified_sim_params[param_type] = flattened_params
 
     return classified_sim_params
+
+
+def get_config_from_yaml(config_yaml):
+    """Create dictionary with parameters from YAML file and groups them into lists.
+
+    Parameters
+    ----------
+    config_yaml : str
+        Relative path to YAML file containing parameters for TEM Simulator
+    Returns
+    -------
+    classified_params : dict
+        Dictionary containing grouped parameters for TEM Simulator, with keys:
+            seed : str maps to int
+                Seed for TEM Simulator
+            particle_mrcout : str maps to bool
+                Flag for optional volume map of sample
+            sample_dimensions : str maps to
+                List containing the specimen grid parameters
+            beam_params : str maps to list
+                List containing the beam parameters
+            detector_params : str maps to list
+                List containing the detector parameters
+            optics_params : str maps to list
+                List containing the optic parameters
+    """
+    with open(config_yaml, "r") as stream:
+        raw_params = yaml.safe_load(stream)
+
+    classified_params = classify_input_config(raw_params)
+
+    return classified_params
