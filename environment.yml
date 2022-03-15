@@ -8,6 +8,7 @@ dependencies:
   - configparser
   - coverage
   - h5py
+  - jupyter
   - mdtraj
   - mrcfile
   - numba

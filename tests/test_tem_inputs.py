@@ -20,6 +20,7 @@ def test_resources():
     resources = {
         "files": {
             "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+            "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
             "metadata_params_file": str(
                 Path(cwd, test_files_path, "metadata_fields.yaml")
             ),
