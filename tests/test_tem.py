@@ -114,12 +114,12 @@ def test_parse_simulator_data(sample_class, sample_resources):
     micrograph, particle_stack = sample_class.parse_simulator_data()
 
     assert particle_stack.shape == (
-        1,
+        3,
         35,
         809,
         809,
     )
-    assert micrograph.shape == (1, 4092, 5760)
+    assert micrograph.shape == (3, 4092, 5760)
 
 
 def test_export_simulated_data(sample_class, sample_resources):

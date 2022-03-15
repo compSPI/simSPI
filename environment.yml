@@ -22,5 +22,6 @@ dependencies:
     - geomstats
     - git+https://github.com/compSPI/compSPI.git
     - git+https://github.com/compSPI/ioSPI.git
+    - papermill
     - raster_geometry
     - starfile
