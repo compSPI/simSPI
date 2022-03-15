@@ -37,7 +37,7 @@
     mtf_params: [0,0,1,0,0]     # to be described. [0,0,1,0,0] is perfect detector.
 
   geometry_parameters:
-    n_samples: 1                       # number of samples to be generated
+    n_samples: 3                       # number of samples to be generated
 
   ctf_parameters:
    distribution_type: 'uniform'        # type of distribution, either 'gaussian' or 'uniform'

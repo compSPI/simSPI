@@ -4,9 +4,9 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from ioSPI.ioSPI import micrographs
+from ioSPI import micrographs
 
-from simSPI.simSPI import crd, fov, tem_distribution_utils, tem_inputs
+from simSPI import crd, fov, tem_distribution_utils, tem_inputs
 
 
 class TEMSimulator:
@@ -29,7 +29,7 @@ class TEMSimulator:
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
 
-        self.sim_dict = self.get_config_from_yaml(sim_config)
+        self.sim_dict = tem_inputs.get_config_from_yaml(sim_config)
         self.output_path_dict = tem_inputs.generate_path_dict(**parsed_path_config)
         self.output_path_dict["local_sim_dir"] = parsed_path_config["local_sim_dir"]
 
