@@ -31,7 +31,7 @@ def test_resources():
 
 def normalized_mse(a, b):
     """Return normalized error between two numpy arrays."""
-    return np.sum((a - b) ** 2) ** 0.5 / np.sum(a ** 2) ** 0.5
+    return np.sum((a - b) ** 2) ** 0.5 / np.sum(a**2) ** 0.5
 
 
 def test_fill_parameters_dictionary_max():
