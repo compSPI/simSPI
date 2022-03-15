@@ -25,6 +25,7 @@ def test_resources():
 
 
 def _exec_notebook(path, path_yaml, sim_yaml):
+    """Execute notebook on path using papermill to fill config paths."""
     file_name = tempfile.NamedTemporaryFile(suffix=".ipynb").name
     args = [
         "papermill",
