@@ -388,13 +388,14 @@ class TEMSimulator:
             Individual particle data with gaussian noise applied
         """
         noisy_particles = []
+        snr_default = 1.0
 
         if "other" not in self.parameter_dict:
             return particles
 
         for i in range(self.parameter_dict["geometry"]["n_tilts"]):
             variance = np.var(particles[i])
-            snr = 1.0
+            snr = snr_default
             try:
                 snr = self.parameter_dict["other"]["signal_to_noise"]
             except KeyError:
