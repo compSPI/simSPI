@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import micrographs
 
-from simSPI import crd, fov, tem_distribution_utils, tem_inputs
+from simSPI import crd, fov, tem_distribution, tem_inputs
 
 
 class TEMSimulator:
@@ -270,7 +270,7 @@ class TEMSimulator:
         defocus_params = self.parameter_dict["ctf"]
         n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
-        distribution_generator = tem_distribution_utils.DistributionGenerator(
+        distribution_generator = tem_distribution.DistributionGenerator(
             defocus_params["distribution_type"],
             defocus_params["distribution_parameters"],
         )
