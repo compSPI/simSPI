@@ -469,7 +469,6 @@ def test_write_tem_defocus_file_from_distribution(tmp_path):
     test_distribution_len = 10
     test_distribution = list(np.random.rand(test_distribution_len))
 
-    print(test_distribution)
 
     write_tem_defocus_file_from_distribution(test_defocus_file, test_distribution)
 
