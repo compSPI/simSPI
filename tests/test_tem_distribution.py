@@ -38,7 +38,7 @@ def test_draw_samples_gaussian():
     samples = generator.draw_samples_1d(size)
 
     mean_error = 3.69 * scale / np.sqrt(size)
-    std_error = 0.1
+    std_error = 1
 
     assert type(samples) is torch.Tensor
     assert samples.shape == torch.Size([size])
