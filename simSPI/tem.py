@@ -6,7 +6,7 @@ import numpy as np
 import yaml
 from ioSPI import micrographs
 
-from simSPI import crd, fov, tem_distribution_utils, tem_inputs
+from simSPI import crd, fov, tem_distribution, tem_inputs
 
 
 class TEMSimulator:
@@ -55,7 +55,7 @@ class TEMSimulator:
         defocus_params = self.parameter_dict["ctf"]
         n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
-        distribution_generator = tem_distribution_utils.DistributionGenerator(
+        distribution_generator = tem_distribution.DistributionGenerator(
             defocus_params["distribution_type"],
             defocus_params["distribution_parameters"],
         )
@@ -160,13 +160,14 @@ class TEMSimulator:
             Individual particle data with gaussian noise applied
         """
         noisy_particles = []
+        snr_default = 1.0
 
         if "noise" not in self.parameter_dict:
             return particle_stacks
 
         for i in range(self.parameter_dict["geometry"]["n_tilts"]):
             variance = np.var(particle_stacks[i])
-            snr = 1.0
+            snr = snr_default
             try:
                 snr = self.parameter_dict["noise"]["signal_to_noise"]
             except KeyError:
