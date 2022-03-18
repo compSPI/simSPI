@@ -1,7 +1,8 @@
 """Tests for tem_distribution."""
+import numpy as np
 import pytest
 import torch
-import numpy as np
+
 from simSPI import tem_distribution
 
 
@@ -18,8 +19,7 @@ def test_constructor():
 
 
 def test_draw_samples_uniform():
-    """Test if samples of expected length are returned."""
-
+    """Test uniform distributions range and length."""
     upper, lower = (10, 0)
     size = 100
     generator = tem_distribution.DistributionGenerator("uniform", [lower, upper])
@@ -31,13 +31,13 @@ def test_draw_samples_uniform():
 
 
 def test_draw_samples_gaussian():
-    """Test if samples of expected length are returned."""
-    loc, scale = (5,10)
+    """Test gaussians distributions parameters and length."""
+    loc, scale = (5, 10)
     size = 10000
-    generator = tem_distribution.DistributionGenerator("gaussian", [loc,scale])
+    generator = tem_distribution.DistributionGenerator("gaussian", [loc, scale])
     samples = generator.draw_samples_1d(size)
 
-    mean_error = 3.69 * scale/np.sqrt(size)
+    mean_error = 3.69 * scale / np.sqrt(size)
     std_error = 0.1
 
     assert type(samples) is torch.Tensor
