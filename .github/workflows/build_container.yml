@@ -74,6 +74,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simspi:latest
           cache-from: type=local,src=/tmp/.buildx-cache
+          no-cache: true
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Image digest
