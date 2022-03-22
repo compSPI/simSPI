@@ -1,5 +1,6 @@
 """Help format TEM Simulator input parameters."""
 
+import logging
 import random
 
 import numpy as np
@@ -7,7 +8,14 @@ import yaml
 
 
 def populate_tem_input_parameter_dict(
-    input_params_file, mrc_file, pdb_file, crd_file, log_file, dose=None, noise=None
+    input_params_file,
+    mrc_file,
+    pdb_file,
+    crd_file,
+    log_file,
+    defocus_file,
+    dose=None,
+    noise=None,
 ):
     """Return parameter dictionary with settings for simulation.
 
@@ -23,6 +31,8 @@ def populate_tem_input_parameter_dict(
         Coordinates of the sample copies
     log_file : str
         Log file for the run
+    defocus_file : str
+        Defocus File to store defocus distribution
     dose : int
         If present, overrides beam_parameters[electron_dose]
     noise : str
@@ -74,12 +84,23 @@ def populate_tem_input_parameter_dict(
     - detector_q_efficiency        : detector quantum efficiency
     - mtf_params                   : list of 5 MTF parameters
 
+    *** geometry ***
+    - n_samples : number of images of the sample
+
+    *** ctf ***
+    - distribution_type [OPTIONAL] : type of distribution. Overrides defocus_um
+                                        parameter if present.
+
+    - distribution_parameters [OPTIONAL] : distribution parameters. Required if
+                                                distribution_type is present.
+
     *** miscellaneous ***
     - seed [OPTIONAL]              : seed for the run. If not present, random.
     - signal_to_noise [OPTIONAL]   : signal-to-noise ratio for gaussian white noise.
     - signal_to_noise_db [OPTIONAL] : signal-to-noise ratio in decibels.
     """
     parameters = None
+    log = logging.getLogger()
     with open(input_params_file, "r") as f:
         parameters = yaml.safe_load(f)
 
@@ -89,6 +110,8 @@ def populate_tem_input_parameter_dict(
     except KeyError:
         random.seed()
         dic["simulation"]["seed"] = random.randint(0, int(1e10))
+
+    dic["simulation"]["log_file"] = log_file
 
     dic["other"] = {}
     try:
@@ -127,6 +150,7 @@ def populate_tem_input_parameter_dict(
     dic["particleset"] = {}
     dic["particleset"]["name"] = parameters["molecular_model"]["particle_name"]
     dic["particleset"]["crd_file"] = crd_file
+
     dic["beam"] = {}
     dic["beam"]["voltage"] = parameters["beam_parameters"]["voltage_kv"]
     dic["beam"]["spread"] = parameters["beam_parameters"]["energy_spread_v"]
@@ -152,6 +176,13 @@ def populate_tem_input_parameter_dict(
         "aperture_angle_mrad"
     ]
 
+    if "optics_defocusout" in parameters["optics_parameters"]:
+        dic["optics"]["defocus_file_out"] = parameters["optics_parameters"][
+            "optics_defocusout"
+        ]
+    else:
+        dic["optics"]["defocus_file_out"] = None
+
     dic["detector"] = {}
 
     if "defocus_um" in parameters["optics_parameters"]:
@@ -169,13 +200,6 @@ def populate_tem_input_parameter_dict(
     dic["optics"]["defocus_nonsyst_error"] = parameters["optics_parameters"][
         "defocus_nonsyst_error_um"
     ]
-
-    if "optics_defocusout" in parameters["optics_parameters"]:
-        dic["optics"]["defocus_file_out"] = parameters["optics_parameters"][
-            "optics_defocusout"
-        ]
-    else:
-        dic["optics"]["defocus_file_out"] = None
 
     dic["detector"]["det_pix_x"] = parameters["detector_parameters"]["detector_nx_px"]
     dic["detector"]["det_pix_y"] = parameters["detector_parameters"]["detector_ny_px"]
@@ -197,6 +221,24 @@ def populate_tem_input_parameter_dict(
     dic["detector"]["mtf_alpha"] = parameters["detector_parameters"]["mtf_params"][3]
     dic["detector"]["mtf_beta"] = parameters["detector_parameters"]["mtf_params"][4]
     dic["detector"]["image_file_out"] = mrc_file
+
+    dic["geometry"] = {}
+    dic["geometry"]["n_tilts"] = parameters["geometry_parameters"]["n_samples"]
+
+    try:
+        dic["ctf"] = {}
+        dic["ctf"]["distribution_type"] = parameters["ctf_parameters"][
+            "distribution_type"
+        ]
+        dic["ctf"]["distribution_parameters"] = parameters["ctf_parameters"][
+            "distribution_parameters"
+        ]
+        dic["optics"]["gen_defocus"] = "no"
+        dic["optics"]["defocus_file_in"] = defocus_file
+    except KeyError:
+        log.warning("ctf_parameters not found/invalid. Using constant defocus.")
+        dic["optics"]["gen_defocus"] = "yes"
+        dic["optics"]["defocus_file_in"] = None
 
     return dic
 
@@ -269,6 +311,24 @@ def starfile_append_tem_simulator_data(
     return data_list
 
 
+def write_tem_defocus_file_from_distribution(path: str, distribution: list):
+    """Write defocus distribution into tabular formatted file.
+
+    Parameters
+    ----------
+    path : str
+        File path to defocus file.
+    distribution : list
+        Defocus distribution.
+
+    """
+    with open(path, "w") as inp:
+        inp.write("# File created by TEM-simulator, version 1.3.\n")
+        inp.write(f"{len(distribution)} 1\n")
+        for sample in distribution:
+            inp.write(f"{sample}\n")
+
+
 def write_tem_inputs_to_inp_file(path, tem_inputs):
     """Write tem simulator inputs to input .inp file.
 
@@ -315,10 +375,10 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
             "=== geometry ===\n"
             "gen_tilt_data = yes\n"
             "tilt_axis = 0\n"
-            "ntilts = 1\n"
+            "ntilts = {0[n_tilts]}\n"
             "theta_start = 0\n"
             "theta_incr = 0\n"
-            "geom_errors = none\n"
+            "geom_errors = none\n".format(tem_inputs["geometry"])
         )
         inp.write(
             "=== electronbeam ===\n"
@@ -336,7 +396,7 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
             "aperture = {0[aperture]}\n"
             "focal_length = {0[focal_length]}\n"
             "cond_ap_angle = {0[cond_ap_angle]}\n"
-            "gen_defocus = yes\n"
+            "gen_defocus = {0[gen_defocus]}\n"
             "defocus_nominal = {0[defocus_nominal]}\n"
             "defocus_syst_error = {0[defocus_syst_error]}\n"
             "defocus_syst_error = {0[defocus_nonsyst_error]}\n".format(
@@ -348,6 +408,10 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
                 "defocus_file_out = {0[defocus_file_out]}\n".format(
                     tem_inputs["optics"]
                 )
+            )
+        if tem_inputs["optics"]["defocus_file_in"] is not None:
+            inp.write(
+                "defocus_file_in = {0[defocus_file_in]}\n".format(tem_inputs["optics"])
             )
         inp.write(
             "=== detector ===\n"

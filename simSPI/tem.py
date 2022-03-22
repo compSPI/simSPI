@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 from ioSPI import micrographs
 
-from simSPI import crd, fov, tem_inputs
+from simSPI import crd, fov, tem_distribution, tem_inputs
 
 
 class TEMSimulator:
@@ -21,14 +21,15 @@ class TEMSimulator:
     sim_config : str
         Relative path to YAML file containing simulator paths for TEM Simulator.
 
+    Notes
+    -----
+    defocus_distribution_samples are in um.
     """
 
     def __init__(self, path_config, sim_config):
 
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
-
-        stream.close()
 
         self.sim_dict = self.get_config_from_yaml(sim_config)
         self.output_path_dict = self.generate_path_dict(**parsed_path_config)
@@ -40,7 +41,10 @@ class TEMSimulator:
             self.output_path_dict["pdb_file"],
             self.output_path_dict["crd_file"],
             self.output_path_dict["log_file"],
+            self.output_path_dict["defocus_file"],
         )
+
+        self.defocus_distribution_samples = []
 
     def get_config_from_yaml(self, config_yaml):
         """Create dictionary with parameters from YAML file and groups them into lists.
@@ -68,8 +72,6 @@ class TEMSimulator:
         """
         with open(config_yaml, "r") as stream:
             raw_params = yaml.safe_load(stream)
-
-        stream.close()
 
         classified_params = self.classify_input_config(raw_params)
 
@@ -185,6 +187,8 @@ class TEMSimulator:
                 relative path to desired output mrc file
             log_file
                 relative path to desired output log file
+            defocus_file
+                relative path to desired output defocus parameter file
             star_file
                 relative poth to desured output star file
         """
@@ -221,6 +225,9 @@ class TEMSimulator:
         path_dict["star_file"] = str(
             Path(output_dir, pdb_keyword + mrc_keyword + ".star")
         )
+        path_dict["defocus_file"] = str(
+            Path(output_dir, pdb_keyword + mrc_keyword + "_defocus" + ".txt")
+        )
 
         return path_dict
 
@@ -240,7 +247,8 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
         """
         self.create_crd_file(pad)
-        self.write_inp_file()
+        self.create_defocus_file()
+        self.create_inp_file()
         self.generate_metadata()
 
         particle_data = self.get_image_data()
@@ -256,6 +264,24 @@ class TEMSimulator:
                 particle_data = self.apply_gaussian_noise(particle_data)
 
         return particle_data
+
+    def create_defocus_file(self):
+        """Sample defocus parameters and generate corresponding defocus file."""
+        defocus_params = self.parameter_dict["ctf"]
+        n_samples = self.parameter_dict["geometry"]["n_tilts"]
+
+        distribution_generator = tem_distribution.DistributionGenerator(
+            defocus_params["distribution_type"],
+            defocus_params["distribution_parameters"],
+        )
+        samples = distribution_generator.draw_samples_1d(n_samples).tolist()
+        samples = [round(num, 4) for num in samples]
+
+        tem_inputs.write_tem_defocus_file_from_distribution(
+            self.output_path_dict["defocus_file"], samples
+        )
+
+        self.defocus_distribution_samples = samples
 
     def create_crd_file(self, pad):
         """Format and write molecular model data to crd_file for use in TEM-simulator.
@@ -279,7 +305,7 @@ class TEMSimulator:
             crd_file=self.output_path_dict["crd_file"],
         )
 
-    def write_inp_file(self):
+    def create_inp_file(self):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
 
         The .inp files contain the parameters controlling the simulation. These are text
@@ -302,7 +328,7 @@ class TEMSimulator:
         Raises
         ------
         subprocess.CalledProcessError
-            Raised if shell commmand exits with non zero code.
+            Raised if shell command exits with non-zero code.
 
         Notes
         -----
@@ -313,10 +339,11 @@ class TEMSimulator:
 
         subprocess.run([sim_executable, input_file_arg], check=True)
 
-        data = micrographs.read_micrograph_from_mrc(self.output_path_dict["mrc_file"])
-        micrograph = data[0, ...]
+        micrograph_data = micrographs.read_micrograph_from_mrc(
+            self.output_path_dict["mrc_file"]
+        )
 
-        return micrograph
+        return micrograph_data
 
     def extract_particles(self, micrograph, pad):
         """Extract particle data from micrograph.
@@ -333,15 +360,19 @@ class TEMSimulator:
         particles : arr
             Individual particle data extracted from micrograph
         """
-        particles = fov.micrograph2particles(
-            micrograph,
-            self.sim_dict["optics_parameters"],
-            self.sim_dict["detector_parameters"],
-            pdb_file=self.output_path_dict["pdb_file"],
-            pad=pad,
-        )
+        particle_stacks = []
 
-        return particles
+        for i in range(self.parameter_dict["geometry"]["n_tilts"]):
+            particles = fov.micrograph2particles(
+                micrograph[i],
+                self.sim_dict["optics_parameters"],
+                self.sim_dict["detector_parameters"],
+                pdb_file=self.output_path_dict["pdb_file"],
+                pad=pad,
+            )
+            particle_stacks.append(particles)
+
+        return np.array(particle_stacks)
 
     def apply_gaussian_noise(self, particles):
         """Apply gaussian noise to particle data.
@@ -356,22 +387,28 @@ class TEMSimulator:
         noisy_particles : arr
             Individual particle data with gaussian noise applied
         """
-        variance = np.var(particles)
+        noisy_particles = []
+        snr_default = 1.0
+
         if "other" not in self.parameter_dict:
-            return particles.copy()
-        snr = 1.0
-        try:
-            snr = self.parameter_dict["other"]["signal_to_noise"]
-        except KeyError:
-            pass
-        try:
-            snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
-            snr = 10 ** (snr_db / 10)
-        except KeyError:
-            pass
-        scale = np.sqrt(variance / snr)
-        noisy_particles = np.random.normal(particles, scale)
-        return noisy_particles
+            return particles
+
+        for i in range(self.parameter_dict["geometry"]["n_tilts"]):
+            variance = np.var(particles[i])
+            snr = snr_default
+            try:
+                snr = self.parameter_dict["other"]["signal_to_noise"]
+            except KeyError:
+                pass
+            try:
+                snr_db = self.parameter_dict["other"]["signal_to_noise_db"]
+                snr = 10 ** (snr_db / 10)
+            except KeyError:
+                pass
+            scale = np.sqrt(variance / snr)
+            noisy_particles.append(np.random.normal(particles[i], scale))
+
+        return np.array(noisy_particles)
 
     def export_particle_stack(self, particles):
         """Export extracted particle data to h5 file.
@@ -382,20 +419,25 @@ class TEMSimulator:
             Individual particle data extracted from micrograph
 
         """
-        micrographs.write_data_dict_to_hdf5(self.output_path_dict["h5_file"], particles)
+        flattened_particles = np.ndarray.flatten(particles)
+        micrographs.write_data_dict_to_hdf5(
+            self.output_path_dict["h5_file"], flattened_particles
+        )
 
         if "other" in self.parameter_dict:
             noisy_particles = self.apply_gaussian_noise(particles)
+            flattened_noisy_particles = np.ndarray.flatten(noisy_particles)
+
             if "h5_file_noisy" in self.output_path_dict:
                 micrographs.write_data_dict_to_hdf5(
-                    self.output_path_dict["h5_file_noisy"], noisy_particles
+                    self.output_path_dict["h5_file_noisy"], flattened_noisy_particles
                 )
             else:
                 micrographs.write_data_dict_to_hdf5(
                     self.output_path_dict["h5_file"][:-3]
                     + "-noisy"
                     + self.output_path_dict["h5_file"][-3:],
-                    noisy_particles,
+                    flattened_noisy_particles,
                 )
 
     def generate_metadata(self):
@@ -413,7 +455,7 @@ class TEMSimulator:
         with open(Path(self.output_path_dict["metadata_params_file"]), "r") as stream:
             metadata_fields = yaml.safe_load(stream)
 
-        stream.close()
+        n_samples = self.parameter_dict["geometry"]["n_tilts"]
 
         with open(self.output_path_dict["star_file"], "w") as f:
             mtf_params = {}
@@ -438,23 +480,26 @@ class TEMSimulator:
                 if c in mtf_params:
                     f.write(f"{mtf_params[c]:13.4f}\n")
 
-            f.write("\n")
-            f.write("loop_\n")
-            f.write("_x\n")
-            f.write("_y\n")
-            f.write("_z\n")
-            f.write("_phi\n")
-            f.write("_theta\n")
-            f.write("_psi\n")
+            for i in range(n_samples):
 
-            for coord in particle_metadata:
-                f.write(
-                    "{0[0]:13.4f}{0[1]:13.4f}{0[2]:13.4f}"
-                    "{0[3]:13.4f}{0[4]:13.4f}"
-                    "{0[5]:13.4f}\n".format(coord)
-                )
+                f.write(f"particle_rotation_angles: {i + 1}\n")
+                f.write("loop_\n")
+                f.write("_defocus\n")
+                f.write("_x\n")
+                f.write("_y\n")
+                f.write("_z\n")
+                f.write("_phi\n")
+                f.write("_theta\n")
+                f.write("_psi\n")
 
-        f.close()
+                for coord in particle_metadata:
+                    f.write(
+                        "{0:13.4f}{1[0]:13.4f}{1[1]:13.4f}{1[2]:13.4f}"
+                        "{1[3]:13.4f}{1[4]:13.4f}"
+                        "{1[5]:13.4f}\n".format(
+                            self.defocus_distribution_samples[i], coord
+                        )
+                    )
 
     @staticmethod
     def retrieve_rotation_metadata(path):
@@ -475,8 +520,6 @@ class TEMSimulator:
         lines = []
         with open(path) as f:
             lines = f.readlines()
-
-        f.close()
 
         for i, line in enumerate(lines):
             if i >= 4:

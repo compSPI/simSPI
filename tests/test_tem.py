@@ -12,7 +12,7 @@ from simSPI import fov, tem
 @pytest.fixture
 def sample_class():
     """Instantiate TEMSimulator for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "/work/tests/test_files/tem"
     cwd = os.getcwd()
 
     tem_simulator = tem.TEMSimulator(
@@ -26,7 +26,7 @@ def sample_class():
 @pytest.fixture
 def sample_resources():
     """Return sample resources for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "/work/tests/test_files/tem"
     cwd = os.getcwd()
     resources = {
         "files": {
@@ -41,7 +41,7 @@ def sample_resources():
 
     micrograph = np.load(str(Path(cwd, test_files_path, "micrograph.npz")))
 
-    resources["data"] = {"micrograph": micrograph.f.arr_0}
+    resources["data"] = {"micrograph": np.array([micrograph.f.arr_0])}
 
     return resources
 
@@ -59,6 +59,7 @@ def test_temsimulator_constructor(sample_resources):
         "beam",
         "optics",
         "detector",
+        "geometry",
     ]
     assert tem_sim.output_path_dict is not None
     assert tem_sim.sim_dict is not None
@@ -150,6 +151,7 @@ def test_generate_path_dict(sample_class, sample_resources):
         "h5_file": ".h5",
         "h5_file_noisy": "-noisy.h5",
         "star_file": ".star",
+        "defocus_file": ".txt",
     }
     returned_paths = sample_class.generate_path_dict(
         sample_resources["files"]["pdb_file"],
@@ -170,8 +172,14 @@ def test_create_crd_file(sample_class):
 
 def test_create_inp_file(sample_class):
     """Test creation of .inp file."""
-    sample_class.write_inp_file()
+    sample_class.create_inp_file()
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
+
+
+def test_create_defocus_file(sample_class):
+    """Test creation of defocus file."""
+    sample_class.create_defocus_file()
+    assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
 
 
 def test_extract_particles(sample_class, sample_resources):
@@ -181,6 +189,7 @@ def test_extract_particles(sample_class, sample_resources):
     )
 
     assert particles.shape == (
+        1,
         35,
         809,
         809,
@@ -217,7 +226,7 @@ def test_export_particle_stack(sample_class, sample_resources):
     ]
 
     particles = fov.micrograph2particles(
-        sample_resources["data"]["micrograph"],
+        sample_resources["data"]["micrograph"][0],
         sample_class.sim_dict["optics_parameters"],
         sample_class.sim_dict["detector_parameters"],
         pdb_file=sample_resources["files"]["pdb_file"],
@@ -237,11 +246,11 @@ def test_get_image_data(sample_class):
     This test requires a local TEM sim installation to run.
     """
     sample_class.create_crd_file(pad=5)
-    sample_class.write_inp_file()
+    sample_class.create_inp_file()
     data = sample_class.get_image_data()
     assert os.path.isfile(sample_class.output_path_dict["log_file"])
     assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
-    assert data.shape == (4092, 5760)
+    assert data.shape == (1, 4092, 5760)
 
 
 def test_run(sample_class):
@@ -253,6 +262,7 @@ def test_run(sample_class):
     """
     particles = sample_class.run(export_particles=True)
     assert particles.shape == (
+        1,
         35,
         809,
         809,
@@ -296,7 +306,7 @@ def test_apply_gaussian_noise(sample_class, sample_resources):
     ]
 
     particles = fov.micrograph2particles(
-        sample_resources["data"]["micrograph"],
+        sample_resources["data"]["micrograph"][0],
         sample_class.sim_dict["optics_parameters"],
         sample_class.sim_dict["detector_parameters"],
         pdb_file=sample_resources["files"]["pdb_file"],

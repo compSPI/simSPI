@@ -1,6 +1,7 @@
 """Contain test functions for save_utils."""
 import os
 import tempfile
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -10,6 +11,7 @@ from ioSPI.particle_metadata import update_optics_config_from_starfile
 from simSPI.tem_inputs import (
     populate_tem_input_parameter_dict,
     starfile_append_tem_simulator_data,
+    write_tem_defocus_file_from_distribution,
     write_tem_inputs_to_inp_file,
 )
 
@@ -26,6 +28,7 @@ def test_fill_parameters_dictionary_max():
 
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
+    defocus_file = "a.txt"
     voxel_size = 0.2
     particle_name = "africa"
     particle_mrcout = "b.mrc"
@@ -61,7 +64,9 @@ def test_fill_parameters_dictionary_max():
     snr = 0.6
     snr_db = 10
     key = particle_mrcout.split(".mrc")[0]
-
+    n_samples = 5
+    dist_type = "uniform"
+    dist_parameters = [0, 1]
     try:
         with open(tmp_yml.name, "w") as f:
             data = {
@@ -107,6 +112,11 @@ def test_fill_parameters_dictionary_max():
                     "signal_to_noise": snr,
                     "signal_to_noise_db": snr_db,
                 },
+                "geometry_parameters": {"n_samples": n_samples},
+                "ctf_parameters": {
+                    "distribution_type": dist_type,
+                    "distribution_parameters": dist_parameters,
+                },
             }
             contents = yaml.dump(data)
             f.write(contents)
@@ -116,6 +126,7 @@ def test_fill_parameters_dictionary_max():
             pdb_file,
             crd_file,
             log_file,
+            defocus_file,
             dose=dose,
             noise=noise_override,
         )
@@ -178,6 +189,7 @@ def test_fill_parameters_dictionary_min():
 
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
+    defocus_file = "a.txt"
     voxel_size = 0.2
     particle_name = "africa"
     crd_file = "a.crd"
@@ -204,6 +216,7 @@ def test_fill_parameters_dictionary_min():
     detector_q_efficiency = 0.1
     mtf_params = [0.1, 0.0, 0.7, 0, 0]
     log_file = "itslog.log"
+    n_samples = 5
 
     try:
         with open(tmp_yml.name, "w") as f:
@@ -242,11 +255,12 @@ def test_fill_parameters_dictionary_min():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
+                "geometry_parameters": {"n_samples": n_samples},
             }
             contents = yaml.dump(data)
             f.write(contents)
         out_dict = populate_tem_input_parameter_dict(
-            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
+            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file, defocus_file
         )
 
         assert out_dict["simulation"]["log_file"] == log_file
@@ -326,7 +340,6 @@ def test_starfile_data():
     )
     assert len(data_list) == config.batch_size
     for num, list_var in enumerate(data_list):
-
         assert isinstance(list_var[0], str)
         assert (
             normalized_mse(list_var[1], rot_params["relion_angle_rot"][num].numpy())
@@ -370,6 +383,7 @@ def test_write_inp_file():
     tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
+    defocus_file = "a.txt"
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
     voxel_size = 0.2
@@ -398,7 +412,7 @@ def test_write_inp_file():
     detector_q_efficiency = 0.1
     mtf_params = [0.1, 0.0, 0.7, 0, 0]
     log_file = "itslog.log"
-
+    n_samples = 10
     try:
         with open(tmp_yml.name, "w") as f:
             data = {
@@ -436,13 +450,28 @@ def test_write_inp_file():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
+                "geometry_parameters": {"n_samples": n_samples},
             }
             contents = yaml.dump(data)
             f.write(contents)
         out_dict = populate_tem_input_parameter_dict(
-            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
+            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file, defocus_file
         )
         write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
     finally:
         os.unlink(tmp_inp.name)
         os.unlink(tmp_yml.name)
+
+
+def test_write_tem_defocus_file_from_distribution(tmp_path):
+    """Test if defocus file is generated with right format."""
+    test_defocus_file = str(Path(tmp_path, "defocus_file_test.txt"))
+    test_distribution_len = 10
+    test_distribution = list(np.random.rand(test_distribution_len))
+
+    write_tem_defocus_file_from_distribution(test_defocus_file, test_distribution)
+
+    with open(test_defocus_file, "r") as generated_file:
+        rows = generated_file.readlines()
+        assert len(rows) == test_distribution_len + 2
+        assert str(test_distribution_len) in rows[1]
