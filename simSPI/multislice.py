@@ -24,9 +24,7 @@ def apply_complex_ctf_to_exit_wave(exit_wave_f, complex_ctf):
         Exit wave ctf convolution (in real space).
     """
     n_pix = exit_wave_f.shape[0]
-    np_to_torch = torch.tensor(exit_wave_f * complex_ctf).reshape(
-        1, 1, n_pix, n_pix
-    )
+    np_to_torch = torch.tensor(exit_wave_f * complex_ctf).reshape(1, 1, n_pix, n_pix)
     i0 = torch.abs(transforms.fourier_to_primal_2D(np_to_torch))
     return i0.detach().numpy().reshape(n_pix, n_pix)
 
@@ -145,10 +143,7 @@ def exit_wave_to_image(exit_wave_f, complex_ctf, dose, noise_bg, dqe, ntf):
     n_pix = i0.shape[0]
     i0_torch = torch.tensor(i0).reshape(1, 1, n_pix, n_pix)
     i0_f = (
-        transforms.primal_to_fourier_2D(i0_torch)
-        .detach()
-        .numpy()
-        .reshape(n_pix, n_pix)
+        transforms.primal_to_fourier_2D(i0_torch).detach().numpy().reshape(n_pix, n_pix)
     )
     i0_dqe = apply_dqe(i0_f, dqe)
     shot_noise_sample = apply_poisson_shot_noise_sample(i0_dqe, dose, noise_bg)
