@@ -1,0 +1,5 @@
+  pdb_file: './simSPI/data/pdb_files/4v6x.pdb'
+  metadata_params_file: './simSPI/data/metadata_fields.yaml'
+  mrc_keyword: '_randomrot'
+  output_dir: './simSPI/temp_workspace/output/'
+  local_sim_dir: './TEM-simulator/src/TEM-simulator'

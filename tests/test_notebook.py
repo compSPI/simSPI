@@ -10,7 +10,7 @@ import pytest
 @pytest.fixture
 def test_resources():
     """Return resources for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "/work/tests/test_files/tem"
     notebooks_path = "/work/notebooks/"
     cwd = os.getcwd()
     resources = {
