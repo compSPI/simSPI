@@ -15,7 +15,7 @@ from simSPI import tem_inputs
 @pytest.fixture
 def test_resources():
     """Return resources for testing."""
-    test_files_path = "/work/tests/test_files"
+    test_files_path = "/work/tests/test_files/tem"
     cwd = os.getcwd()
     resources = {
         "files": {
