@@ -48,6 +48,10 @@ def sample_resources():
 
 def test_temsimulator_constructor(sample_resources):
     """Test whether constructor populates attributes."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem.TEMSimulator(invalid_file_type, sample_resources["files"]["sim_yaml"])
+
     tem_sim = tem.TEMSimulator(
         sample_resources["files"]["path_yaml"], sample_resources["files"]["sim_yaml"]
     )

@@ -27,12 +27,15 @@ class TEMSimulator:
 
     def __init__(self, path_config, sim_config):
 
+        self.log = logging.getLogger()
+
         suffix = Path(path_config).suffix
-        log = logging.getLogger()
         allowed_types = [".yaml", ".yml"]
 
         if suffix.lower() not in allowed_types:
-            log.error(f"`File Path : {path_config} must be of type(s) {allowed_types} ")
+            self.log.error(
+                f"`File Path : {path_config} must be of type(s) {allowed_types} "
+            )
             raise TypeError()
 
         with open(path_config, "r") as stream:
@@ -74,7 +77,9 @@ class TEMSimulator:
         tem_inputs.write_tem_defocus_file_from_distribution(
             self.output_path_dict["defocus_file"], samples
         )
-
+        self.log.info(
+            f"defocus file created at {self.output_path_dict['defocus_file']}"
+        )
         self.defocus_distribution_samples = samples
 
     def create_crd_file(self):
@@ -92,6 +97,7 @@ class TEMSimulator:
             yrange=y_range,
             crd_file=self.output_path_dict["crd_file"],
         )
+        self.log.info(f"coordinate file created at {self.output_path_dict['crd_file']}")
 
     def create_inp_file(self):
         """Write simulation parameters to .inp file for use by the TEM-simulator.
@@ -105,6 +111,7 @@ class TEMSimulator:
         tem_inputs.write_tem_inputs_to_inp_file(
             path=self.output_path_dict["inp_file"], tem_inputs=self.parameter_dict
         )
+        self.log.info(f"input file created at {self.output_path_dict['inp_file']}")
 
     def run_simulator(self):
         """Run TEM simulator and generates log and mrc files.
@@ -122,6 +129,9 @@ class TEMSimulator:
         input_file_arg = f"{self.output_path_dict['inp_file']}"
 
         subprocess.run([sim_executable, input_file_arg], check=True)
+        self.log.info(
+            f"TEM Simulator run logs generated at {self.output_path_dict['log_file']}"
+        )
 
     def parse_simulator_data(self):
         """Extract micrograph and particle stack data.
@@ -210,7 +220,7 @@ class TEMSimulator:
         )
 
         self.generate_metadata()
-
+        self.log.info(f"h5 file created at {self.output_path_dict['h5_file']}")
         return self.output_path_dict["h5_file"], self.output_path_dict["star_file"]
 
     def generate_metadata(self):
@@ -226,11 +236,10 @@ class TEMSimulator:
         )
 
         suffix = Path(self.output_path_dict["metadata_params_file"]).suffix
-        log = logging.getLogger()
         allowed_types = [".yaml", ".yml"]
 
         if suffix.lower() not in allowed_types:
-            log.error(
+            self.log.error(
                 f"`File Path : {self.output_path_dict['metadata_params_file']} "
                 f"must be of type(s) {allowed_types} "
             )
@@ -285,3 +294,4 @@ class TEMSimulator:
                             self.defocus_distribution_samples[i], coord
                         )
                     )
+        self.log.info(f"meta-data file created at {self.output_path_dict['star_file']}")
