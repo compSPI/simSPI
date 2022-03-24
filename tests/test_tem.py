@@ -70,6 +70,9 @@ def test_generate_simulator_inputs(sample_class):
     """Test whether simulator required files are created."""
     sample_class.generate_simulator_inputs()
 
+    print (sample_class.sim_dict)
+    print(sample_class.output_path_dict)
+
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
     assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
     assert os.path.isfile(sample_class.output_path_dict["crd_file"])
