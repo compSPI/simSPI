@@ -1,4 +1,5 @@
 """Wrapper for the TEM Simulator."""
+import logging
 import subprocess
 from pathlib import Path
 
@@ -25,6 +26,14 @@ class TEMSimulator:
     """
 
     def __init__(self, path_config, sim_config):
+
+        suffix = Path(path_config).suffix
+        log = logging.getLogger()
+        allowed_types = [".yaml", ".yml"]
+
+        if suffix.lower() not in allowed_types:
+            log.error(f"`File Path : {path_config} must be of type(s) {allowed_types} ")
+            raise TypeError()
 
         with open(path_config, "r") as stream:
             parsed_path_config = yaml.safe_load(stream)
@@ -215,6 +224,17 @@ class TEMSimulator:
         particle_metadata = tem_inputs.retrieve_rotation_metadata(
             self.output_path_dict["crd_file"]
         )
+
+        suffix = Path(self.output_path_dict["metadata_params_file"]).suffix
+        log = logging.getLogger()
+        allowed_types = [".yaml", ".yml"]
+
+        if suffix.lower() not in allowed_types:
+            log.error(
+                f"`File Path : {self.output_path_dict['metadata_params_file']} "
+                f"must be of type(s) {allowed_types} "
+            )
+            raise TypeError()
 
         with open(Path(self.output_path_dict["metadata_params_file"]), "r") as stream:
             metadata_fields = yaml.safe_load(stream)
