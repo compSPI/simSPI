@@ -106,7 +106,7 @@ def populate_tem_input_parameter_dict(
     parameters = None
     log = logging.getLogger()
 
-    if Path(input_params_file).suffix.lower() != '.yaml':
+    if Path(input_params_file).suffix.lower() != '.yml':
         raise TypeError('Invalid input file format.')
 
     with open(input_params_file, "r") as f:
