@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import torch
 import yaml
-from ioSPI.particle_metadata import update_optics_config_from_starfile
+from ioSPI.ioSPI.particle_metadata import update_optics_config_from_starfile
 
 from simSPI import tem_inputs
 
@@ -33,6 +33,20 @@ def test_resources():
 def normalized_mse(a, b):
     """Return normalized error between two numpy arrays."""
     return np.sum((a - b) ** 2) ** 0.5 / np.sum(a**2) ** 0.5
+
+
+def test_verify_file_type():
+    """Test if verify_file_type raises exception."""
+    allowed_types = [".txt", ".yml", ".h5"]
+
+    valid_files = ["/work/a.txt", "/work/dir/a.TXT", "a.yml", "a.h5"]
+
+    for file in valid_files:
+        tem_inputs.verify_file_type(file, allowed_types)
+
+    invalid_file = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.verify_file_type(invalid_file, allowed_types)
 
 
 def test_fill_parameters_dictionary_max():
@@ -393,7 +407,7 @@ def test_starfile_data():
 
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
-    tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".imp")
+    tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".inp")
     tmp_inp.close()
     tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
