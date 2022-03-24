@@ -11,6 +11,7 @@
     hole_diameter_nm: 1200         # the diameter of the sample in nm.
     hole_thickness_center_nm: 100  # the thickness of the sample at the center in nm.
     hole_thickness_edge_nm: 100    # The thickness of the sample at the edge and the surrounding support in nm.
+    particle_slice_pad: 5          # padding around each projected particle in px.
 
   beam_parameters:
     voltage_kv: 300                  # the acceleration voltage of the microscope in kV. Range : [1,10^4].
