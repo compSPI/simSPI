@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import torch
 import yaml
-from ioSPI.ioSPI.particle_metadata import update_optics_config_from_starfile
+from ioSPI.particle_metadata import update_optics_config_from_starfile
 
 from simSPI import tem_inputs
 
@@ -35,22 +35,19 @@ def normalized_mse(a, b):
     return np.sum((a - b) ** 2) ** 0.5 / np.sum(a**2) ** 0.5
 
 
-def test_verify_file_type():
-    """Test if verify_file_type raises exception."""
-    allowed_types = [".txt", ".yml", ".h5"]
-
-    valid_files = ["/work/a.txt", "/work/dir/a.TXT", "a.yml", "a.h5"]
-
-    for file in valid_files:
-        tem_inputs.verify_file_type(file, allowed_types)
-
-    invalid_file = "test.test"
-    with pytest.raises(TypeError):
-        tem_inputs.verify_file_type(invalid_file, allowed_types)
-
-
 def test_fill_parameters_dictionary_max():
     """Test fill_parameters_dictionary with maximal garbage parameters."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.populate_tem_input_parameter_dict(
+            invalid_file_type,
+            "",
+            "",
+            "",
+            "",
+            "",
+        )
+
     tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
@@ -407,6 +404,10 @@ def test_starfile_data():
 
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.get_config_from_yaml(invalid_file_type)
+
     tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".inp")
     tmp_inp.close()
     tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
@@ -494,6 +495,10 @@ def test_write_inp_file():
 
 def test_write_tem_defocus_file_from_distribution(tmp_path):
     """Test if defocus file is generated with right format."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.get_config_from_yaml(invalid_file_type)
+
     test_defocus_file = str(Path(tmp_path, "defocus_file_test.txt"))
     test_distribution_len = 10
     test_distribution = list(np.random.rand(test_distribution_len))
@@ -521,7 +526,7 @@ def test_generate_path_dict(test_resources):
         "star_file": ".star",
         "defocus_file": ".txt",
     }
-    print(test_resources)
+
     returned_paths = tem_inputs.generate_path_dict(
         test_resources["files"]["pdb_file"],
         test_resources["files"]["metadata_params_file"],
@@ -597,6 +602,10 @@ def test_get_config_from_yaml(test_resources):
         "specimen_grid_params": 4,
         "molecular_model": 3,
     }
+
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.get_config_from_yaml(invalid_file_type)
 
     test_yaml = test_resources["files"]["sim_yaml"]
     returned_config = tem_inputs.get_config_from_yaml(test_yaml)

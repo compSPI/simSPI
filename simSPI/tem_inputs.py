@@ -9,31 +9,6 @@ import numpy as np
 import yaml
 
 
-def verify_file_type(path, allowed_types):
-    """Returns true if file extension is in allowed types.
-
-    Implemented to mitigate risk :
-    https://cwe.mitre.org/data/definitions/73.html
-
-    Parameters
-    ----------
-    path : str
-        Path of file to be checked.
-    allowed_types : list
-        List of allowed file extensions.
-    Raises
-    -------
-    TypeError
-        if file extension not in allowed types.
-    """
-    logger = logging.getLogger()
-    suffix = Path(path).suffix
-
-    if suffix.lower() not in allowed_types:
-        logger.error(f"`File Path : {path} must be of type(s) {allowed_types} ")
-        raise TypeError()
-
-
 def populate_tem_input_parameter_dict(
     input_params_file,
     mrc_file,
@@ -127,11 +102,22 @@ def populate_tem_input_parameter_dict(
 
     *** miscellaneous ***
     - seed [OPTIONAL]              : seed for the run. If not present, random.
+
+    Raises
+    ------
+    TypeError
+        Raised when path has invalid extension.
     """
     parameters = None
     log = logging.getLogger()
 
-    verify_file_type(input_params_file, [".yml", ".yaml"])
+    suffix = Path(input_params_file).suffix
+    allowed_types = [".yml", ".yaml"]
+    if suffix.lower() not in allowed_types:
+        log.error(
+            f"`File Path : {input_params_file} must be of type(s) {allowed_types} "
+        )
+        raise TypeError()
 
     with open(input_params_file, "r") as f:
         parameters = yaml.safe_load(f)
@@ -355,8 +341,19 @@ def write_tem_defocus_file_from_distribution(path: str, distribution: list):
     distribution : list
         Defocus distribution.
 
+    Raises
+    ------
+    TypeError
+        Raised when path has invalid extension.
     """
-    verify_file_type(path, [".txt"])
+    log = logging.getLogger()
+    suffix = Path(path).suffix
+    allowed_types = [".txt"]
+
+    if suffix.lower() not in allowed_types:
+        log.error(f"`File Path : {path} must be of type(s) {allowed_types} ")
+        raise TypeError()
+
     with open(path, "w") as inp:
         inp.write("# File created by TEM-simulator, version 1.3.\n")
         inp.write(f"{len(distribution)} 1\n")
@@ -373,8 +370,19 @@ def write_tem_inputs_to_inp_file(path, tem_inputs):
         Relative path to input file.
     tem_inputs : dict
         Dictionary containing parameters to write.
+
+    Raises
+    ------
+    TypeError
+        Raised when path has invalid extension.
     """
-    verify_file_type(path, [".inp"])
+    log = logging.getLogger()
+    suffix = Path(path).suffix
+    allowed_types = [".inp"]
+
+    if suffix.lower() not in allowed_types:
+        log.error(f"`File Path : {path} must be of type(s) {allowed_types} ")
+        raise TypeError()
     with open(path, "w") as inp:
         inp.write(
             "=== simulation ===\n"
@@ -479,10 +487,22 @@ def retrieve_rotation_metadata(path):
     rotation_metadata : array-like, shape=[..., 3]
         N x 3 matrix representing the rotation angles , phi, theta, psi, of
         each particle in stack.
+
+    Raises
+    ------
+    TypeError
+        Raised when path has invalid extension.
     """
     rotation_metadata = []
     lines = []
-    verify_file_type(path, [".txt"])
+
+    log = logging.getLogger()
+    suffix = Path(path).suffix
+    allowed_types = [".txt"]
+
+    if suffix.lower() not in allowed_types:
+        log.error(f"`File Path : {path} must be of type(s) {allowed_types} ")
+        raise TypeError()
     with open(path) as f:
         lines = f.readlines()
 
@@ -654,8 +674,19 @@ def get_config_from_yaml(config_yaml):
                 List containing the detector parameters
             optics_params : str maps to list
                 List containing the optic parameters
+    Raises
+    ------
+    TypeError
+        Raised when config_yaml has invalid extension.
     """
-    verify_file_type(config_yaml, [".yml", ".yaml"])
+    log = logging.getLogger()
+    suffix = Path(config_yaml).suffix
+    allowed_types = [".yaml", ".yml"]
+
+    if suffix.lower() not in allowed_types:
+        log.error(f"`File Path : {config_yaml} must be of type(s) {allowed_types} ")
+        raise TypeError()
+
     with open(config_yaml, "r") as stream:
         raw_params = yaml.safe_load(stream)
 
