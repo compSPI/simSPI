@@ -14,7 +14,9 @@ def sample_class():
     """Instantiate TEMSimulator for testing."""
     test_files_path = "/work/tests/test_files/tem"
     cwd = os.getcwd()
-
+    print('debugging statements > hv60')
+    print(sample_class.sim_dict)
+    print(sample_class.output_path_dict)
     tem_simulator = tem.TEMSimulator(
         str(Path(cwd, test_files_path, "path_config.yaml")),
         str(Path(cwd, test_files_path, "sim_config.yaml")),
@@ -70,7 +72,8 @@ def test_generate_simulator_inputs(sample_class):
     """Test whether simulator required files are created."""
     sample_class.generate_simulator_inputs()
 
-    print (sample_class.sim_dict)
+    print('debugging statements > hv60')
+    print(sample_class.sim_dict)
     print(sample_class.output_path_dict)
 
     assert os.path.isfile(sample_class.output_path_dict["inp_file"])
