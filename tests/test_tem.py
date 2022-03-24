@@ -14,14 +14,14 @@ def sample_class():
     """Instantiate TEMSimulator for testing."""
     test_files_path = "/work/tests/test_files/tem"
     cwd = os.getcwd()
-    print('debugging statements > hv60')
-    print(sample_class.sim_dict)
-    print(sample_class.output_path_dict)
+
     tem_simulator = tem.TEMSimulator(
         str(Path(cwd, test_files_path, "path_config.yaml")),
         str(Path(cwd, test_files_path, "sim_config.yaml")),
     )
-
+    print('debugging statements > hv60')
+    print(tem_simulator.sim_dict)
+    print(tem_simulator.output_path_dict)
     return tem_simulator
 
 
