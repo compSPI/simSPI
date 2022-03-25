@@ -42,12 +42,15 @@
                                 # Transfer Function. [0,0,1,0,0] is perfect detector.
 
   geometry_parameters:
-    n_samples: 1                       # number of samples to be generated.
+    n_samples: 2                       # number of samples to be generated.
 
   ctf_parameters:
    distribution_type: 'uniform'        # type of distribution for generated defocus values. Range : ['gaussian','uniform'].
    distribution_parameters: [0, 1]     # distribution parameters for defocus distribution.
                                        # uniform: [low, high]. gaussian: [loc, scale].
 
+  noise_parameters:
+   signal_to_noise: 0.67       # signal-to-noise-ratio for added white noise.
+
   miscellaneous:
-    signal_to_noise: 0.67       # signal-to-noise-ratio for added white noise.
+   seed : 1234                 # seed for simulator.
