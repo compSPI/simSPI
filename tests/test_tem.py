@@ -48,6 +48,10 @@ def sample_resources():
 
 def test_temsimulator_constructor(sample_resources):
     """Test whether constructor populates attributes."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem.TEMSimulator(invalid_file_type, sample_resources["files"]["sim_yaml"])
+
     tem_sim = tem.TEMSimulator(
         sample_resources["files"]["path_yaml"], sample_resources["files"]["sim_yaml"]
     )
@@ -66,107 +70,18 @@ def test_temsimulator_constructor(sample_resources):
     assert set(parameters_dict_keys).issubset(tem_sim.parameter_dict.keys())
 
 
-def test_get_config_from_yaml(sample_resources, sample_class):
-    """Test whether yaml is parsed."""
-    expected_config_template = {
-        "beam_parameters": 4,
-        "optics_parameters": 10,
-        "detector_parameters": 11,
-        "specimen_grid_params": 3,
-        "molecular_model": 3,
-    }
+def test_generate_simulator_inputs(sample_class):
+    """Test whether simulator required files are created."""
+    sample_class.generate_simulator_inputs()
 
-    test_yaml = sample_resources["files"]["sim_yaml"]
-    returned_config = sample_class.get_config_from_yaml(test_yaml)
-
-    for config_group, config_list in returned_config.items():
-        assert config_group in expected_config_template
-        assert len(config_list) is expected_config_template[config_group]
-
-
-def test_classify_input_config(sample_class):
-    """Test classification of simulation parameters."""
-    raw_params = {
-        "molecular_model": {
-            "voxel_size_nm": 0.1,
-            "particle_name": "toto",
-            "particle_mrcout": "None",
-        },
-        "specimen_grid_params": {
-            "hole_diameter_nm": 1200,
-            "hole_thickness_center_nm": 100,
-            "hole_thickness_edge_nm": 100,
-        },
-        "beam_parameters": {
-            "voltage_kv": 300,
-            "energy_spread_v": 1.3,
-            "electron_dose_e_nm2": 100,
-            "electron_dose_std_e_per_nm2": 0,
-        },
-        "optics_parameters": {
-            "magnification": 81000,
-            "spherical_aberration_mm": 2.7,
-            "chromatic_aberration_mm": 2.7,
-            "aperture_diameter_um": 50,
-            "focal_length_mm": 3.5,
-            "aperture_angle_mrad": 0.1,
-            "defocus_um": 1.0,
-            "defocus_syst_error_um": 0.0,
-            "defocus_nonsyst_error_um": 0.0,
-            "optics_defocusout": "None",
-        },
-        "detector_parameters": {
-            "detector_nx_px": 5760,
-            "detector_ny_px": 4092,
-            "detector_pixel_size_um": 5,
-            "average_gain_count_per_electron": 2,
-            "noise": "no",
-            "detector_q_efficiency": 0.5,
-            "mtf_params": [0, 0, 1, 0, 0],
-        },
-    }
-
-    returned_params = sample_class.classify_input_config(raw_params)
-
-    for param_group_name, param_list in returned_params.items():
-        assert param_group_name in raw_params
-
-        for param_value in raw_params[param_group_name].values():
-            if type(param_value) is list:
-                for items in param_value:
-                    assert items in param_list
-            else:
-                assert param_value in param_list
-
-
-def test_generate_path_dict(sample_class, sample_resources):
-    """Test whether returned path dictionary has expected file paths."""
-    expected_path_template = {
-        "pdb_file": ".pdb",
-        "metadata_params_file": ".yaml",
-        "crd_file": ".txt",
-        "mrc_file": ".mrc",
-        "log_file": ".log",
-        "inp_file": ".inp",
-        "h5_file": ".h5",
-        "h5_file_noisy": "-noisy.h5",
-        "star_file": ".star",
-        "defocus_file": ".txt",
-    }
-    returned_paths = sample_class.generate_path_dict(
-        sample_resources["files"]["pdb_file"],
-        sample_resources["files"]["metadata_params_file"],
-    )
-    for file_type, file_path in returned_paths.items():
-        assert file_type in expected_path_template
-        directory, file = os.path.split(file_path)
-        assert os.path.isdir(directory)
-        assert expected_path_template[file_type] in file
+    assert os.path.isfile(sample_class.output_path_dict["inp_file"])
+    assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
+    assert os.path.isfile(sample_class.output_path_dict["crd_file"])
 
 
 def test_create_crd_file(sample_class):
     """Test creation of .crd file."""
-    sample_class.create_crd_file(pad=5)
+    sample_class.create_crd_file()
     assert os.path.isfile(sample_class.output_path_dict["crd_file"])
 
 
@@ -182,22 +97,37 @@ def test_create_defocus_file(sample_class):
     assert os.path.isfile(sample_class.output_path_dict["defocus_file"])
 
 
-def test_extract_particles(sample_class, sample_resources):
-    """Test extract_particles returns particles of expected shape from mrc."""
-    particles = sample_class.extract_particles(
-        sample_resources["data"]["micrograph"], 5.0
-    )
+def test_run_simulator(sample_class):
+    """Test whether mrc and log files are generated by simulator.
 
-    assert particles.shape == (
-        1,
+    Notes
+    -----
+    This test requires a local TEM sim installation to run.
+    """
+    sample_class.create_crd_file()
+    sample_class.create_inp_file()
+    sample_class.run_simulator()
+    assert os.path.isfile(sample_class.output_path_dict["log_file"])
+    assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
+
+
+def test_parse_simulator_data(sample_class, sample_resources):
+    """Test parse_simulator_data returns particles of expected shape from mrc."""
+    sample_class.generate_simulator_inputs()
+    sample_class.run_simulator()
+    micrograph, particle_stack = sample_class.parse_simulator_data()
+
+    assert particle_stack.shape == (
+        2,
         35,
         809,
         809,
     )
+    assert micrograph.shape == (2, 4092, 5760)
 
 
-def test_export_particle_stack(sample_class, sample_resources):
-    """Test if particle stack is exported as h5 file."""
+def test_export_simulated_data(sample_class, sample_resources):
+    """Test if h5 and star file associated with particle stack are created."""
     sample_class.sim_dict["molecular_model"] = [0.1, "toto", "None"]
     sample_class.sim_dict["optics_parameters"] = [
         81000,
@@ -224,8 +154,9 @@ def test_export_particle_stack(sample_class, sample_resources):
         0,
         0,
     ]
+    sample_class.generate_simulator_inputs()
 
-    particles = fov.micrograph2particles(
+    particle_stacks = fov.micrograph2particles(
         sample_resources["data"]["micrograph"][0],
         sample_class.sim_dict["optics_parameters"],
         sample_class.sim_dict["detector_parameters"],
@@ -233,42 +164,9 @@ def test_export_particle_stack(sample_class, sample_resources):
         pad=5.0,
     )
 
-    sample_class.export_particle_stack(particles)
+    sample_class.export_simulated_data(particle_stacks)
     assert os.path.isfile(sample_class.output_path_dict["h5_file"])
-    assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
-
-
-def test_get_image_data(sample_class):
-    """Test whether mrc data is generated from local tem installation.
-
-    Notes
-    -----
-    This test requires a local TEM sim installation to run.
-    """
-    sample_class.create_crd_file(pad=5)
-    sample_class.create_inp_file()
-    data = sample_class.get_image_data()
-    assert os.path.isfile(sample_class.output_path_dict["log_file"])
-    assert os.path.isfile(sample_class.output_path_dict["mrc_file"])
-    assert data.shape == (1, 4092, 5760)
-
-
-def test_run(sample_class):
-    """Test whether run returns and exports particles with expected shape.
-
-    Notes
-    -----
-    This test requires a local TEM sim installation to run.
-    """
-    particles = sample_class.run(export_particles=True)
-    assert particles.shape == (
-        1,
-        35,
-        809,
-        809,
-    )
-    assert os.path.isfile(sample_class.output_path_dict["h5_file"])
-    assert os.path.isfile(sample_class.output_path_dict["h5_file_noisy"])
+    assert os.path.isfile(sample_class.output_path_dict["star_file"])
 
 
 def test_apply_gaussian_noise(sample_class, sample_resources):
@@ -318,7 +216,7 @@ def test_apply_gaussian_noise(sample_class, sample_resources):
         AssertionError, np.testing.assert_array_equal, particles, noisy_particles
     )
 
-    sample_class.parameter_dict.pop("other", None)
+    sample_class.parameter_dict.pop("noise", None)
 
     original_particles = sample_class.apply_gaussian_noise(particles)
     np.testing.assert_array_equal(particles, original_particles)
