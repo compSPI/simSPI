@@ -6,9 +6,19 @@ requirements = []
 
 setuptools.setup(
     name="simSPI",
-    maintainer=["Frédéric Poitevin", "Nina Miolane", "Geoffrey Woollard", "Harshit Gupta"]
-    version="0.0.2",
-    maintainer_email=["frederic.poitevin@stanford.edu", "ninamiolane@ucsb.edu", "geoffwoollard@gmail.com","hgupta@slac.stanford.edu"]
+    maintainer=[
+        "Frédéric Poitevin",
+        "Nina Miolane",
+        "Geoffrey Woollard",
+        "Harshit Gupta",
+    ],
+    version="0.0.3",
+    maintainer_email=[
+        "frederic.poitevin@stanford.edu",
+        "ninamiolane@ucsb.edu",
+        "geoffwoollard@gmail.com",
+        "hgupta@slac.stanford.edu",
+    ],
     description="Methods and tools for simulating single particle imaging data",
     long_description=open("README.md", encoding="utf8").read(),
     long_description_content_type="text/markdown",
