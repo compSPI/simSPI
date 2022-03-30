@@ -2,14 +2,13 @@ name: simSPI
 channels:
   - conda-forge
   - defaults
-  - pytorch
   - pytorch3d
 dependencies:
   - codecov
   - configparser
   - coverage
   - h5py
-  - ipykernel
+  - jupyter
   - mdtraj
   - mrcfile
   - numba
@@ -24,5 +23,6 @@ dependencies:
     - geomstats
     - git+https://github.com/compSPI/compSPI.git
     - git+https://github.com/compSPI/ioSPI.git
+    - papermill
     - raster_geometry
     - starfile

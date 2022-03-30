@@ -39,6 +39,7 @@ COPY .codecov.yml /work/.codecov.yml
 COPY .coveragerc /work/.coveragerc
 COPY .flake8 /work/.flake8
 COPY simSPI /work/simSPI
+COPY notebooks /work/notebooks
 COPY tests /work/tests
 RUN . /opt/anaconda/etc/profile.d/conda.sh && conda update -c conda-forge conda
 RUN . /opt/anaconda/etc/profile.d/conda.sh && \

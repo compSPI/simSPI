@@ -1,17 +1,33 @@
 """Contain test functions for save_utils."""
 import os
 import tempfile
+from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 import yaml
 from ioSPI.particle_metadata import update_optics_config_from_starfile
 
-from simSPI.tem_inputs import (
-    populate_tem_input_parameter_dict,
-    starfile_append_tem_simulator_data,
-    write_tem_inputs_to_inp_file,
-)
+from simSPI import tem_inputs
+
+
+@pytest.fixture
+def test_resources():
+    """Return resources for testing."""
+    test_files_path = "/work/tests/test_files/tem"
+    cwd = os.getcwd()
+    resources = {
+        "files": {
+            "pdb_file": str(Path(cwd, test_files_path, "4v6x.pdb")),
+            "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
+            "metadata_params_file": str(
+                Path(cwd, test_files_path, "metadata_fields.yaml")
+            ),
+        }
+    }
+
+    return resources
 
 
 def normalized_mse(a, b):
@@ -21,11 +37,23 @@ def normalized_mse(a, b):
 
 def test_fill_parameters_dictionary_max():
     """Test fill_parameters_dictionary with maximal garbage parameters."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.populate_tem_input_parameter_dict(
+            invalid_file_type,
+            "",
+            "",
+            "",
+            "",
+            "",
+        )
+
     tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
+    defocus_file = "a.txt"
     voxel_size = 0.2
     particle_name = "africa"
     particle_mrcout = "b.mrc"
@@ -61,7 +89,9 @@ def test_fill_parameters_dictionary_max():
     snr = 0.6
     snr_db = 10
     key = particle_mrcout.split(".mrc")[0]
-
+    n_samples = 5
+    dist_type = "uniform"
+    dist_parameters = [0, 1]
     try:
         with open(tmp_yml.name, "w") as f:
             data = {
@@ -102,20 +132,28 @@ def test_fill_parameters_dictionary_max():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
-                "miscellaneous": {
-                    "seed": seed,
+                "noise_parameters": {
                     "signal_to_noise": snr,
                     "signal_to_noise_db": snr_db,
+                },
+                "miscellaneous": {
+                    "seed": seed,
+                },
+                "geometry_parameters": {"n_samples": n_samples},
+                "ctf_parameters": {
+                    "distribution_type": dist_type,
+                    "distribution_parameters": dist_parameters,
                 },
             }
             contents = yaml.dump(data)
             f.write(contents)
-        out_dict = populate_tem_input_parameter_dict(
+        out_dict = tem_inputs.populate_tem_input_parameter_dict(
             tmp_yml.name,
             mrc_file,
             pdb_file,
             crd_file,
             log_file,
+            defocus_file,
             dose=dose,
             noise=noise_override,
         )
@@ -165,8 +203,7 @@ def test_fill_parameters_dictionary_max():
         assert out_dict["detector"]["mtf_beta"] == mtf_params[4]
         assert out_dict["detector"]["image_file_out"] == mrc_file
 
-        assert out_dict["other"]["signal_to_noise"] == snr
-        assert out_dict["other"]["signal_to_noise_db"] == snr_db
+        assert out_dict["noise"]["signal_to_noise"] == snr
     finally:
         os.unlink(tmp_yml.name)
 
@@ -178,6 +215,7 @@ def test_fill_parameters_dictionary_min():
 
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
+    defocus_file = "a.txt"
     voxel_size = 0.2
     particle_name = "africa"
     crd_file = "a.crd"
@@ -204,6 +242,7 @@ def test_fill_parameters_dictionary_min():
     detector_q_efficiency = 0.1
     mtf_params = [0.1, 0.0, 0.7, 0, 0]
     log_file = "itslog.log"
+    n_samples = 5
 
     try:
         with open(tmp_yml.name, "w") as f:
@@ -242,11 +281,12 @@ def test_fill_parameters_dictionary_min():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
+                "geometry_parameters": {"n_samples": n_samples},
             }
             contents = yaml.dump(data)
             f.write(contents)
-        out_dict = populate_tem_input_parameter_dict(
-            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
+        out_dict = tem_inputs.populate_tem_input_parameter_dict(
+            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file, defocus_file
         )
 
         assert out_dict["simulation"]["log_file"] == log_file
@@ -321,12 +361,11 @@ def test_starfile_data():
         "defocus_angle": ctf_val[:, 2],
     }
     data_list = []
-    data_list = starfile_append_tem_simulator_data(
+    data_list = tem_inputs.starfile_append_tem_simulator_data(
         data_list, rot_params, ctf_params, shift_params, iterations, config
     )
     assert len(data_list) == config.batch_size
     for num, list_var in enumerate(data_list):
-
         assert isinstance(list_var[0], str)
         assert (
             normalized_mse(list_var[1], rot_params["relion_angle_rot"][num].numpy())
@@ -365,11 +404,16 @@ def test_starfile_data():
 
 def test_write_inp_file():
     """Test write_inp_file helper with output from fill_parameters_dictionary."""
-    tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".imp")
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.get_config_from_yaml(invalid_file_type)
+
+    tmp_inp = tempfile.NamedTemporaryFile(delete=False, suffix=".inp")
     tmp_inp.close()
     tmp_yml = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
     tmp_yml.close()
 
+    defocus_file = "a.txt"
     mrc_file = "a.mrc"
     pdb_file = "a.pdb"
     voxel_size = 0.2
@@ -398,7 +442,7 @@ def test_write_inp_file():
     detector_q_efficiency = 0.1
     mtf_params = [0.1, 0.0, 0.7, 0, 0]
     log_file = "itslog.log"
-
+    n_samples = 10
     try:
         with open(tmp_yml.name, "w") as f:
             data = {
@@ -436,13 +480,136 @@ def test_write_inp_file():
                     "detector_q_efficiency": detector_q_efficiency,
                     "mtf_params": mtf_params,
                 },
+                "geometry_parameters": {"n_samples": n_samples},
             }
             contents = yaml.dump(data)
             f.write(contents)
-        out_dict = populate_tem_input_parameter_dict(
-            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file
+        out_dict = tem_inputs.populate_tem_input_parameter_dict(
+            tmp_yml.name, mrc_file, pdb_file, crd_file, log_file, defocus_file
         )
-        write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
+        tem_inputs.write_tem_inputs_to_inp_file(tmp_inp.name, out_dict)
     finally:
         os.unlink(tmp_inp.name)
         os.unlink(tmp_yml.name)
+
+
+def test_write_tem_defocus_file_from_distribution(tmp_path):
+    """Test if defocus file is generated with right format."""
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.get_config_from_yaml(invalid_file_type)
+
+    test_defocus_file = str(Path(tmp_path, "defocus_file_test.txt"))
+    test_distribution_len = 10
+    test_distribution = list(np.random.rand(test_distribution_len))
+
+    tem_inputs.write_tem_defocus_file_from_distribution(
+        test_defocus_file, test_distribution
+    )
+
+    with open(test_defocus_file, "r") as generated_file:
+        rows = generated_file.readlines()
+        assert len(rows) == test_distribution_len + 2
+        assert str(test_distribution_len) in rows[1]
+
+
+def test_generate_path_dict(test_resources):
+    """Test whether returned path dictionary has expected file paths."""
+    expected_path_template = {
+        "pdb_file": ".pdb",
+        "metadata_params_file": ".yaml",
+        "crd_file": ".txt",
+        "mrc_file": ".mrc",
+        "log_file": ".log",
+        "inp_file": ".inp",
+        "h5_file": ".h5",
+        "star_file": ".star",
+        "defocus_file": ".txt",
+    }
+
+    returned_paths = tem_inputs.generate_path_dict(
+        test_resources["files"]["pdb_file"],
+        test_resources["files"]["metadata_params_file"],
+    )
+    for file_type, file_path in returned_paths.items():
+        assert file_type in expected_path_template
+        directory, file = os.path.split(file_path)
+        assert os.path.isdir(directory)
+        assert expected_path_template[file_type] in file
+
+
+def test_classify_input_config():
+    """Test classification of simulation parameters."""
+    raw_params = {
+        "molecular_model": {
+            "voxel_size_nm": 0.1,
+            "particle_name": "toto",
+            "particle_mrcout": "None",
+        },
+        "specimen_grid_params": {
+            "hole_diameter_nm": 1200,
+            "hole_thickness_center_nm": 100,
+            "hole_thickness_edge_nm": 100,
+        },
+        "beam_parameters": {
+            "voltage_kv": 300,
+            "energy_spread_v": 1.3,
+            "electron_dose_e_nm2": 100,
+            "electron_dose_std_e_per_nm2": 0,
+        },
+        "optics_parameters": {
+            "magnification": 81000,
+            "spherical_aberration_mm": 2.7,
+            "chromatic_aberration_mm": 2.7,
+            "aperture_diameter_um": 50,
+            "focal_length_mm": 3.5,
+            "aperture_angle_mrad": 0.1,
+            "defocus_um": 1.0,
+            "defocus_syst_error_um": 0.0,
+            "defocus_nonsyst_error_um": 0.0,
+            "optics_defocusout": "None",
+        },
+        "detector_parameters": {
+            "detector_nx_px": 5760,
+            "detector_ny_px": 4092,
+            "detector_pixel_size_um": 5,
+            "average_gain_count_per_electron": 2,
+            "noise": "no",
+            "detector_q_efficiency": 0.5,
+            "mtf_params": [0, 0, 1, 0, 0],
+        },
+    }
+
+    returned_params = tem_inputs.classify_input_config(raw_params)
+
+    for param_group_name, param_list in returned_params.items():
+        assert param_group_name in raw_params
+
+        for param_value in raw_params[param_group_name].values():
+            if type(param_value) is list:
+                for items in param_value:
+                    assert items in param_list
+            else:
+                assert param_value in param_list
+
+
+def test_get_config_from_yaml(test_resources):
+    """Test whether yaml is parsed."""
+    expected_config_template = {
+        "beam_parameters": 4,
+        "optics_parameters": 10,
+        "detector_parameters": 11,
+        "specimen_grid_params": 4,
+        "molecular_model": 3,
+    }
+
+    invalid_file_type = "test.test"
+    with pytest.raises(TypeError):
+        tem_inputs.get_config_from_yaml(invalid_file_type)
+
+    test_yaml = test_resources["files"]["sim_yaml"]
+    returned_config = tem_inputs.get_config_from_yaml(test_yaml)
+
+    for config_group, config_list in returned_config.items():
+        assert config_group in expected_config_template
+        assert len(config_list) is expected_config_template[config_group]

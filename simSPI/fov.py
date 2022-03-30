@@ -56,6 +56,7 @@ def define_grid_in_fov(
     x_range = np.arange(x_origin, x_frontier, boxsize)
     y_range = np.arange(y_origin, y_frontier, boxsize)
     n_particles = int(fov_nx * fov_ny)
+
     return x_range, y_range, n_particles
 
 
