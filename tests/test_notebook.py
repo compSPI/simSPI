@@ -19,6 +19,7 @@ def test_resources():
             "notebook_path": str(Path(os.getcwd(), notebooks_path)),
             "path_yaml": str(Path(cwd, test_files_path, "path_config.yaml")),
             "sim_yaml": str(Path(cwd, test_files_path, "sim_config.yaml")),
+            "sim_yaml_clean": str(Path(cwd, test_files_path, "sim_config_clean.yaml")),
         }
     }
 
@@ -57,12 +58,13 @@ def test_tem_tutorial(test_resources):
     except subprocess.CalledProcessError as exc:
         assert False, f"{notebook_name} raised exception: {exc}"
 
+
 def test_sim_tutorial(test_resources):
     """Test execution of tem_tutorial.ipynb notebook."""
     notebook_name = "/sim_tutorial.ipynb"
 
     notebook_path = test_resources["files"]["notebook_path"]
-    sim_yaml = test_resources["files"]["sim_yaml"]
+    sim_yaml = test_resources["files"]["sim_yaml_clean"]
     path_yaml = test_resources["files"]["path_yaml"]
 
     try:
