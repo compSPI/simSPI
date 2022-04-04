@@ -181,7 +181,7 @@ class TEMSimulator:
         noisy_particles = []
         snr_default = 1.0
 
-        if self.parameter_dict["noise"] == {}:
+        if "noise" not in self.parameter_dict:
             return particle_stacks
 
         for i in range(self.parameter_dict["geometry"]["n_tilts"]):
