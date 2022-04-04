@@ -1,7 +1,6 @@
-  # absolute paths
-  pdb_file: '/home/luis/simSPI/notebooks/4v6x.pdb'
-  metadata_params_file: '/home/luis/simSPI/notebooks/metadata_fields.yaml'
+  pdb_file: './simSPI/notebooks/4v6x.pdb'
+  metadata_params_file: './simSPI/notebooks/metadata_fields.yaml'
   mrc_keyword: '_randomrot'
-  output_dir: '/home/luis/simSPI/notebooks/'
-  local_sim_dir: '/home/luis/TEM-simulator_1.3/src/TEM-simulator'
+  output_dir: './simSPI/notebooks/'
+  local_sim_dir: './TEM-simulator_1.3/src/TEM-simulator'
 
