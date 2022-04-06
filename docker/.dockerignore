@@ -1,0 +1,11 @@
+.github
+.pytest_cache
+data
+simSPI.egg-info
+.deepsource.toml
+.gitignore
+.pre-commit-config.yaml
+dev-requirements.txt
+environment-mac.yml
+path-config.yaml
+sim-config.yaml
