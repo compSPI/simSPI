@@ -2,7 +2,7 @@ name: "Building simSPI Container"
 
 on:
   push:
-    branches: [master, github-actions-test, update-container]
+    branches: [master, github-actions-test, update-container, fix-dockerignore]
     paths:
       - 'docker/Dockerfile'
       - 'docker/entrypoint.sh'
