@@ -1,5 +1,5 @@
 **/*
-!environment.yaml
+!environment.yml
 !setup.py
 !pytest.ini
 !.codecov.yml
