@@ -1,4 +1,5 @@
 **/*
+!README.md
 !environment.yml
 !setup.py
 !pytest.ini
