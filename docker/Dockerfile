@@ -31,17 +31,6 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
 
 # Copy the code and generate the environment
 COPY . /work/
-# Remains to be done: COPY all and remove the fat later, instead-of multiplying layers:
-#COPY environment.yml /work/environment.yml
-#COPY README.md /work/README.md
-#COPY setup.py /work/setup.py
-#COPY pytest.ini /work/pytest.ini
-#COPY .codecov.yml /work/.codecov.yml
-#COPY .coveragerc /work/.coveragerc
-#COPY .flake8 /work/.flake8
-#COPY simSPI /work/simSPI
-#COPY notebooks /work/notebooks
-#COPY tests /work/tests
 RUN . /opt/anaconda/etc/profile.d/conda.sh && conda update -c conda-forge conda
 RUN . /opt/anaconda/etc/profile.d/conda.sh && \
     conda env update --name base --file environment.yml && \

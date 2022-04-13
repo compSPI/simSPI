@@ -1,0 +1,12 @@
+**/*
+!README.md
+!environment.yml
+!setup.py
+!pytest.ini
+!.codecov.yml
+!.coveragerc
+!.flake8
+!simSPI/**
+!notebooks/**
+!tests/**
+!docker/**
