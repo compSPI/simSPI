@@ -40,6 +40,9 @@
     detector_q_efficiency: 0.5  # detector quantum efficiency. Range : [10^-2,1]. Only used if noise is 'yes'.
     mtf_params: [0,0,1,0,0]     # parameters [mtf_a,mtf_b,mtf_c,mtf_alpha,mtf_beta] specifying the shape of the Modular
                                 # Transfer Function. [0,0,1,0,0] is perfect detector.
+  ctf_parameters:
+    distribution_type: 'gaussian'   #gaussian distribution for ctf parameters
+    distribution_parameters: [1, 2] #defocus parameters: 1 and 2 microns
 
   geometry_parameters:
     n_samples: 1                       # number of samples to be generated.
