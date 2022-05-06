@@ -1,6 +1,7 @@
 """Test function for projector module."""
 
 import numpy as np
+import torch
 
 from simSPI.linear_simulator.projector import Projector
 
@@ -40,6 +41,7 @@ def init_data(path):
         config_dict = saved_data["config_dict"]
     else:
         config_dict = {}
+    config_dict["space"] = "real"
     config = AttrDict(config_dict)
     return saved_data, config
 
@@ -63,11 +65,12 @@ def normalized_mse(a, b):
     return (a - b).pow(2).sum().sqrt() / a.pow(2).sum().sqrt()
 
 
-def test_projector():
+def test_projector_real():
     """Test accuracy of projector function."""
     path = "tests/data/projector_data.npy"
 
     saved_data, config = init_data(path)
+    config.space = "real"
     rot_params = saved_data["rot_params"]
     projector = Projector(config)
     projector.vol = saved_data["volume"]
@@ -75,3 +78,27 @@ def test_projector():
     out = projector(rot_params)
     error = normalized_mse(saved_data["projector_output"], out).item()
     assert (error < 0.01) == 1
+
+def test_projector_fourier():
+    """Test accuracy of projector function."""
+    path = "tests/data/projector_data.npy"
+
+    saved_data, config = init_data(path)
+    config.space = "fourier"
+    rot_params = saved_data["rot_params"]
+    projector = Projector(config)
+    print(saved_data["volume"])
+    projector.vol = torch.fft.fftshift(torch.fft.fftn(torch.fft.fftshift(saved_data["volume"])))
+
+    out = projector(rot_params)
+    fft_proj_out = torch.fft.fftshift(torch.fft.fft2(torch.fft.fftshift(saved_data["projector_output"],dim=(2,3))),dim=(2,3))
+    print(out.dtype)
+    print(fft_proj_out[0,0,0])
+    print(out[0,0,0])
+    print((fft_proj_out.real/out.real).median())
+    print(out.shape[0],np.sqrt(out.shape[0]),1.0/np.sqrt(out.shape[0]))
+    error_r = normalized_mse(fft_proj_out.real, out.real).item()
+    error_i = normalized_mse(fft_proj_out.imag, out.imag).item()
+    assert (error_r < 0.01) == 1
+    assert (error_i < 0.01) == 1
+
