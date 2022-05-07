@@ -84,7 +84,12 @@ class Projector(torch.nn.Module):
         rotmat = rot_params["rotmat"]
         batch_sz = rotmat.shape[0]
         
+        print(rotmat[0])
+        rotmat = torch.transpose(rotmat,-1,-2)
+        print(rotmat[0])
         rot_vol_coords = self.vol_coords.repeat((batch_sz, 1, 1)).bmm(rotmat[:, :2, :])
+        print(rot_vol_coords[0])
+        print(rot_vol_coords[1])
         
         # rescale the coordinates to be compatible with the edge alignment of torch.nn.functional.grid_sample
         if 0 == self.config.side_len % 2:  # even case
