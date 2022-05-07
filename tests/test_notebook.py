@@ -71,3 +71,15 @@ def test_sim_tutorial(test_resources):
         _exec_notebook(notebook_path + notebook_name, path_yaml, sim_yaml)
     except subprocess.CalledProcessError as exc:
         assert False, f"{notebook_name} raised exception: {exc}"
+
+
+def test_micrographs(test_resources):
+    """Test execution of micrographs.ipynb notebook."""
+    notebook_name = "/micrographs.ipynb"
+
+    notebook_path = test_resources["files"]["notebook_path"]
+
+    try:
+        _exec_notebook(notebook_path + notebook_name)
+    except subprocess.CalledProcessError as exc:
+        assert False, f"{notebook_name} raised exception: {exc}"
