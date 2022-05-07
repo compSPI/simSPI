@@ -80,6 +80,6 @@ def test_micrographs(test_resources):
     notebook_path = test_resources["files"]["notebook_path"]
 
     try:
-        _exec_notebook(notebook_path + notebook_name)
+        _exec_notebook(notebook_path + notebook_name, "", "")
     except subprocess.CalledProcessError as exc:
         assert False, f"{notebook_name} raised exception: {exc}"
