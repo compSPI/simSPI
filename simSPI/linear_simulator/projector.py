@@ -34,8 +34,6 @@ class Projector(torch.nn.Module):
                 * 3
             )
             coords = torch.stack([y, x, z], dim=-1)
-            # Rescale coordinates to [-1,1] to be compatible with torch.nn.functional.grid_sample
-            coords = 2 * coords
 
             self.register_buffer("vol_coords", coords.reshape(-1, 3))
         elif self.space == "fourier":
@@ -50,6 +48,8 @@ class Projector(torch.nn.Module):
                 * 2
             )
             coords = torch.stack([y, x], dim=-1)
+            # Rescale coordinates to [-1,1] to be compatible with torch.nn.functional.grid_sample
+            coords = 2 * coords
             self.register_buffer("vol_coords", coords.reshape(-1, 2))
 
     def forward(self, rot_params, proj_axis=-1):
@@ -83,8 +83,21 @@ class Projector(torch.nn.Module):
 
         rotmat = rot_params["rotmat"]
         batch_sz = rotmat.shape[0]
+        
         rot_vol_coords = self.vol_coords.repeat((batch_sz, 1, 1)).bmm(rotmat[:, :2, :])
-
+        
+        # rescale the coordinates to be compatible with the edge alignment of torch.nn.functional.grid_sample
+        if 0 == self.config.side_len % 2:  # even case
+            rot_vol_coords = (
+                (rot_vol_coords + 1)
+                * (self.config.side_len )
+                / (self.config.side_len-1)
+            ) - 1
+        else:  # odd case
+            rot_vol_coords = (
+                (rot_vol_coords) * (self.config.side_len ) / (self.config.side_len-1)
+            )
+            
         projection = torch.empty(
             (batch_sz, self.config.side_len, self.config.side_len),
             dtype=torch.complex64,
@@ -132,17 +145,6 @@ class Projector(torch.nn.Module):
         t = Rotate(rotmat, device=self.vol_coords.device)
         rot_vol_coords = t.transform_points(self.vol_coords.repeat(batch_sz, 1, 1))
 
-        # rescale the coordinates to be compatible with the edge alignment of torch.nn.functional.grid_sample
-        if 0 == self.config.side_len % 2:  # even case
-            rot_vol_coords = (
-                (rot_vol_coords + 1)
-                * (self.config.side_len + 1)
-                / (self.config.side_len)
-            ) - 1
-        else:  # odd case
-            rot_vol_coords = (
-                (rot_vol_coords) * (self.config.side_len + 1) / (self.config.side_len)
-            )
 
         rot_vol = torch.nn.functional.grid_sample(
             self.vol.repeat(batch_sz, 1, 1, 1, 1),

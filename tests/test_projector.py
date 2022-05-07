@@ -86,10 +86,17 @@ def test_projector_fourier():
     saved_data, config = init_data(path)
     config.space = "fourier"
     rot_params = saved_data["rot_params"]
+    #rot_params["rotmat"].data[0]=torch.tensor([[1,0,0],[0,1,0],[0,0,1]])
+    #print(rot_params["rotmat"])
     projector = Projector(config)
-    print(saved_data["volume"])
+    #print(saved_data["volume"])
     projector.vol = torch.fft.fftshift(torch.fft.fftn(torch.fft.fftshift(saved_data["volume"])))
-
+    
+    print(projector.vol.shape)
+    sz = projector.vol.shape[0]
+    print("vol_coords", projector.vol_coords)
+    print("Vol Center", projector.vol[sz//2,sz//2,sz//2])
+    
     out = projector(rot_params)
     fft_proj_out = torch.fft.fftshift(torch.fft.fft2(torch.fft.fftshift(saved_data["projector_output"],dim=(2,3))),dim=(2,3))
     print(out.dtype)
