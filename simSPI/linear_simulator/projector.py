@@ -1,6 +1,5 @@
 """Class to generate tomographic projection."""
 
-import numpy as np
 import torch
 from pytorch3d.transforms import Rotate
 
@@ -48,11 +47,18 @@ class Projector(torch.nn.Module):
                 * 2
             )
             coords = torch.stack([y, x], dim=-1)
-            # Rescale coordinates to [-1,1] to be compatible with torch.nn.functional.grid_sample
+            # Rescale coordinates to [-1,1] to be compatible with
+            # torch.nn.functional.grid_sample
             coords = 2 * coords
             self.register_buffer("vol_coords", coords.reshape(-1, 2))
 
     def forward(self, rot_params, proj_axis=-1):
+        """Forward method for projection.
+
+        Parameters
+        ----------
+        rot_params : tensor of rotation matrices
+        """
         if self.space == "real":
             return self._forward_real(rot_params, proj_axis)
         elif self.space == "fourier":
@@ -79,41 +85,41 @@ class Projector(torch.nn.Module):
         projection: tensor
             Tensor containing tomographic projection in the Fourier domain
             (batch_size x 1 x sidelen x sidelen)
-        
+
         Comments
         --------
-        Note that the Fourier volumes are arbitrary channel x height x width complex valued tensors, 
+        Note that the Fourier volumes are arbitrary 
+        channel x height x width complex valued tensors,
         they are not assumed to be Fourier transforms of a real valued 3D functions.
-        
-        Note that the tomographic projection is interpolated on a rotated 2D grid. 
-        The rotated 2D grid extends outside the boundaries of the 3D grid. 
-        The values outside the boundaries are not defined in a useful way. 
+
+        Note that the tomographic projection is interpolated on a rotated 2D grid.
+        The rotated 2D grid extends outside the boundaries of the 3D grid.
+        The values outside the boundaries are not defined in a useful way.
         Therefore, in most applications, it make sense to apply a radial filter to the sample.
 
         """
-
         rotmat = rot_params["rotmat"]
         batch_sz = rotmat.shape[0]
-        
-        #print(rotmat[0])
-        rotmat = torch.transpose(rotmat,-1,-2)
-        #print(rotmat[0])
+
+        # print(rotmat[0])
+        rotmat = torch.transpose(rotmat, -1, -2)
+        # print(rotmat[0])
         rot_vol_coords = self.vol_coords.repeat((batch_sz, 1, 1)).bmm(rotmat[:, :2, :])
-        #print(rot_vol_coords[0])
-        #print(rot_vol_coords[1])
-        
+        # print(rot_vol_coords[0])
+        # print(rot_vol_coords[1])
+
         # rescale the coordinates to be compatible with the edge alignment of torch.nn.functional.grid_sample
         if 0 == self.config.side_len % 2:  # even case
             rot_vol_coords = (
                 (rot_vol_coords + 1)
-                * (self.config.side_len )
-                / (self.config.side_len-1)
+                * (self.config.side_len)
+                / (self.config.side_len - 1)
             ) - 1
         else:  # odd case
             rot_vol_coords = (
-                (rot_vol_coords) * (self.config.side_len ) / (self.config.side_len-1)
+                (rot_vol_coords) * (self.config.side_len) / (self.config.side_len - 1)
             )
-            
+
         projection = torch.empty(
             (batch_sz, self.config.side_len, self.config.side_len),
             dtype=torch.complex64,
@@ -121,7 +127,7 @@ class Projector(torch.nn.Module):
         # interpolation is decomposed to real and imaginary parts due to torch grid_sample type rules. Requires data and coordinates of same type.
         # padding_mode="reflection" is required due to possible pathologies right on the border.
         # however, padding_mode="zeros" is what users might expect in most cases other than these axis aligned cases.
-        padding_mode="zeros"
+        padding_mode = "zeros"
         projection.real = torch.nn.functional.grid_sample(
             self.vol.real.repeat((batch_sz, 1, 1, 1, 1)),
             rot_vol_coords[:, None, None, :, :],
@@ -166,7 +172,6 @@ class Projector(torch.nn.Module):
         batch_sz = rotmat.shape[0]
         t = Rotate(rotmat, device=self.vol_coords.device)
         rot_vol_coords = t.transform_points(self.vol_coords.repeat(batch_sz, 1, 1))
-
 
         rot_vol = torch.nn.functional.grid_sample(
             self.vol.repeat(batch_sz, 1, 1, 1, 1),
