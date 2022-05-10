@@ -88,14 +88,15 @@ class Projector(torch.nn.Module):
 
         Comments
         --------
-        Note that the Fourier volumes are arbitrary 
+        Note that the Fourier volumes are arbitrary
         channel x height x width complex valued tensors,
         they are not assumed to be Fourier transforms of a real valued 3D functions.
 
         Note that the tomographic projection is interpolated on a rotated 2D grid.
         The rotated 2D grid extends outside the boundaries of the 3D grid.
         The values outside the boundaries are not defined in a useful way.
-        Therefore, in most applications, it make sense to apply a radial filter to the sample.
+        Therefore, in most applications, it make sense to apply a radial filter
+        to the sample.
 
         """
         rotmat = rot_params["rotmat"]
@@ -108,7 +109,8 @@ class Projector(torch.nn.Module):
         # print(rot_vol_coords[0])
         # print(rot_vol_coords[1])
 
-        # rescale the coordinates to be compatible with the edge alignment of torch.nn.functional.grid_sample
+        # rescale the coordinates to be compatible with the edge alignment of
+        # torch.nn.functional.grid_sample
         if 0 == self.config.side_len % 2:  # even case
             rot_vol_coords = (
                 (rot_vol_coords + 1)
@@ -124,9 +126,12 @@ class Projector(torch.nn.Module):
             (batch_sz, self.config.side_len, self.config.side_len),
             dtype=torch.complex64,
         )
-        # interpolation is decomposed to real and imaginary parts due to torch grid_sample type rules. Requires data and coordinates of same type.
-        # padding_mode="reflection" is required due to possible pathologies right on the border.
-        # however, padding_mode="zeros" is what users might expect in most cases other than these axis aligned cases.
+        # interpolation is decomposed to real and imaginary parts due to torch
+        # grid_sample type rules. Requires data and coordinates of same type.
+        # padding_mode="reflection" is required due to possible pathologies
+        # right on the border.
+        # however, padding_mode="zeros" is what users might expect in most
+        # cases other than these axis aligned cases.
         padding_mode = "zeros"
         projection.real = torch.nn.functional.grid_sample(
             self.vol.real.repeat((batch_sz, 1, 1, 1, 1)),

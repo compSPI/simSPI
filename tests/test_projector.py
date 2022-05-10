@@ -82,9 +82,9 @@ def test_projector_real():
 
 def test_projector_fourier():
     """Test accuracy of projector function.
+
     Note: corrent test only checks that the scaling is compatible.
     """
-
     path = "tests/data/projector_data.npy"
 
     saved_data, config = init_data(path)
@@ -102,8 +102,7 @@ def test_projector_fourier():
     fft_proj_out = torch.fft.fft2(
         torch.fft.fftshift(saved_data["projector_output"], dim=(2, 3))
     )
-    # for j in range(fft_proj_out.shape[0]):
-    #    print("image relative error ", j, (fft_proj_out[j]-out[j]).norm()/fft_proj_out[j].norm())
+
     print(out.dtype)
     print("ratio", sz, (fft_proj_out.real / out.real).median())
     print("ratio", sz, 1 / (fft_proj_out.real[0, 0, 0, 0] / out.real[0, 0, 0, 0]))
