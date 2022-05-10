@@ -3,3 +3,4 @@
 temp_workspace/*
 data/pdb_files/*
 notebooks/.ipynb_checkpoints
+.ipynb_checkpoints/
