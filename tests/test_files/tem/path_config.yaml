@@ -1,8 +1,7 @@
   # absolute paths
-  pdb_file: '/Users/bogdan/Work/cryoem/compspi/simSPI/tests/test_files/tem/4v6x.pdb'
-  metadata_params_file: '/Users/bogdan/Work/cryoem/compspi/simSPI/tests/test_files/tem/metadata_fields.yaml'
+  pdb_file: '/work/tests/test_files/tem/4v6x.pdb'
+  metadata_params_file: '/work/tests/test_files/tem/metadata_fields.yaml'
   mrc_keyword: '_randomrot'
-  output_dir: '/Users/bogdan/Work/cryoem/compspi/simSPI/tests/test_files/tem'
-  local_sim_dir: '/Users/bogdan/Work/cryoem/compspi/simSPI/TEM-simulator_1.3/src/TEM-simulator'
-    #TODO: change all these to /work/ before committing
+  output_dir: '/work/tests/test_files/tem'
+  local_sim_dir: '/work/TEM-simulator_1.3/src/TEM-simulator'
 

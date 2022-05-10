@@ -10,10 +10,9 @@ import pytest
 @pytest.fixture
 def test_resources():
     """Return resources for testing."""
-    test_files_path = "/Users/bogdan/Work/cryoem/compspi/simSPI/tests/test_files/tem"
-    #TODO: change this and below to /work/ before comit
+    test_files_path = "/work/tests/test_files/tem"
 
-    notebooks_path = "/Users/bogdan/Work/cryoem/compspi/simSPI/notebooks/"
+    notebooks_path = "/work/notebooks/"
     cwd = os.getcwd()
     resources = {
         "files": {
