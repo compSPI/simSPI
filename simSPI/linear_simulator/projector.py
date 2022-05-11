@@ -65,7 +65,7 @@ class Projector(torch.nn.Module):
         """
         if self.space == "real":
             return self._forward_real(rot_params, proj_axis)
-        
+
         if self.space == "fourier":
             if proj_axis != -1:
                 raise NotImplementedError(
