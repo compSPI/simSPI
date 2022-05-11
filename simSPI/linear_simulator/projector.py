@@ -111,7 +111,7 @@ class Projector(torch.nn.Module):
 
         # rescale the coordinates to be compatible with the edge alignment of
         # torch.nn.functional.grid_sample
-        if 0 == self.config.side_len % 2:  # even case
+        if self.config.side_len % 2 == 0:  # even case
             rot_vol_coords = (
                 (rot_vol_coords + 1)
                 * (self.config.side_len)
