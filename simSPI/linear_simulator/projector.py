@@ -68,7 +68,9 @@ class Projector(torch.nn.Module):
         
         if self.space == "fourier":
             if proj_axis != -1:
-                raise NotImplementedError("proj_axis must currently be -1 for Fourier space projection")
+                raise NotImplementedError(
+                    "proj_axis must currently be -1 for Fourier space projection"
+                )
             return self._forward_fourier(rot_params)
         raise NotImplementedError(
             f"Space type '{self.space}' " f"has not been implemented!"
