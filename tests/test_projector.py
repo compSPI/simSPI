@@ -107,8 +107,3 @@ def test_projector_fourier():
     print("ratio", sz, 1 / (fft_proj_out.real[0, 0, 0, 0] / out.real[0, 0, 0, 0]))
     print("ratio", sz, 1 / (fft_proj_out.real[:, 0, 0, 0] / out.real[:, 0, 0, 0]))
     assert 0.01 > (fft_proj_out.real[0, 0, 0, 0] / out.real[0, 0, 0, 0] - 1).abs()
-    # print(out.shape[0],np.sqrt(out.shape[0]),1.0/np.sqrt(out.shape[0]))
-    # error_r = normalized_mse(fft_proj_out.real, out.real).item()
-    # error_i = normalized_mse(fft_proj_out.imag, out.imag).item()
-    # assert (error_r < 0.01) == 1
-    # assert (error_i < 0.01) == 1
