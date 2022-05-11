@@ -11,7 +11,6 @@ import pytest
 def test_resources_tem_sim():
     """Return resources for testing the sim_tutorial and the tem_tutorial notebooks."""
     test_files_path = "/work/tests/test_files/tem"
-
     notebooks_path = "/work/notebooks/"
     cwd = os.getcwd()
     resources = {
@@ -28,12 +27,12 @@ def test_resources_tem_sim():
 
 @pytest.fixture
 def test_resources_linsim():
-    """Return resources for testing the linear_simulator_tutorial notebook."""
+    """Return resources for testing the linearsimulator_tutorial notebook."""
     test_data_path = "/work/tests/data/"
     notebooks_path = "/work/notebooks/"
     cwd = os.getcwd()
     resources = {
-        "notebook_path": str(Path(os.getcwd(), notebooks_path)),
+        "notebook_path": str(Path(cwd, notebooks_path)),
         "arg_paths": {
             "vol_path": str(Path(cwd, test_data_path, "linear_simulator_vol.mrc")),
             "data_path": str(Path(cwd, test_data_path, "linear_simulator_data.npy")),
@@ -86,7 +85,7 @@ def test_tem_tutorial(test_resources_tem_sim):
 
 
 def test_sim_tutorial(test_resources_tem_sim):
-    """Test execution of tem_tutorial.ipynb notebook."""
+    """Test execution of sim_tutorial.ipynb notebook."""
     notebook_name = "/sim_tutorial.ipynb"
     notebook_path = test_resources_tem_sim["notebook_path"]
 
@@ -98,7 +97,7 @@ def test_sim_tutorial(test_resources_tem_sim):
         assert False, f"{notebook_name} raised exception: {exc}"
 
 
-def test_linear_simulator(test_resources_linsim):
+def test_linearsimulator_tutorial(test_resources_linsim):
     """Test execution of the linearsimulator_tutorial.ipynb notebook."""
     notebook_name = "/linearsimulator_tutorial.ipynb"
     notebook_path = test_resources_linsim["notebook_path"]
