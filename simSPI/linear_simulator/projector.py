@@ -65,14 +65,14 @@ class Projector(torch.nn.Module):
         """
         if self.space == "real":
             return self._forward_real(rot_params, proj_axis)
-        elif self.space == "fourier":
+        
+        if self.space == "fourier":
             if proj_axis != -1:
                 raise NotImplementedError("proj_axis must currently be -1 for Fourier space projection")
             return self._forward_fourier(rot_params)
-        else:
-            raise NotImplementedError(
-                f"Space type '{self.space}' " f"has not been implemented!"
-            )
+        raise NotImplementedError(
+            f"Space type '{self.space}' " f"has not been implemented!"
+        )
 
     def _forward_fourier(self, rot_params):
         """Output the tomographic projection of the volume in Fourier space.
