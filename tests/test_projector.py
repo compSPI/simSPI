@@ -41,7 +41,6 @@ def init_data(path):
         config_dict = saved_data["config_dict"]
     else:
         config_dict = {}
-    config_dict["space"] = "real"
     config = AttrDict(config_dict)
     return saved_data, config
 
@@ -70,7 +69,7 @@ def test_projector_real():
     path = "tests/data/projector_data.npy"
 
     saved_data, config = init_data(path)
-    config.space = "real"
+    config["space"] = "real"
     rot_params = saved_data["rot_params"]
     projector = Projector(config)
     projector.vol = saved_data["volume"]
@@ -88,7 +87,7 @@ def test_projector_fourier():
     path = "tests/data/projector_data.npy"
 
     saved_data, config = init_data(path)
-    config.space = "fourier"
+    config["space"] = "fourier"
     rot_params = saved_data["rot_params"]
     projector = Projector(config)
     projector.vol = torch.fft.fftshift(
