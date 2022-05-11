@@ -8,6 +8,8 @@
 
 Methods and tools for simulating SPI data.
 
+![simSPI](docs/simSPI.png)
+
 # Download
 
 First download:
