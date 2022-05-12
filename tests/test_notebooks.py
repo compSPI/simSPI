@@ -102,13 +102,17 @@ def test_linearsimulator_tutorial(test_resources_linsim):
     notebook_name = "/linearsimulator_tutorial.ipynb"
     notebook_path = test_resources_linsim["notebook_path"]
 
-    print("Testing ls")
     os.system("pwd")
+    print("Testing ls")
     os.system("ls")
+    print("Testing ls notebooks")
     os.system("ls notebooks/")
+    print("Testing ls tests")
     os.system("ls tests/")
 
+    print("Testing ls /work/notebooks")
     os.system("ls /work/notebooks/")
+    print("Testing ls /work/tests")
     os.system("ls /work/tests/")
 
     try:

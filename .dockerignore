@@ -10,3 +10,4 @@
 !notebooks/**
 !tests/**
 !docker/**
+!notebooks/linearsimulator_tutorial.ipynb
