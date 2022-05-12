@@ -66,8 +66,6 @@ def _exec_notebook(path, arg_paths):
     for arg_name, arg_val in arg_paths.items():
         args.extend(["-p", arg_name, arg_val])
 
-    print(" ".join(args))
-
     subprocess.check_call(args)
 
 
@@ -101,19 +99,6 @@ def test_linearsimulator_tutorial(test_resources_linsim):
     """Test execution of the linearsimulator_tutorial.ipynb notebook."""
     notebook_name = "/linearsimulator_tutorial.ipynb"
     notebook_path = test_resources_linsim["notebook_path"]
-
-    os.system("pwd")
-    print("Testing ls")
-    os.system("ls")
-    print("Testing ls notebooks")
-    os.system("ls notebooks/")
-    print("Testing ls tests")
-    os.system("ls tests/")
-
-    print("Testing ls /work/notebooks")
-    os.system("ls /work/notebooks/")
-    print("Testing ls /work/tests")
-    os.system("ls /work/tests/")
 
     try:
         _exec_notebook(
