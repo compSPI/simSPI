@@ -60,7 +60,7 @@ def _exec_notebook(path, arg_paths):
         path,
         file_name,
         "--execution-timeout",
-        "180",
+        "360",
     ]
 
     for arg_name, arg_val in arg_paths.items():
