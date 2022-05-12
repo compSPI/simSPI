@@ -102,6 +102,15 @@ def test_linearsimulator_tutorial(test_resources_linsim):
     notebook_name = "/linearsimulator_tutorial.ipynb"
     notebook_path = test_resources_linsim["notebook_path"]
 
+    print("Testing ls")
+    os.system("pwd")
+    os.system("ls")
+    os.system("ls notebooks/")
+    os.system("ls tests/")
+
+    os.system("ls /work/notebooks/")
+    os.system("ls /work/tests/")
+
     try:
         _exec_notebook(
             notebook_path + notebook_name, test_resources_linsim["arg_paths"]
