@@ -31,6 +31,8 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &
 
 # Copy the code and generate the environment
 COPY . /work/
+COPY notebooks /work/notebooks
+
 RUN . /opt/anaconda/etc/profile.d/conda.sh && conda update -c conda-forge conda
 RUN . /opt/anaconda/etc/profile.d/conda.sh && \
     conda env update --name base --file environment.yml && \
