@@ -3,5 +3,4 @@
   metadata_params_file: './notebooks/metadata_fields.yaml'
   mrc_keyword: '_randomrot'
   output_dir: './notebooks/'
-  local_sim_dir: '/work/TEM-simulator_1.3/src/TEM-simulator'
-
+  local_sim_dir: './TEM-simulator_1.3/src/TEM-simulator'
