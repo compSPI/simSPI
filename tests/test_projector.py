@@ -1,6 +1,7 @@
 """Test function for projector module."""
 
 import numpy as np
+import torch
 
 from simSPI.linear_simulator.projector import Projector
 
@@ -63,11 +64,12 @@ def normalized_mse(a, b):
     return (a - b).pow(2).sum().sqrt() / a.pow(2).sum().sqrt()
 
 
-def test_projector():
+def test_projector_real():
     """Test accuracy of projector function."""
     path = "tests/data/projector_data.npy"
 
     saved_data, config = init_data(path)
+    config["space"] = "real"
     rot_params = saved_data["rot_params"]
     projector = Projector(config)
     projector.vol = saved_data["volume"]
@@ -75,3 +77,33 @@ def test_projector():
     out = projector(rot_params)
     error = normalized_mse(saved_data["projector_output"], out).item()
     assert (error < 0.01) == 1
+
+
+def test_projector_fourier():
+    """Test accuracy of projector function.
+
+    Note: corrent test only checks that the scaling is compatible.
+    """
+    path = "tests/data/projector_data.npy"
+
+    saved_data, config = init_data(path)
+    config["space"] = "fourier"
+    rot_params = saved_data["rot_params"]
+    projector = Projector(config)
+    projector.vol = torch.fft.fftshift(
+        torch.fft.fftn(torch.fft.fftshift(saved_data["volume"], dim=[-3, -2, -1])),
+        dim=[-3, -2, -1],
+    )
+
+    sz = projector.vol.shape[0]
+
+    out = projector(rot_params)
+    fft_proj_out = torch.fft.fft2(
+        torch.fft.fftshift(saved_data["projector_output"], dim=(2, 3))
+    )
+
+    print(out.dtype)
+    print("ratio", sz, (fft_proj_out.real / out.real).median())
+    print("ratio", sz, 1 / (fft_proj_out.real[0, 0, 0, 0] / out.real[0, 0, 0, 0]))
+    print("ratio", sz, 1 / (fft_proj_out.real[:, 0, 0, 0] / out.real[:, 0, 0, 0]))
+    assert 0.01 > (fft_proj_out.real[0, 0, 0, 0] / out.real[0, 0, 0, 0] - 1).abs()
