@@ -70,7 +70,7 @@ def normalized_mse(a, b):
 
 def test_simulator():
     """Test accuracy of linear forward model."""
-    path = "tests/data/linear_simulator_data.npy"
+    path = "tests/data/linear_simulator_data.yml"
 
     saved_data, config = init_data(path)
     rot_params = saved_data["rot_params"]
@@ -83,7 +83,7 @@ def test_simulator():
 
     assert normalized_mse(saved_data["final_output"].real, out) < 0.01
 
-    path = "tests/data/linear_simulator_data_cube.npy"
+    path = "tests/data/linear_simulator_data_cube.yml"
 
     saved_data, config = init_data(path)
     with mrcfile.new(config.input_volume_path, overwrite=True) as m:
