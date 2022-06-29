@@ -3,7 +3,7 @@
 import os
 
 import mrcfile
-import numpy as np
+import yaml
 
 from simSPI.linear_simulator.linear_simulator import LinearSimulator
 
@@ -26,7 +26,7 @@ class AttrDict(dict):
 def init_data(path):
     """Load data for the test functions.
 
-    Loads .npy file from a path and converts its config dictionary into a class
+    Loads .yml file from a path and converts its config dictionary into a class
 
     Parameters
     ----------
@@ -38,12 +38,13 @@ def init_data(path):
         loaded dictionary
     config: object
     """
-    saved_data = np.load(path, allow_pickle=True).item()
+    with open(path) as f:
+        saved_data = yaml.load(f, Loader=yaml.Loader)
     if "config_dict" in saved_data:
         config_dict = saved_data["config_dict"]
-
     else:
         config_dict = {}
+
     config = AttrDict(config_dict)
     return saved_data, config
 
